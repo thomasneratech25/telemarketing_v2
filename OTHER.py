@@ -1,13 +1,17 @@
 import os
 import re
+import sys
 import time
 import json
 import socket
 import atexit
+import logging
 import requests
 import subprocess
+from pathlib import Path
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from colorama import Fore, Style
 from urllib.parse import urlencode
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
@@ -19,6 +23,26 @@ from playwright.sync_api import sync_playwright, expect
 # Load MongoDB API Key 
 load_dotenv("/Users/nera_thomas/Desktop/Telemarketing/api/mongodb/.env")
 MONGODB_URI = os.getenv("MONGODB_API_KEY")
+
+# Logging configuration
+LOG_DIR = Path(__file__).resolve().parent / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+logger = logging.getLogger("log_files")
+if not logger.handlers:
+    logger.setLevel(logging.INFO)
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+
+    file_handler = logging.FileHandler(LOG_DIR / "superswan_errors.log", encoding="utf-8")
+    file_handler.setLevel(logging.ERROR)
+    file_handler.setFormatter(formatter)
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.INFO)
+    stream_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
+    logger.addHandler(stream_handler)
 
 # Chrome Settings
 class Automation:
@@ -270,7 +294,7 @@ class mongodb_2_gs:
 
         # Call MongoDB database and collection
         client = MongoClient(MONGODB_URI)
-        db = client["Telemarketing"]
+        db = client["OTHER"]
         collection = db[collection]
 
         # Set and Ensure when upload data this 3 Field are Unique Data
@@ -389,7 +413,7 @@ class mongodb_2_gs:
                 raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
             client = MongoClient(MONGODB_URI)
 
-            db = client["Telemarketing"]
+            db = client["OTHER"]
             collection = db[collection]
             documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
             rows = documents
@@ -435,7 +459,7 @@ class mongodb_2_gs:
 
         # Call MongoDB database and collection
         client = MongoClient(MONGODB_URI)
-        db = client["Telemarketing"]
+        db = client["OTHER"]
         collection = db[collection]
 
         # Set and Ensure when upload data this 3 Field is Unique Data
@@ -548,7 +572,7 @@ class mongodb_2_gs:
                 raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
             client = MongoClient(MONGODB_URI)
 
-            db = client["Telemarketing"]
+            db = client["OTHER"]
             collection = db[collection]
             documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
             rows = documents
@@ -594,7 +618,7 @@ class mongodb_2_gs:
 
         # Call MongoDB database and collection
         client = MongoClient(MONGODB_URI)
-        db = client["Telemarketing"]
+        db = client["OTHER"]
         collection = db[collection]
 
         # Set and Ensure when upload data this 3 Field is Unique Data
@@ -709,7 +733,7 @@ class mongodb_2_gs:
                 raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
             client = MongoClient(MONGODB_URI)
 
-            db = client["Telemarketing"]
+            db = client["OTHER"]
             collection = db[collection]
             documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
             rows = documents
@@ -803,7 +827,7 @@ class mongodb_2_gs:
         MONGODB_URI = os.getenv("MONGODB_API_KEY")
         client = MongoClient(MONGODB_URI)
 
-        db = client["Telemarketing"]
+        db = client["OTHER"]
         col = db[collection]
         docs = list(col.find({}, {"_id": 0}))
 
@@ -865,7 +889,7 @@ class mongodb_2_gs:
 
         # Call MongoDB database and collection
         client = MongoClient(MONGODB_URI)
-        db = client["Telemarketing"]
+        db = client["OTHER"]
         collection = db[collection]
 
         # Ensure deposit-specific unique index does not block member inserts
@@ -981,7 +1005,7 @@ class mongodb_2_gs:
             MONGODB_URI = os.getenv("MONGODB_API_KEY")
             client = MongoClient(MONGODB_URI)
 
-            db = client["Telemarketing"]
+            db = client["OTHER"]
             collection = db[collection]
             documents = list(collection.find({}, {"_id": 0}).sort("register_info_date", 1))
             rows = documents
@@ -1050,7 +1074,7 @@ class mongodb_2_gs:
             load_dotenv()
             MONGODB_URI = os.getenv("MONGODB_API_KEY")
             client = MongoClient(MONGODB_URI)
-            db = client["Telemarketing"]
+            db = client["OTHER"]
             col = db[collection]
 
             documents = list(col.find({}, {"_id": 0}).sort("register_info_date", 1))
@@ -1350,9 +1374,6 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     @classmethod
     def deposit_list_PID(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column):
 
-        # Tell ultra listener which collection + sheet columns to watch
-        cls.notify_listener(collection, gs_id, gs_tab, start_column, end_column, mode="deposit")
-
         # Get today date and time
         today = datetime.now()
         today = today.strftime("%Y-%m-%d")
@@ -1378,7 +1399,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             currency
         ],
         "status": "approved",
-        "start_date": "2025-11-01",
+        "start_date": today,
         "end_date": today,
         "gmt": gmt_time,
         "merchant_id": 1,
@@ -1465,7 +1486,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 print("No data returned from API.")
 
         # # Upload Data to Google Sheet by reading from MongoDB
-        # mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+        mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
 
         # Python Requests Method
     
@@ -1817,9 +1838,6 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     @classmethod
     def member_info(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column):
 
-        # Tell ultra listener which collection + sheet columns to watch
-        cls.notify_listener(collection, gs_id, gs_tab, start_column, end_column, mode="memberinfo")
-
         # Get today date and time
         today = datetime.now()
         today = today.strftime("%Y-%m-%d")
@@ -1969,7 +1987,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         "currency": [
             currency
         ],
-        "register_from": "2025-11-01",
+        "register_from": today,
         "register_to": today,
         "merchant_id": 1,
         "admin_id": 581,
@@ -2290,40 +2308,39 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 # member_info_2 format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name)
 # deposit_list format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name, google sheet start column, google sheet end column)
 
-# # =============== MEMBER INFO ==============================
-
-# # S55 (S5T) 
-# Fetch.member_info("s55bo.com", "s55", "THB", "+07:00", "S55_S5T_MI", "12Eu4ZGeRkcqgUWscQ-ZNetBq-Xz0xQGWvifWRbzXqL4", "S5T", "A", "E")
-# mongodb_2_gs.sync_append_no_overwrite(collection="S55_S5T_MI", gs_id="12Eu4ZGeRkcqgUWscQ-ZNetBq-Xz0xQGWvifWRbzXqL4", gs_tab="S5T", start_column="A", end_column="E")
-
-# # IBS UEA8 MY 
-# Fetch.member_info("29018465.asia", "uea8", "MYR", "+08:00", "UM_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "UM")
-# # IBS UEA8 SG 
-# Fetch.member_info("29018465.asia", "uea8", "SGD", "+08:00", "US_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "US")
-
-# =============== SSBO DEPOSIT LIST PLAYER ID ============================
-
-# S55 (S5T) 
-# Fetch.ssbo_deposit_list_PID("aw8", ["MYR"], "SSBO_A8M_DL", "1Lh8HI7YSz7I2XvwQ63lYK_b1b09AMeIvEBwRAxFXchA", "DEPOSIT LIST")
-
-# =============== DEPOSIT LIST PLAYER ID ============================
-
-# # S55 (S5T) 
-# Fetch.deposit_list_PID("s55bo.com", "s55", "THB", "+07:00", "S55_S5T_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S5T DEPOSIT LIST", "A", "C")
-
-# # IBS UEA8 MY 
-# Fetch.deposit_list_PID("29018465.asia", "uea8", "MYR", "+08:00", "UM_DL", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "UM DEPOSIT LIST", "A", "C")
-# # IBS UEA8 SG
-# Fetch.deposit_list_PID("29018465.asia", "uea8", "SGD", "+08:00", "UM_DL_2", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "US DEPOSIT LIST", "A", "C")
-
-
 # # =============== DEPOSIT LIST USERNAME ============================
 
-# # S55 (S5T) 
-# Fetch.deposit_list_PID("s55bo.com", "s55", "THB", "+07:00", "S55_S5T_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S5T DEPOSIT LIST 2", "A", "C")
+while True:
+    try:
+        # =-=-=-=-==-=-=-=-=-= DEPOSIT LIST =-=-=-=-==-=-=-=-=-=
 
-# # IBS UEA8 MY 
-# Fetch.deposit_list_USERNAME("29018465.asia", "uea8", "MYR", "+08:00", "UM_DL", "1Lh8HI7YSz7I2XvwQ63lYK_b1b09AMeIvEBwRAxFXchA", "UM DEPOSIT LIST 2", "A", "C")
-# # IBS UEA8 SG 
-# Fetch.deposit_list_USERNAME("29018465.asia", "uea8", "SGD", "+08:00", "US_DL", "1Lh8HI7YSz7I2XvwQ63lYK_b1b09AMeIvEBwRAxFXchA", "US DEPOSIT LIST 2", "A", "C")
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} S5T {Fore.YELLOW} DEPOSIT LIST Data...{Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
 
+        # # S55 (S5T) 
+        Fetch.deposit_list_PID("s55bo.com", "s55", "THB", "+07:00", "S55_S5T_DL", "12Eu4ZGeRkcqgUWscQ-ZNetBq-Xz0xQGWvifWRbzXqL4", "DEPOSIT LIST", "A", "C")
+
+        # # =-=-=-=-==-=-=-=-= MEMBER INFO =-=-=-=-==-=-=-=-=-=
+
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} JOLI {Fore.YELLOW} MEMBER INFO Data...{Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
+
+        # Input 2 Google Sheet ID
+        gs_ids = ["1Lh8HI7YSz7I2XvwQ63lYK_b1b09AMeIvEBwRAxFXchA", "1JBHT3uCvRjmX5ruxkkGDfgH7c19KFjyd0qQl_iJVaCs"]
+        # Jolibeee GMT+8
+        Fetch.member_info_SPLIT_DATA("jolibetbo.com", "joli", "PHP", "+08:00", "JOLI_MI", gs_ids, "joli")
+
+        time.sleep(600)
+
+    except KeyboardInterrupt:
+            logger.info("Execution interrupted by user.")
+            break
+    except Exception:
+        logger.exception("Unexpected error; retrying in 60 seconds.")
+        time.sleep(60)
