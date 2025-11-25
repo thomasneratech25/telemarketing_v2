@@ -5,6 +5,8 @@ import time
 import json
 import socket
 import atexit
+import shutil
+import zipfile
 import logging
 import requests
 import subprocess
@@ -33,7 +35,7 @@ if not logger.handlers:
     logger.setLevel(logging.INFO)
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 
-    file_handler = logging.FileHandler(LOG_DIR / "superswan_errors.log", encoding="utf-8")
+    file_handler = logging.FileHandler(LOG_DIR / "UM_US_errors.log", encoding="utf-8")
     file_handler.setLevel(logging.ERROR)
     file_handler.setFormatter(formatter)
 
@@ -512,6 +514,776 @@ class mongodb_2_gs:
             docs = list(col.find({}, {"_id": 0}))
             combined.extend(cls._normalize_pid_rows(docs))
         return combined
+    
+    # ====================================================================================
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SSBO & IBS AMR =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # ====================================================================================
+
+    # MongoDB Database (All Member Report)
+    def mongodbAPI_AMR(rows, collection):
+
+        # MongoDB API KEY
+        MONGODB_URI = os.getenv("MONGODB_API_KEY")
+
+        # Call MongoDB database and collection
+        client = MongoClient(MONGODB_URI)
+        db = client["UEA8"]
+        collection = db[collection]
+
+        # Drop any legacy indexes that might conflict
+        for idx in (
+            "player_id_1_amount_1_completed_at_1",
+            "all_member_unique",
+            "username_1_first_name_1_register_info_date_1",
+        ):
+            try:
+                collection.drop_index(idx)
+            except Exception:
+                pass
+
+        # Ensure username+member_id+register_date unique to avoid duplicates
+        collection.create_index(
+            [("username", 1), ("fullname", 1), ("member_id", 1)],
+            name="all_member_unique",
+            unique=True,
+            partialFilterExpression={
+                "username": {"$type": "string"},
+                "fullname": {"$type": "string"},
+                "member_id": {"$type": "string"},
+            },
+        )
+
+        inserted = 0
+        skipped = 0
+        cleaned_docs = []
+        batch = []
+
+        ordered_fields = [
+            "none",
+            "currency",
+            "member_group",
+            "username",
+            "fullname",
+            "member_id",
+            "phone_no",
+            "email",
+            "vip_level",
+            "aff_username",
+            "member_tag",
+            "deposit_count",
+            "affiliate_transfer_in_count",
+            "affiliate_transfer_in_amount",
+            "total_deposit",
+            "processing_fee",
+            "received_deposit",
+            "withdraw_count",
+            "affiliate_transfer_out_count",
+            "affiliate_transfer_out_amount",
+            "total_withdraw",
+            "adjust_count",
+            "adjust_in",
+            "adjust_out",
+            "total_adjust",
+            "bet_count",
+            "total_valid_bet",
+            "total_bonus_bet",
+            "total_turnover",
+            "total_valid_bonus_bet",
+            "win_loss",
+            "player_bonus_winloss",
+            "total_bonus",
+            "total_cancel_bonus",
+            "total_rebate",
+            "total_referral",
+            "total_referral_comm",
+            "total_reward",
+            "total_win_loss",
+        ]
+
+        for row in rows:
+
+            if not isinstance(row, dict):
+                continue
+
+            doc = {}
+            for field in ordered_fields:
+                value = row.get(field, "")
+                if value is None:
+                    value = ""
+                doc[field] = value
+
+            username = row.get("username") or row.get("memberLogin")
+            member_id = row.get("member_id") or row.get("player_id")
+
+            if username:
+                doc["username"] = str(username)
+            if member_id:
+                doc["member_id"] = str(member_id)
+
+            cleaned_docs.append(doc.copy())
+            batch.append(doc)
+
+            if len(batch) == 500:
+                try:
+                    collection.insert_many(batch, ordered=False)
+                    inserted += len(batch)
+                except Exception as exc:
+                    if hasattr(exc, "details"):
+                        skipped += len(exc.details.get("writeErrors", []))
+                        inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                    else:
+                        skipped += 0
+                batch = []
+
+        if batch:
+            try:
+                collection.insert_many(batch, ordered=False)
+                inserted += len(batch)
+            except Exception as exc:
+                if hasattr(exc, "details"):
+                    skipped += len(exc.details.get("writeErrors", []))
+                    inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                else:
+                    skipped += 0
+
+        return cleaned_docs, inserted, skipped
+
+    # Update Data to Google Sheet from MongoDB (All Member Report)
+    @classmethod
+    def upload_to_google_sheet_AMR(cls, collection, gs_id, gs_tab, rows=None):
+
+        # Authenticate with OAuth2
+        creds = cls.googleAPI()
+        service = build("sheets", "v4", credentials=creds)
+        sheet = service.spreadsheets()
+
+        SPREADSHEET_ID = gs_id
+        RANGE_NAME = cls._build_a1_range(gs_tab, "A", 2, "AM")
+
+        ordered_fields = [
+            "none",
+            "currency",
+            "member_group",
+            "username",
+            "fullname",
+            "member_id",
+            "phone_no",
+            "email",
+            "vip_level",
+            "aff_username",
+            "member_tag",
+            "deposit_count",
+            "affiliate_transfer_in_count",
+            "affiliate_transfer_in_amount",
+            "total_deposit",
+            "processing_fee",
+            "received_deposit",
+            "withdraw_count",
+            "affiliate_transfer_out_count",
+            "affiliate_transfer_out_amount",
+            "total_withdraw",
+            "adjust_count",
+            "adjust_in",
+            "adjust_out",
+            "total_adjust",
+            "bet_count",
+            "total_valid_bet",
+            "total_bonus_bet",
+            "total_turnover",
+            "total_valid_bonus_bet",
+            "win_loss",
+            "player_bonus_winloss",
+            "total_bonus",
+            "total_cancel_bonus",
+            "total_rebate",
+            "total_referral",
+            "total_referral_comm",
+            "total_reward",
+            "total_win_loss",
+        ]
+
+        def sanitize_rows(raw_rows):
+            sanitized = []
+            for r in raw_rows:
+                if isinstance(r, dict):
+                    sanitized.append([
+                        str(r.get(field, "")) if r.get(field, "") is not None else ""
+                        for field in ordered_fields
+                    ])
+                else:
+                    sanitized.append([""] * len(ordered_fields))
+            return sanitized
+
+        load_dotenv()
+        MONGODB_URI = os.getenv("MONGODB_API_KEY")
+        if not MONGODB_URI:
+            raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
+        client = MongoClient(MONGODB_URI)
+        db = client["UEA8"]
+
+        if not rows:
+            collection_ref = db[collection]
+            documents = list(collection_ref.find({}, {"_id": 0}).sort("username", 1))
+            rows = documents
+
+        rows = sanitize_rows(rows)
+        row_count = len(rows)
+
+        if not rows:
+            print("No rows found to upload to Google Sheet.")
+            return
+
+        body = {"values": rows, "majorDimension": "ROWS"}
+
+        print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
+        sheet.values().clear(
+            spreadsheetId=SPREADSHEET_ID,
+            range=RANGE_NAME
+        ).execute()
+
+        try:
+            sheet.values().update(
+                spreadsheetId=SPREADSHEET_ID,
+                range=RANGE_NAME,
+                valueInputOption="USER_ENTERED",
+                body=body
+            ).execute()
+        except Exception as exc:
+            print(f"Failed to upload to Google Sheets: {exc}")
+            raise
+
+        # print("Rows to upload:", rows)
+        print("Uploaded MongoDB data to Google Sheet.\n")
+
+    # Unzip File (ssbo)
+    @classmethod
+    def unzip(cls, file_name):
+        base_dir = "/Users/nera_thomas/Desktop/Telemarketing/excel_file"
+        zip_path = os.path.join(base_dir, f"{file_name}.zip")
+
+        if not os.path.exists(zip_path):
+            print(f"❌ Zip file not found: {zip_path}")
+            return
+
+        # ✅ Use dedicated temp folder
+        extract_to = os.path.join(base_dir, f"{file_name}_temp")
+        os.makedirs(extract_to, exist_ok=True)
+
+        new_csv_path = os.path.join(base_dir, f"{file_name}.csv")
+        if os.path.exists(new_csv_path):
+            os.remove(new_csv_path)
+
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
+            zip_ref.extractall(extract_to)
+        print(f"✅ Unzipped into folder: {extract_to}")
+
+        csv_files = []
+        for root, _, files in os.walk(extract_to):
+            for file in files:
+                if file.endswith(".csv"):
+                    csv_files.append(os.path.join(root, file))
+
+        if not csv_files:
+            print("❌ No CSV found inside ZIP.")
+            shutil.rmtree(extract_to, ignore_errors=True)
+            return
+
+        shutil.move(csv_files[0], new_csv_path)
+        shutil.rmtree(extract_to, ignore_errors=True)
+
+    # Upload to Google Sheet (From JSON List) (All Member Report)
+    @classmethod
+    def upload_GS_allmemberReport(cls, file_name, g_sheet_tab, g_sheet_ID):
+        """Upload CSV data to Google Sheet starting from row 2 (overwrite existing cells)."""
+        import os, pandas as pd
+        from googleapiclient.discovery import build
+
+        creds = cls.googleAPI()
+        sheet = build("sheets", "v4", credentials=creds).spreadsheets()
+
+        csv_path = f"/Users/nera_thomas/Desktop/Telemarketing/excel_file/{file_name}.csv"
+        if not os.path.exists(csv_path):
+            print(f"❌ File not found: {csv_path}")
+            return
+
+        df = pd.read_csv(csv_path, encoding="utf-8-sig").fillna("")
+        values = df.values.tolist()   # skip header row on sheet
+
+        sheet.values().update(
+            spreadsheetId=g_sheet_ID,
+            range=f"'{g_sheet_tab}'!A2",
+            valueInputOption="USER_ENTERED",
+            body={"values": values}
+        ).execute()
+
+        print(f"✅ Uploaded {len(df)} data rows to '{g_sheet_tab}' starting from row 2.")
+
+    # ====================================================================================
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SSBO & IBS FTD/STD =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # ====================================================================================
+
+    # =-=-=--=-=-=-=-=-= IBS =-=-=-=-=-=-=-=-=-=-=-=-=
+    # MongoDB Database (FTD/STD)
+    def mongodbAPI_FTD_STD(rows, collection):
+
+        # MongoDB API KEY
+        MONGODB_URI = os.getenv("MONGODB_API_KEY")
+
+        # Call MongoDB database and collection
+        client = MongoClient(MONGODB_URI)
+        db = client["UEA8"]
+        collection = db[collection]
+
+        # Ensure deposit-specific unique index does not block member inserts
+        try:
+            collection.drop_index("player_id_1_amount_1_completed_at_1")
+        except Exception:
+            pass
+
+       # Set and Ensure when upload data this 3 Field is Unique Data
+        collection.create_index(
+            [("username", 1), ("name", 1), ("completed_date", 1)],
+            name="ftd_std_unique",
+            unique=True
+        )
+
+        # Count insert and skip
+        inserted = 0
+        skipped = 0
+        cleaned_docs = []
+
+        batch = []
+
+        # for each rows in a list of JSON objects return
+        for row in rows:
+
+            # Skip null or invalid rows
+            if not isinstance(row, dict):
+                continue
+
+            # Extract only the fields you want (Extract Data from json file)
+            username = (
+                row.get("username")
+                or row.get("memberLogin")
+                or row.get("login")
+                or row.get("playerLogin")
+                or row.get("player_id")
+                or row.get("user_id")
+            )
+            name = (
+                row.get("name")
+                or row.get("playerName")
+                or row.get("first_name")
+                or row.get("fullName")
+                or ""
+            )
+            completed_date = (
+                row.get("completed_date")
+                or row.get("eventTime")
+                or row.get("created_at")
+                or row.get("createdAt")
+                or row.get("firstDepositTime")
+            )
+            mobileno = (
+                row.get("mobileno")
+                or row.get("mobile")
+                or row.get("phone")
+                or ""
+            )
+            player_id = (
+                row.get("player_id")
+                or row.get("playerId")
+                or row.get("user_id")
+                or username
+            )
+
+            if not username or not completed_date:
+                continue
+
+            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
+            try:
+                completed_date_str = str(completed_date).replace("Z", "+00:00")
+                dt = datetime.fromisoformat(completed_date_str)
+            except ValueError:
+                try:
+                    dt = datetime.strptime(str(completed_date), "%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    continue
+            completed_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
+
+            # Build the new cleaned document (Use for upload data to MongoDB)
+            doc = {
+                "username": str(username),
+                "name": name,
+                "completed_date": completed_date_fmt,
+                "mobileno": mobileno,
+                "player_id": str(player_id) if player_id is not None else "",
+            }
+
+            # Keep the version without _id for uploading later
+            cleaned_docs.append(doc.copy())
+            batch.append(doc)
+
+            if len(batch) == 500:
+                try:
+                    collection.insert_many(batch, ordered=False)
+                    inserted += len(batch)
+                except Exception as exc:
+                    if hasattr(exc, "details"):
+                        skipped += len(exc.details.get("writeErrors", []))
+                        inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                    else:
+                        skipped += 0
+                batch = []
+
+        # Insert any remaining documents in batch
+        if batch:
+            try:
+                collection.insert_many(batch, ordered=False)
+                inserted += len(batch)
+            except Exception as exc:
+                if hasattr(exc, "details"):
+                    skipped += len(exc.details.get("writeErrors", []))
+                    inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                else:
+                    skipped += 0
+
+        return cleaned_docs, inserted, skipped
+
+    # Update Data to Google Sheet from MongoDB (FTD/STD)
+    @classmethod
+    def upload_to_google_sheet_FTD_STD(cls, collection, gs_id, gs_tab, rows=None, extra_mongo_collections=None):
+        
+        # Authenticate with OAuth2
+        creds = cls.googleAPI()
+        service = build("sheets", "v4", credentials=creds)
+        sheet = service.spreadsheets()
+
+        # Google Sheet ID and Sheet Tab Name (range name)
+        SPREADSHEET_ID = gs_id
+        RANGE_NAME = cls._build_a1_range(gs_tab, "A", 3, "E")
+
+        # Convert from MongoDB (dics) to Google Sheet API (list), because Google Sheets API only accept "list".
+        def sanitize_rows(raw_rows):
+            """Convert MongoDB docs to Google Sheet rows for Member Info."""
+            sanitized = []
+            for r in raw_rows:
+                if isinstance(r, dict):
+                    sanitized.append([
+                        str(r.get("username", "")),
+                        str(r.get("name", "")),
+                        str(r.get("completed_date", "")),
+                        str(r.get("mobileno", "")),
+                        str(
+                            r.get("player_id", "")
+                            or r.get("member_id", "")
+                        ),
+                    ])
+                else:
+                    sanitized.append(["", "", "", "", ""])
+            return sanitized
+
+        load_dotenv()
+        MONGODB_URI = os.getenv("MONGODB_API_KEY")
+        if not MONGODB_URI:
+            raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
+        client = MongoClient(MONGODB_URI)
+        db = client["UEA8"]
+
+        # If no data upload to MongoDB, it auto upload data to google sheet
+        if not rows:
+            collection_ref = db[collection]
+            documents = list(collection_ref.find({}, {"_id": 0}).sort("completed_date", 1))
+            rows = documents
+        
+        if extra_mongo_collections:
+            for extra_col in extra_mongo_collections:
+                extra_ref = db[extra_col]
+                extra_docs = list(extra_ref.find({}, {"_id": 0}).sort("completed_date", 1))
+                rows.extend(extra_docs)
+
+        rows = sanitize_rows(rows)
+        row_count = len(rows)
+
+        if not rows:
+            print("No rows found to upload to Google Sheet.")
+            return
+
+        body = {"values": rows, "majorDimension": "ROWS"}
+
+        print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
+        # Clear previous data then write the fresh rows
+        sheet.values().clear(
+            spreadsheetId=SPREADSHEET_ID,
+            range=RANGE_NAME
+        ).execute()
+
+        try:
+            sheet.values().update(
+                spreadsheetId=SPREADSHEET_ID,
+                range=RANGE_NAME,
+                valueInputOption="USER_ENTERED",  # let Sheets parse dates/numbers
+                body=body
+            ).execute()
+        except Exception as exc:
+            print(f"Failed to upload to Google Sheets: {exc}")
+            raise
+
+        if row_count > 1:
+            cls._sort_range_by_column(
+                service,
+                SPREADSHEET_ID,
+                gs_tab,
+                "A",
+                "E",
+                3,
+                3 + row_count - 1,
+                sort_column_letter="C",
+                descending=False
+            )
+
+        # print("Rows to upload:", rows)
+        print("Uploaded MongoDB data to Google Sheet.\n")
+
+
+    # =-=-=--=-=-=-=-=-= SSBO =-=-=-=-=-=-=-=-=-=-=-=-=
+    # MongoDB Database (Member Info)
+    def mongodbAPI_ssbo_FTD_STD(rows, collection):
+
+        # MongoDB API KEY
+        MONGODB_URI = os.getenv("MONGODB_API_KEY")
+
+        # Call MongoDB database and collection
+        client = MongoClient(MONGODB_URI)
+        db = client["UEA8"]
+        collection = db[collection]
+
+        # Ensure deposit-specific unique index does not block member inserts
+        try:
+            collection.drop_index("player_id_1_amount_1_completed_at_1")
+        except Exception:
+            pass
+        # Remove any legacy member indexes before recreating ours
+        for idx_name in (
+            "login_1_name_1_registerDate_1",
+            "ssbo_member_unique",
+            "username_1_first_name_1_firstDepositDate_1",
+        ):
+            try:
+                collection.drop_index(idx_name)
+            except Exception:
+                pass
+
+       # Set and Ensure when upload data this 3 Field is Unique Data
+        collection.create_index(
+            [("username", 1), ("first_name", 1), ("register_info_date", 1)],
+            name="ssbo_member_unique",
+            unique=True,
+            partialFilterExpression={
+                "username": {"$type": "string"},
+                "first_name": {"$type": "string"},
+                "register_info_date": {"$type": "string"},
+            },
+        )
+
+        # Count insert and skip
+        inserted = 0
+        skipped = 0
+        cleaned_docs = []
+
+        batch = []
+
+        # for each rows in a list of JSON objects return
+        for row in rows:
+
+            # Skip null or invalid rows
+            if not isinstance(row, dict):
+                continue
+
+            # Extract only the fields you want (Extract Data from json file)
+            username = row.get("username") or row.get("login")
+            first_name = row.get("first_name") or row.get("name") or row.get("memberName") or ""
+            register_info_date = row.get("register_info_date") or row.get("registerDate") or row.get("firstDepositDate")
+            mobileno = row.get("mobileno") or row.get("phone") or ""
+            member_id = row.get("member_id") or row.get("id") or row.get("player_id") or ""
+
+            if not username or not register_info_date:
+                continue
+
+            username = str(username)
+            first_name = str(first_name)
+            member_id = str(member_id)
+            mobileno = str(mobileno)
+
+            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
+            try:
+                dt = datetime.fromisoformat(str(register_info_date).replace("Z", "+00:00"))
+            except ValueError:
+                dt = datetime.fromisoformat(str(register_info_date))
+            register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
+
+            # Build the new cleaned document (Use for upload data to MongoDB)
+            doc = {
+                "username": username,
+                "first_name": first_name,
+                "register_info_date": register_info_date_fmt,
+                "mobileno": mobileno,
+                "member_id": member_id,
+            }
+
+            # Keep the version without _id for uploading later
+            cleaned_docs.append(doc.copy())
+            batch.append(doc)
+
+            if len(batch) == 500:
+                try:
+                    collection.insert_many(batch, ordered=False)
+                    inserted += len(batch)
+                except Exception as exc:
+                    if hasattr(exc, "details"):
+                        skipped += len(exc.details.get("writeErrors", []))
+                        inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                    else:
+                        skipped += 0
+                batch = []
+
+        # Insert any remaining documents in batch
+        if batch:
+            try:
+                collection.insert_many(batch, ordered=False)
+                inserted += len(batch)
+            except Exception as exc:
+                if hasattr(exc, "details"):
+                    skipped += len(exc.details.get("writeErrors", []))
+                    inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                else:
+                    skipped += 0
+
+        return cleaned_docs, inserted, skipped
+
+    # Update Data to Google Sheet from MongoDB (MemberInfo)
+    @classmethod
+    def upload_to_google_sheet_ssbo_FTD_STD(cls, collection, gs_id, gs_tab, rows=None, extra_mongo_collections=None):
+        
+        # Authenticate with OAuth2
+        creds = cls.googleAPI()
+        service = build("sheets", "v4", credentials=creds)
+        sheet = service.spreadsheets()
+
+        # Google Sheet ID and Sheet Tab Name (range name)
+        SPREADSHEET_ID = gs_id
+        RANGE_NAME = cls._build_a1_range(gs_tab, "A", 3, "E")
+
+        # Convert from MongoDB (dics) to Google Sheet API (list), because Google Sheets API only accept "list".
+        def sanitize_rows(raw_rows):
+            """Convert MongoDB docs to Google Sheet rows for FTD/STD."""
+            sanitized = []
+            for r in raw_rows:
+                if isinstance(r, dict):
+                    username = (
+                        r.get("username")
+                        or r.get("login")
+                        or ""
+                    )
+                    first_name = (
+                        r.get("first_name")
+                        or r.get("name")
+                        or ""
+                    )
+                    register_date = (
+                        r.get("register_info_date")
+                        or r.get("registerDate")
+                        or r.get("firstDepositDate")
+                        or r.get("completed_date")
+                        or r.get("completed_at")
+                        or ""
+                    )
+                    phone = (
+                        r.get("mobileno")
+                        or r.get("phone")
+                        or ""
+                    )
+                    member_id = (
+                        r.get("member_id")
+                        or r.get("id")
+                        or r.get("player_id")
+                        or ""
+                    )
+                    sanitized.append([
+                        str(username),
+                        str(first_name),
+                        str(register_date),
+                        str(phone),
+                        str(member_id),
+                    ])
+                else:
+                    sanitized.append(["", "", "", "", ""])
+            return sanitized
+
+        load_dotenv()
+        MONGODB_URI = os.getenv("MONGODB_API_KEY")
+        if not MONGODB_URI:
+            raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
+        client = MongoClient(MONGODB_URI)
+        db = client["UEA8"]
+
+        # If no data upload to MongoDB, it auto upload data to google sheet
+        if not rows:
+            collection_ref = db[collection]
+            documents = list(
+                collection_ref.find({}, {"_id": 0}).sort("register_info_date", 1)
+            )
+            rows = documents
+        if extra_mongo_collections:
+            for extra_col in extra_mongo_collections:
+                extra_ref = db[extra_col]
+                extra_docs = list(
+                    extra_ref.find({}, {"_id": 0}).sort("register_info_date", 1)
+                )
+                rows.extend(extra_docs)
+        
+        rows = sanitize_rows(rows)
+        row_count = len(rows)
+
+        if not rows:
+            print("No rows found to upload to Google Sheet.")
+            return
+
+        body = {"values": rows, "majorDimension": "ROWS"}
+
+        print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
+        # Clear previous data then write the fresh rows
+        sheet.values().clear(
+            spreadsheetId=SPREADSHEET_ID,
+            range=RANGE_NAME
+        ).execute()
+
+        try:
+            sheet.values().update(
+                spreadsheetId=SPREADSHEET_ID,
+                range=RANGE_NAME,
+                valueInputOption="USER_ENTERED",  # let Sheets parse dates/numbers
+                body=body
+            ).execute()
+        except Exception as exc:
+            print(f"Failed to upload to Google Sheets: {exc}")
+            raise
+
+        if row_count > 1:
+            cls._sort_range_by_column(
+                service,
+                SPREADSHEET_ID,
+                gs_tab,
+                "A",
+                "E",
+                3,
+                3 + row_count - 1,
+                sort_column_letter="C",
+                descending=False
+            )
+
+        # print("Rows to upload:", rows)
+        print("Uploaded MongoDB data to Google Sheet.\n")
 
     # ====================================================================================
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SSBO & IBS MEMBER INFO =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -1748,14 +2520,632 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             browser.close()
             Automation.cleanup()
 
+    # ====================================================================================
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SSBO & IBS AMR =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # ====================================================================================    
+    
+    # BO All Member Report
+    @classmethod
+    def allmemberReport(cls, bo_link, bo_name, currency, gmt_time, collection, g_sheet_ID, g_sheet_tab):
+
+        # Get today date and time
+        today = datetime.now().strftime("%Y-%m-%d")
+
+        # Cookie File
+        cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+
+        # Auto-create file if missing
+        os.makedirs(os.path.dirname(cookie_file), exist_ok=True)
+        if not os.path.exists(cookie_file):
+            open(cookie_file, "w").write('{"user_cookie": ""}')
+
+        # Load cookie
+        with open(cookie_file, "r", encoding="utf-8") as f:
+            user_cookie = json.load(f).get("user_cookie", "")
+
+        url = f"https://v3-bo.{bo_link}/api/be/report/get-all-member-report"
+
+        headers = {
+            'accept': 'application/json',
+            'accept-language': 'en-US,en;q=0.9',
+            'content-type': 'application/json',
+            'domain': f'v3-bo.{bo_link}',
+            'gmt': gmt_time,
+            'lang': 'en-US',
+            'loggedin': 'true',
+            'origin': f'https://v3-bo.{bo_link}',
+            'page': '/en-us/report/personnel-report/all-member-report',
+            'priority': 'u=1, i',
+            'referer': f'https://v3-bo.{bo_link}/en-us/report/personnel-report/all-member-report',
+            'sec-ch-ua': '"Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'type': 'POST',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
+            'Cookie': f"i18n_redirected=en-us; user={user_cookie}",
+        }
+
+        page = 1
+        paginate = 200
+        total_inserted = 0
+        total_skipped = 0
+        last_page_with_data = 0
+        finish_reason = None
+
+        while True:
+
+            payload = {
+                "paginate": paginate,
+                "page": page,
+                "from_date": f"2025-11-01T00:00:00+08:00",
+                "to_date": f"{today}T23:59:59+08:00",
+                "currency": [currency],
+                "merchant_id": 1,
+                "admin_id": 295,
+                "aid": 295
+            }
+
+            response = requests.post(url, headers=headers, json=payload)
+
+            try:
+                data = response.json()
+            except ValueError:
+                print("⚠️ Response is not valid JSON.")
+                print("Status code:", response.status_code)
+                print("Text preview:", response.text[:500])
+                finish_reason = "invalid_json"
+                break
+
+            if data.get("statusCode") == 401:
+                print("⚠️ Received 401 Unauthorized. Attempting to refresh cookies...")
+                Automation.chrome_CDP()
+                cls._get_cookies(
+                    bo_link,
+                    cls.accounts[f"{bo_name}"]["merchant_code"],
+                    cls.accounts[f"{bo_name}"]["acc_ID"],
+                    cls.accounts[f"{bo_name}"]["acc_PASS"],
+                    f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+                )
+                print("⚠️  Cookies refreshed ... Retrying request...")
+                return cls.allmemberReport(bo_link, bo_name, currency, gmt_time, collection, g_sheet_ID, g_sheet_tab)
+
+            rows = data.get("data", [])
+            pagination = data.get("pagination", {})
+
+            print(f"Page {page} → {len(rows)} rows")
+
+            if not isinstance(rows, list):
+                rows = []
+
+            if not rows:
+                finish_reason = "no_data" if page == 1 else "completed"
+                if page > 1:
+                    last_page_with_data = page - 1
+                break
+
+            _, inserted, skipped = cls.mongodbAPI_AMR(rows, collection)
+            total_inserted += inserted
+            total_skipped += skipped
+            last_page_with_data = page
+
+            pagination_last_page = None
+            if isinstance(pagination, dict):
+                pagination_last_page = (
+                    pagination.get("last_page")
+                    or pagination.get("lastPage")
+                )
+                if pagination_last_page is not None:
+                    try:
+                        pagination_last_page = int(pagination_last_page)
+                    except (TypeError, ValueError):
+                        pagination_last_page = None
+
+            if (
+                pagination_last_page is not None
+                and page >= pagination_last_page
+            ):
+                finish_reason = "completed"
+                break
+
+            if pagination_last_page is None and len(rows) < paginate:
+                finish_reason = "completed"
+                break
+
+            page += 1
+
+        if finish_reason is None:
+            finish_reason = "completed"
+
+        print(f"MongoDB Summary → Inserted: {total_inserted}, Skipped: {total_skipped}")
+        if finish_reason == "no_data":
+            print("⚠️ No All Member rows returned — break")
+        elif finish_reason == "invalid_json":
+            print("⚠️ Unable to continue due to invalid JSON response.")
+        else:
+            print(f"Finished. Last page = {last_page_with_data}")
+
+        cls.upload_to_google_sheet_AMR(collection, g_sheet_ID, g_sheet_tab)
+
+    # BO All Member Report (Extract Data like Postman/API and save as json file)
+    @classmethod
+    def ssbo_allmemberReport(cls, currency, file_name, g_sheet_tab, g_sheet_ID):
+        with sync_playwright() as p:  
+            
+            # Get Deposit List Data (effect for fun only)
+            msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[{file_name}] {Fore.YELLOW}All Member Report...{Style.RESET_ALL}\n"
+            for ch in msg:
+                sys.stdout.write(ch)
+                sys.stdout.flush()
+                time.sleep(0.02)
+
+            # Wait for Chrome CDP to be ready
+            cls.wait_for_cdp_ready()
+
+            # Connect to running Chrome
+            browser = p.chromium.connect_over_cdp("http://localhost:9222")
+            context = browser.contexts[0] if browser.contexts else browser.new_context()    
+
+            # Open a new browser page
+            page = context.pages[0] if context.pages else context.new_page()
+            page.goto("https://aw8.premium-bo.com/", wait_until="load", timeout=0)
+
+            # if announment appear, then click close
+            try:
+                # Wait for "Member" appear
+                expect(page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[4]/div[1]/div[1]/a[1]/ul[1]/li[2]")).to_be_visible(timeout=30000)
+                # Check whether "Merchant credit balance is low" appear, else pass
+                expect(page.locator("//div[normalize-space()='Merchant credit balance is low.']")).to_be_visible(timeout=1500)
+                # Click checkbox
+                page.locator("//div[@class='disable-low-merchant-credit-balance']//input[@type='checkbox']").click()
+                time.sleep(1)
+                # Click Close
+                page.locator("//button[normalize-space()='Close']").click()
+            except:
+                pass
+            
+            # if is in Login Page, then Login, else Skip
+            try:
+                # Check whether "Sign In" appear, else pass
+                expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=2000)
+                # Fill in Username
+                page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan"]["acc_ID"])
+                # Fill in Password
+                page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan"]["acc_PASS"])
+                # Login 
+                page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
+                # Delay 2 second
+                page.wait_for_timeout(2000)
+                # 
+            except:
+                pass
+            
+            # Click Report
+            page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[7]/div[1]/div[1]/a[1]/ul[1]/li[2]").click()
+            # Click All Member Report
+            page.locator("//a[@ng-reflect-router-link='/report/all-member-report']//li[@class='parent-nav-item'][normalize-space()='10.2. All Member Report']").click() 
+            # Delay 5 seconds
+            page.wait_for_timeout(5000)
+            
+            # if is in Login Page, then Login, else Skip
+            try:
+                # Check whether "Sign In" appear, else pass
+                expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=5000)
+                # Fill in Username
+                page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan"]["acc_ID"])
+                # Fill in Password
+                page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan"]["acc_PASS"])
+                # Login 
+                page.click("//button[normalize-space()='Login']", force=True)
+                # Delay 2 second
+                page.wait_for_timeout(2000)
+                # Click Report
+                page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[7]/div[1]/div[1]/a[1]/ul[1]/li[2]").click()
+                # Click All Member Report
+                page.locator("//a[@ng-reflect-router-link='/report/all-member-report']//li[@class='parent-nav-item'][normalize-space()='10.2. All Member Report']").click()    
+            except:
+                pass
+            
+            # Click Region dropdown
+            page.locator("ng-select .ng-select-container").nth(0).click()
+            page.locator(".ng-dropdown-panel .ng-option").filter(has_text="UEABET").click()
+            # Delay 1 second
+            page.wait_for_timeout(1000)
+            # Click Region dropdown
+            page.locator("ng-select .ng-select-container").nth(1).click()
+            page.locator(".ng-dropdown-panel .ng-option").filter(has_text=currency).click()
+            # Delay 1 second
+            page.wait_for_timeout(1000)
+            # Button Click "This Month"
+            page.locator("//button[normalize-space()='This Month']").click()
+            # Delay 1 second
+            page.wait_for_timeout(1000)
+            # Button Click "Search"
+            page.locator("//button[normalize-space()='Search']").click()
+            # wait for the first row data appear 
+            page.locator("tbody tr").first.wait_for(state="visible", timeout=10000)
+            # Delay 3 seconds
+            page.wait_for_timeout(3000)
+
+            # Download .CSV Report File
+            with page.expect_download(timeout=600000) as download_info:
+                page.locator("//button[normalize-space()='Export']").click(timeout=10000)   # ---> button click downnload csv file
+            download = download_info.value
+
+            # Save the file manually
+            base_dir = "/Users/nera_thomas/Desktop/Telemarketing/excel_file"
+            os.makedirs(base_dir, exist_ok=True)
+            download_path = os.path.join(base_dir, f"{file_name}.zip")
+            download.save_as(download_path)
+
+            # Unzip file
+            cls.unzip(file_name)
+            # Delay 1 second
+            page.wait_for_timeout(1000)
+            # Upload to Google Sheet
+            cls.upload_GS_allmemberReport(file_name, g_sheet_tab, g_sheet_ID)
 
     # ====================================================================================
-    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SSBO & IBS MEMBER INFO =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SSBO & IBS FTD/STD =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # ====================================================================================
+    
+    # IBS FTD/STD Report
+    @classmethod
+    def ftd_stdReport(cls, bo_link, bo_name, currency, gmt_time, collection, g_sheet_ID, g_sheet_tab, upload_to_sheet=True):
+
+        # Get today date and time
+        today = datetime.now()
+        today = today.strftime("%Y-%m-%d")
+
+        # Cookie File
+        cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+
+        # Auto-create file if missing
+        os.makedirs(os.path.dirname(cookie_file), exist_ok=True)
+        if not os.path.exists(cookie_file):
+            open(cookie_file, "w").write('{"user_cookie": ""}')
+
+        # Load cookie
+        with open(cookie_file, "r", encoding="utf-8") as f:
+            user_cookie = json.load(f).get("user_cookie", "")
+
+        url = "https://v3-bo.29018465.asia/api/be/report/get-first-time-deposit-report"
+
+        headers = {
+        'accept': 'application/json',
+        'accept-language': 'en-US,en;q=0.9',
+        'cache-control': 'no-cache',
+        'content-type': 'application/json',
+        'domain': 'v3-bo.29018465.asia',
+        'gmt': gmt_time,
+        'lang': 'en-US',
+        'loggedin': 'true',
+        'origin': 'https://v3-bo.29018465.asia',
+        'page': '/en-us/report/finance-report/report-first-time-deposit',
+        'pragma': 'no-cache',
+        'priority': 'u=1, i',
+        'referer': 'https://v3-bo.29018465.asia/en-us/report/finance-report/report-first-time-deposit',
+        'sec-ch-ua': '"Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
+        'type': 'POST',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
+        'Cookie': f"i18n_redirected=en-us; user={user_cookie}",
+        }
+
+        page = 1
+        total_inserted = 0
+        total_skipped = 0
+        last_page_with_data = 0
+        finish_reason = None
+
+        while True:
+            payload = {
+                "paginate": 100,
+                "page": page,
+                "currency": [currency],
+                "timeZone": gmt_time,
+                "ftd": 1,
+                "start_date": today,
+                "end_date": today,
+                # "register_from": "2025-11-01",
+                # "register_to": today,
+                "merchant_id": 1,
+                "admin_id": 152,
+                "aid": 152
+            }
+
+            response = requests.post(url, headers=headers, json=payload)
+
+            if response.json().get("statusCode") == 401:
+                print("⚠️ Received 401 Unauthorized. Attempting to refresh cookies...")
+                Automation.chrome_CDP()
+                cls._get_cookies(
+                    bo_link,
+                    cls.accounts[bo_name]["merchant_code"],
+                    cls.accounts[bo_name]["acc_ID"],
+                    cls.accounts[bo_name]["acc_PASS"],
+                    f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+                )
+                return cls.ftd_stdReport(bo_link, bo_name, currency, gmt_time, collection, g_sheet_ID, g_sheet_tab, upload_to_sheet=upload_to_sheet)
+
+            try:
+                data = response.json()
+            except Exception:
+                print("Invalid JSON response from API!")
+                print("Status Code:", response.status_code)
+                print("Response text:", response.text[:500])
+                break
+
+            rows = []
+            pagination_info = None
+            data_block = data.get("data", {})
+            currency_candidates = []
+            if isinstance(currency, str):
+                base = str(currency)
+                currency_candidates = [base, base.upper(), base.lower()]
+            elif isinstance(currency, (list, tuple, set)):
+                for cur in currency:
+                    base = str(cur)
+                    currency_candidates.extend([base, base.upper(), base.lower()])
+
+            if isinstance(data_block, dict):
+                currency_payload = None
+                for candidate in currency_candidates:
+                    candidate_value = data_block.get(candidate)
+                    if isinstance(candidate_value, dict):
+                        currency_payload = candidate_value
+                        break
+                if currency_payload is None:
+                    for payload_info in data_block.values():
+                        if isinstance(payload_info, dict):
+                            currency_payload = payload_info
+                            break
+                if isinstance(currency_payload, dict):
+                    rows = currency_payload.get("data", [])
+                    pagination_info = currency_payload.get("pagination")
+                    if isinstance(rows, dict):
+                        rows = rows.get("data", [])
+                elif isinstance(currency_payload, list):
+                    rows = currency_payload
+            elif isinstance(data_block, list):
+                rows = data_block
+            if not isinstance(rows, list):
+                rows = []
+
+            print(f"Page {page} → {len(rows)} rows")
+
+            if not rows:
+                finish_reason = "no_data" if page == 1 else "completed"
+                if page > 1:
+                    last_page_with_data = page - 1
+                break
+
+            _, inserted, skipped = cls.mongodbAPI_FTD_STD(rows, collection)
+            total_inserted += inserted
+            total_skipped += skipped
+            last_page_with_data = page
+
+            pagination_last_page = None
+            pagination_current = None
+            if isinstance(pagination_info, dict):
+                pagination_last_page = (
+                    pagination_info.get("last_page")
+                    or pagination_info.get("lastPage")
+                )
+                pagination_current = (
+                    pagination_info.get("current_page")
+                    or pagination_info.get("currentPage")
+                )
+            if pagination_last_page is not None:
+                try:
+                    pagination_last_page = int(pagination_last_page)
+                except (TypeError, ValueError):
+                    pagination_last_page = None
+            if pagination_current is not None:
+                try:
+                    pagination_current = int(pagination_current)
+                except (TypeError, ValueError):
+                    pagination_current = page
+            else:
+                pagination_current = page
+
+            if (
+                pagination_last_page is not None
+                and pagination_current >= pagination_last_page
+            ):
+                finish_reason = "completed"
+                break
+
+            if pagination_last_page is None and len(rows) < payload["paginate"]:
+                finish_reason = "completed"
+                break
+
+            page += 1
+
+        if finish_reason is None:
+            finish_reason = "completed"
+
+        print(f"MongoDB Summary → Inserted: {total_inserted}, Skipped: {total_skipped}")
+        if finish_reason == "no_data":
+            print("⚠️ No transaction IDs found — break")
+        else:
+            print(f"Finished. Last page = {last_page_with_data}")
+
+        if upload_to_sheet:
+            cls.upload_to_google_sheet_FTD_STD(collection, g_sheet_ID, g_sheet_tab)
+        
+    # SSBO FTD/STD Report
+    @classmethod
+    def ssbo_ftd_stdReport(cls, merchants, currency, collection, g_sheet_ID, g_sheet_tab, extra_mongo_collections=None):
+        
+        # Get today and yesterday date
+        today = datetime.now().strftime("%Y-%m-%d")
+        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Normalize currency input to list form for API payloads
+        if isinstance(currency, (list, tuple, set)):
+            currency = list(currency)
+        else:
+            currency = [currency]
+
+        # Cookie File
+        cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/superswan.json"
+
+        # Auto-create file if missing
+        os.makedirs(os.path.dirname(cookie_file), exist_ok=True)
+        if not os.path.exists(cookie_file):
+            open(cookie_file, "w").write('{"user_cookie": ""}')
+
+        # Load cookie
+        with open(cookie_file, "r", encoding="utf-8") as f:
+            cookie_data = json.load(f)
+
+        user_cookie = cookie_data.get("user_cookie", "")
+        bearer_token = cookie_data.get("bearer_token", "")
+
+        page = 0
+        max_pages = 1000
+        total_inserted = 0
+        total_skipped = 0
+        last_page_with_data = -1
+        finish_reason = None
+
+        while page < max_pages:
+
+            url = "https://aw8.premium-bo.com/cashmarket/api/sbo/report-management/get-first-time-deposit-report"
+
+            params = {
+                "page": page,
+                "size": 200,
+                "sort": "eventTime,DESC",
+                "tenantId": 35,
+                "merchants": merchants,
+                "merchantCode": merchants,
+                "currencies": currency,
+                "start": f"{yesterday}T17:00:00.000Z",
+                "startTime": f"{yesterday}T17:00:00.000Z",
+                "startCreatedTime": f"{yesterday}T17:00:00.000Z",
+                "end": f"{today}T16:59:59.000Z",
+                "endTime": f"{today}T16:59:59.000Z",
+                "endCreatedTime": f"{today}T16:59:59.000Z",
+                "timezone": 8,
+                "cacheBuster": int(time.time() * 1000)
+            }
+
+            headers = {
+                'accept': 'application/json, text/plain, */*',
+                'accept-language': 'en-US,en;q=0.9',
+                'authorization': f'Bearer {bearer_token}',
+                'cache-control': 'no-cache',
+                'pragma': 'no-cache',
+                'priority': 'u=1, i',
+                'referer': 'https://aw8.premium-bo.com/',
+                'sec-ch-ua': '"Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"macOS"',
+                'sec-fetch-dest': 'empty',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-site': 'same-origin',
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
+                'Cookie': f"_ga={user_cookie}" if user_cookie else ""
+            }
+
+            response = requests.get(url, headers=headers, params=params)
+
+            # Handle auth errors before trying to parse JSON
+            if response.status_code in (401, 403):
+                print(f"⚠️ Received {response.status_code} from server. Attempting to refresh cookies + bearer token...")
+                Automation.chrome_CDP()
+                cls._ssbo_get_cookies()
+                print("⚠️ Cookies + bearer token refreshed ... Retrying request...\n")
+                return cls.ssbo_ftd_stdReport(merchants, currency, collection, g_sheet_ID, g_sheet_tab, extra_mongo_collections=extra_mongo_collections)
+
+            # Try to parse JSON safely
+            try:
+                data = response.json()
+            except ValueError:
+                print("⚠️ Response is not valid JSON.")
+                print("Status code:", response.status_code)
+                print("Text preview:", response.text[:500])
+                finish_reason = "invalid_json"
+                break
+            
+            # Normalize data: SSBO sometimes returns a LIST, sometimes a DICT
+            if isinstance(data, list):
+                rows = data
+            elif isinstance(data, dict):
+                payload_block = data.get("data")
+                if isinstance(payload_block, list):
+                    rows = payload_block
+                elif isinstance(payload_block, dict):
+                    # some responses wrap rows inside "content" or "records"
+                    if "data" in payload_block and isinstance(payload_block["data"], list):
+                        rows = payload_block["data"]
+                    elif "records" in payload_block and isinstance(payload_block["records"], list):
+                        rows = payload_block["records"]
+                    else:
+                        extracted = None
+                        for value in payload_block.values():
+                            if isinstance(value, dict) and isinstance(value.get("data"), list):
+                                extracted = value.get("data", [])
+                                break
+                        rows = extracted or []
+                else:
+                    rows = []
+            else:
+                print("⚠️ Unexpected response type:", type(data))
+                finish_reason = "invalid_json"
+                break
+
+            if not isinstance(rows, list):
+                rows = []
+
+            print(f"Page {page} → {len(rows)} rows")
+
+            # STOP when no data
+            if not rows:
+                finish_reason = "no_data" if page == 0 else "completed"
+                if page > 0:
+                    last_page_with_data = page - 1
+                break
+
+            _, inserted, skipped = cls.mongodbAPI_ssbo_FTD_STD(rows, collection)
+            total_inserted += inserted
+            total_skipped += skipped
+            last_page_with_data = page
+
+            page += 1
+
+        if finish_reason is None and page >= max_pages:
+            finish_reason = "safety_stop"
+
+        print(f"MongoDB Summary → Inserted: {total_inserted}, Skipped: {total_skipped}")
+        if finish_reason == "no_data":
+            print("⚠️ No transaction IDs found — break")
+        elif finish_reason == "safety_stop":
+            print(f"⚠️ Stopped after {page} pages to avoid infinite loop.")
+        elif finish_reason == "invalid_json":
+            print("⚠️ Unable to continue due to invalid JSON response.")
+        else:
+            print(f"Finished. Last page = {last_page_with_data}")
+        
+        # upload to google sheet
+        cls.upload_to_google_sheet_ssbo_FTD_STD(collection, g_sheet_ID, g_sheet_tab, extra_mongo_collections=extra_mongo_collections)
+
+
+    # ====================================================================================
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SSBO & IBS MEMBER INFO =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # ====================================================================================
 
     # Member Info
     @classmethod
-    def member_info(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, upload_to_sheet=True):
+    def member_info(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, upload_to_sheet=True):
 
         # Get today date and time
         today = datetime.now()
@@ -1840,7 +3230,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             )
             
             # Retry request...
-            return cls.member_info(bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, upload_to_sheet=upload_to_sheet)
+            return cls.member_info(bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, upload_to_sheet=upload_to_sheet)
 
         # For loop page and fetch data
         for page in range(1, 10000): 
@@ -2596,9 +3986,62 @@ while True:
     try:
 
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # ============================================================== UM US AMR ====================================================================================
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        
+
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[UM & US] {Fore.YELLOW} AMR Data ... {Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
+        
+        print("\n>>== UM AMR ==<<")
+        Fetch.allmemberReport("29018465.asia", "uea8", "MYR", "+08:00", "UM_AMR", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM AMR")
+
+        Automation.chrome_CDP()
+        print("\n>>== UM AMR ==<<")
+        Fetch.ssbo_allmemberReport("Malaysia", "UM_AMR", "SSBO UM AMR", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0")
+        print("\n>>== US AMR ==<<")
+        Fetch.ssbo_allmemberReport("Singapore", "US_AMR", "SSBO US AMR", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0")
+        Automation.cleanup()
+
+
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # ============================================================== UM US FTD/STD ====================================================================================
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[UM] {Fore.YELLOW} FTD/STD Data ... {Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
+
+        # IBS UM MY
+        print("\n>>== IBS UM MY ==<<")
+        Fetch.ftd_stdReport("29018465.asia", "uea8", "MYR", "+08:00", "UM_FTD_STD", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM STD", upload_to_sheet=False)
+
+        # SSBO UM MY
+        print("\n>>== SSBO UM MY ==<<")
+        Fetch.ssbo_ftd_stdReport("uea", "MYR", "SSBO_UM_FTD_STD", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM STD", extra_mongo_collections=["UM_FTD_STD"])
+
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[US] {Fore.YELLOW} FTD/STD Data ... {Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
+
+        # SSBO US SG
+        print("\n>>== SSBO US SG ==<<")
+        Fetch.ssbo_ftd_stdReport("uea", "SGD", "SSBO_US_FTD_STD", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "US STD", extra_mongo_collections=["US_FTD_STD"])
+
+
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         # ============================================================== UM US MEMBER INFO =============================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         
+
         msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[UM] {Fore.YELLOW} MEMBER INFO Data ... {Style.RESET_ALL}\n"
         for ch in msg:
             sys.stdout.write(ch)
@@ -2607,7 +4050,7 @@ while True:
 
         # IBS UM MY
         print("\n>>== IBS UM MY ==<<")
-        Fetch.member_info("29018465.asia", "uea8", "MYR", "+08:00", "UM_MI", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM", "A", "E", upload_to_sheet=False)
+        Fetch.member_info("29018465.asia", "uea8", "MYR", "+08:00", "UM_MI", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM", upload_to_sheet=False)
         # SSBO UM MY
         print("\n>>== SSBO UM MY ==<<")
         Fetch.ssbo_member_info("uea", "MYR", "SSBO_UM_MI", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM", extra_mongo_collections=["UM_MI"])
@@ -2624,9 +4067,10 @@ while True:
         Fetch.ssbo_member_info("uea", "SGD", "SSBO_US_MI", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "US")
 
 
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== UM US PLAYER ID =============================================================================
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    #     # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    #     # ============================================================== UM US PLAYER ID ===============================================================================
+    #     # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 
         msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[UM] {Fore.YELLOW} DEPOSIT LIST Data ... (PLAYER_ID) {Style.RESET_ALL}\n"
         for ch in msg:
@@ -2637,16 +4081,24 @@ while True:
         # SSBO UM MY
         print("\n>>== SSBO UM MY ==<<")
         Fetch.ssbo_deposit_list_PID("uea", ["MYR"], "SSBO_UM_DL", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM DEPOSIT LIST", "A", "C", upload_to_sheet=False)
-        # SSBO US SG
-        print(">>== SSBO US SG ==<<")
-        Fetch.ssbo_deposit_list_PID("uea", ["SGD"], "SSBO_US_DL", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "US DEPOSIT LIST", "A", "C")
         # IBS UM MY 
         print(">>== IBS UM MY ==<<")
         Fetch.deposit_list_PID("29018465.asia", "uea8", "MYR", "+08:00", "UM_DL", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM DEPOSIT LIST", "A", "C", extra_mongo_collections=["SSBO_UM_DL"])
+        
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[US] {Fore.YELLOW} DEPOSIT LIST Data ... (PLAYER_ID) {Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
 
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== UM US USERNAME ================================================================================
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # SSBO US SG
+        print(">>== SSBO US SG ==<<")
+        Fetch.ssbo_deposit_list_PID("uea", ["SGD"], "SSBO_US_DL", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "US DEPOSIT LIST", "A", "C")
+
+
+    #     # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    #     # ============================================================== UM US USERNAME ================================================================================
+    #     # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[UM] {Fore.YELLOW} DEPOSIT LIST Data ... (USERNAME) {Style.RESET_ALL}\n"
         for ch in msg:
@@ -2657,12 +4109,20 @@ while True:
         # SSBO UM MY
         print("\n>>== SSBO UM MY ==<<")
         Fetch.ssbo_deposit_list_PID("uea", ["MYR"], "SSBO_UM_DL", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM DEPOSIT LIST 2", "A", "C", upload_to_sheet=False)
-        # SSBO US SG
-        print(">>== SSBO US SG ==<<")
-        Fetch.ssbo_deposit_list_PID("uea", ["SGD"], "SSBO_US_DL", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "US DEPOSIT LIST 2", "A", "C")
+        
         # IBS UM MY 
         print(">>== IBS UM MY ==<<")
         Fetch.deposit_list_USERNAME("29018465.asia", "uea8", "MYR", "+08:00", "UM_DL_USERNAME", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM DEPOSIT LIST 2", "A", "C", extra_mongo_collections=["SSBO_UM_DL"])
+
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[US] {Fore.YELLOW} DEPOSIT LIST Data ... (USERNAME) {Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
+        
+        # SSBO US SG
+        print(">>== SSBO US SG ==<<")
+        Fetch.ssbo_deposit_list_PID("uea", ["SGD"], "SSBO_US_DL", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "US DEPOSIT LIST 2", "A", "C")
 
         # Delay 10 minutes
         time.sleep(600)

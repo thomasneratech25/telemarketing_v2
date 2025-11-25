@@ -33,7 +33,7 @@ if not logger.handlers:
     logger.setLevel(logging.INFO)
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 
-    file_handler = logging.FileHandler(LOG_DIR / "superswan_errors.log", encoding="utf-8")
+    file_handler = logging.FileHandler(LOG_DIR / "others_errors.log", encoding="utf-8")
     file_handler.setLevel(logging.ERROR)
     file_handler.setFormatter(formatter)
 
@@ -281,171 +281,6 @@ class mongodb_2_gs:
                 token.write(creds.to_json())
 
         return creds
-
-    # ====================================================================================
-    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= SSBO DEPOSIT LIST (PLAYER ID) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    # ====================================================================================
-
-    # MongoDB Database
-    def mongodbAPI_ssbo_DL_PID(rows, collection):
-
-        # MongoDB API KEY
-        MONGODB_URI = os.getenv("MONGODB_API_KEY")
-
-        # Call MongoDB database and collection
-        client = MongoClient(MONGODB_URI)
-        db = client["OTHER"]
-        collection = db[collection]
-
-        # Set and Ensure when upload data this 3 Field are Unique Data
-        collection.create_index(
-            [("memberLogin", 1), ("confirmedAmount", 1), ("lastModifiedDate", 1)],
-            unique=True
-        )
-
-        # Count insert and skip
-        inserted = 0
-        skipped = 0
-        cleaned_docs = []
-
-        batch = []
-
-        # for each rows in a list of JSON objects return
-        for row in rows:
-            # Extract only the fields you want (Extract Data from json file)
-            memberLogin = row.get("memberLogin")
-            confirmedAmount = row.get("confirmedAmount")
-            lastModifiedDate = row.get("lastModifiedDate")
-
-            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
-            if lastModifiedDate:
-                try:
-                    dt = datetime.fromisoformat(lastModifiedDate.replace("Z", "+00:00"))
-                    lastModifiedDate_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
-                except Exception:
-                    lastModifiedDate_fmt = lastModifiedDate
-            else:
-                lastModifiedDate_fmt = ""
-
-            # Build the new cleaned document (Use for upload data to MongoDB)
-            doc = {
-                "memberLogin": memberLogin,
-                "confirmedAmount": confirmedAmount,
-                "lastModifiedDate": lastModifiedDate_fmt
-            }
-
-            # Keep the version without _id for uploading later
-            cleaned_docs.append(doc.copy())
-            batch.append(doc)
-
-            if len(batch) == 500:
-                try:
-                    collection.insert_many(batch, ordered=False)
-                    inserted += len(batch)
-                except Exception as exc:
-                    if hasattr(exc, "details"):
-                        skipped += len(exc.details.get("writeErrors", []))
-                        inserted += len(batch) - len(exc.details.get("writeErrors", []))
-                    else:
-                        skipped += 0
-                batch = []
-
-        # Insert any remaining documents in batch
-        if batch:
-            try:
-                collection.insert_many(batch, ordered=False)
-                inserted += len(batch)
-            except Exception as exc:
-                if hasattr(exc, "details"):
-                    skipped += len(exc.details.get("writeErrors", []))
-                    inserted += len(batch) - len(exc.details.get("writeErrors", []))
-                else:
-                    skipped += 0
-
-        print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}\n")
-        return cleaned_docs
-
-    # Update Data to Google Sheet from MongoDB
-    @classmethod
-    def upload_to_google_sheet_ssbo_DL_PID(cls, collection, gs_id, gs_tab, start_column, end_column, rows=None):
-
-        # Authenticate with OAuth2
-        creds = cls.googleAPI()
-        service = build("sheets", "v4", credentials=creds)
-        sheet = service.spreadsheets()
-
-        # Google Sheet ID and Sheet Tab Name (range name)
-        SPREADSHEET_ID = gs_id
-        RANGE_NAME = f"{gs_tab}!{start_column}3:{end_column}"
-
-        # Convert from MongoDB (dics) to Google Sheet API (list), because Google Sheets API only accept "list".
-        def sanitize_rows(raw_rows):
-            """Normalize rows into list-of-lists; keep completed_at unchanged."""
-            sanitized = []
-            for r in raw_rows:
-                if isinstance(r, dict):
-                    pid = str(r.get("player_id", ""))
-                    if pid and not pid.startswith("'"):
-                        pid = f"'{pid}"  # force Google Sheets to treat as text
-                    sanitized.append([
-                        pid,
-                        str(r.get("amount", "")),
-                        r.get("completed_at", ""),  # do not coerce to str
-                    ])
-                elif isinstance(r, (list, tuple)):
-                    pid = str(r[0]) if len(r) > 0 else ""
-                    if pid and not pid.startswith("'"):
-                        pid = f"'{pid}"
-                    sanitized.append([
-                        pid,
-                        str(r[1]) if len(r) > 1 else "",
-                        r[2] if len(r) > 2 else "",  # do not coerce to str
-                    ])
-                else:
-                    sanitized.append([str(r), "", ""])
-            return sanitized
-
-        # If no data upload to MongoDB, it auto upload data to google sheet
-        if not rows:
-            load_dotenv()
-            MONGODB_URI = os.getenv("MONGODB_API_KEY")
-            if not MONGODB_URI:
-                raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
-            client = MongoClient(MONGODB_URI)
-
-            db = client["OTHER"]
-            collection = db[collection]
-            documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
-            rows = documents
-            
-        rows = sanitize_rows(rows)
-
-        if not rows:
-            print("No rows found to upload to Google Sheet.")
-            return
-
-        body = {"values": rows, "majorDimension": "ROWS"}
-
-        print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
-        # Clear previous data then write the fresh rows
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME
-        ).execute()
-
-        try:
-            sheet.values().update(
-                spreadsheetId=SPREADSHEET_ID,
-                range=RANGE_NAME,
-                valueInputOption="USER_ENTERED",  # let Sheets parse dates/numbers
-                body=body
-            ).execute()
-        except Exception as exc:
-            print(f"Failed to upload to Google Sheets: {exc}")
-            raise
-
-        # print("Rows to upload:", rows)
-        print("Uploaded MongoDB data to Google Sheet.")
 
     # ====================================================================================
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= DEPOSIT LIST (PLAYER ID) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -1130,36 +965,6 @@ class mongodb_2_gs:
 # Fetch Data
 class Fetch(Automation, BO_Account, mongodb_2_gs):
     
-    # =========================== Listener ===========================
-
-    # Listener
-    def notify_listener(collection, gs_id, gs_tab, start_column, end_column, mode):
-        cfg = {
-            "collection": collection,
-            "sheet_id": gs_id,
-            "sheet_tab": gs_tab,
-            "start_col": start_column,
-            "end_col": end_column,
-            "mode": mode
-        }
-
-        max_retries = None  # infinite retry
-        attempt = 0
-
-        while True:
-            try:
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout(3)
-                s.connect(("127.0.0.1", 5050))
-                s.sendall((json.dumps(cfg) + "\n").encode())
-                s.close()
-                print("Listener notified →", cfg)
-                break
-            except Exception as e:
-                attempt += 1
-                print(f"Notify listener failed (attempt {attempt}): {e} → retrying in 2 sec...")
-                time.sleep(2)
-
     # =========================== GET Cookies ===========================
 
     # Get IBS Cookies incase Cookies expired
@@ -1237,142 +1042,18 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             browser.close()
             Automation.cleanup()
 
-    # Get SSBO Cookies incase Cookies expired
-    @classmethod
-    def _ssbo_get_cookies(cls):
-        with sync_playwright() as p:  
-            
-            # Load Env
-            load_dotenv("/Users/nera_thomas/Desktop/Telemarketing/.env")
-
-            # Wait for Chrome CDP to be ready
-            cls.wait_for_cdp_ready()
-
-            # Connect to running Chrome
-            browser = p.chromium.connect_over_cdp("http://localhost:9222")
-            context = browser.contexts[0] if browser.contexts else browser.new_context()    
-
-            # Open a new browser page
-            page = context.pages[0] if context.pages else context.new_page()
-            page.goto("https://aw8.premium-bo.com/#/member/member-info", wait_until="load", timeout=0)
-
-            # if announment appear, then click close
-            try:
-                # Wait for "Member" appear
-                expect(page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[4]/div[1]/div[1]/a[1]/ul[1]/li[2]")).to_be_visible(timeout=30000)
-                # Check whether "Merchant credit balance is low" appear, else pass
-                expect(page.locator("//div[normalize-space()='Merchant credit balance is low.']")).to_be_visible(timeout=1500)
-                # Click checkbox
-                page.locator("//div[@class='disable-low-merchant-credit-balance']//input[@type='checkbox']").click()
-                time.sleep(1)
-                # Click Close
-                page.locator("//button[normalize-space()='Close']").click()
-            except:
-                pass
-
-            # if is in Login Page, then Login, else Skip
-            try:
-                # Check whether "Sign In" appear, else pass
-                expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=2000)
-                # Fill in Username
-                page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan"]["acc_ID"])
-                # Fill in Password
-                page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan"]["acc_PASS"])
-                # Login 
-                page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
-                # Delay 2 second
-                page.wait_for_timeout(2000)
-                # 
-            except:
-                pass
-
-            # if is in Login Page, then Login, else Skip
-            try:
-                # Check whether "Sign In" appear, else pass
-                expect(page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[1]/h5[1]")).to_be_visible(timeout=4000)
-                # Fill in Username
-                page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[2]/div[2]/jhi-text-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_ID"])
-                # Fill in Password
-                page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[3]/div[2]/jhi-password-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_PASS"])
-                # Login 
-                page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
-                # Delay 2 second
-                page.wait_for_timeout(2000)
-                # Click Member
-                page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[4]/div[1]/div[1]/a[1]/ul[1]/li[2]").click()
-                # Click Member Info
-                page.locator("//a[@ng-reflect-router-link='/member/member-info']//li[@class='parent-nav-item'][normalize-space()='1.3. Member Info']").click()
-            except:
-                pass
-            
-            # Click All
-            page.locator("//button[normalize-space()='All']").click()
-            # Delay 1 second
-            page.wait_for_timeout(1000)
-
-            # Extract all cookies
-            cookies = context.cookies()
-
-            # # Convert to Json Format
-            # cookies_json = json.dumps(cookies, indent=4, ensure_ascii=False)
-            # print(cookies_json)
-
-            # Extract all cookies starting with "_ga"
-            ga_cookies = [c for c in cookies if c.get("name", "").startswith("_ga")]
-
-            # Initialize parts list
-            parts = []
-
-            # ============== Get GA1 Cookies ===============
-
-            for c in ga_cookies:
-                name = c.get("name")
-                value = c.get("value")
-                if name == "_ga":  # main GA cookie
-                    parts.append(value)
-                else:
-                    parts.append(f"{name}={value}")
-
-            # Join everything with "; "
-            combined_ga = "; ".join(parts)
-            # print(f"✅ Combined GA cookies: {combined_ga}")
-
-            # =============== Get Bearer Token =================
-
-            bearer_token = ""
-            try:
-                keys = page.evaluate("() => Object.keys(localStorage)")
-                for key in keys:
-                    value = page.evaluate(f"() => window.localStorage.getItem('{key}')")
-                    # Find "jwt":"xxxxx" inside JSON text
-                    match = re.search(r'"jwt"\s*:\s*"([^"]+)"', value or "")
-                    if match:
-                        bearer_token = match.group(1)
-                        # print(f"✅ Found Bearer Token:\nBearer {bearer_token}")
-                        break
-            except Exception as e:
-                print(f"⚠️ Error extracting bearer token: {e}")
-
-            # Save cookie and bearer token to JSON file
-            data = {
-                "user_cookie": combined_ga,
-                "bearer_token": bearer_token
-            }
-            output_path = "/Users/nera_thomas/Desktop/Telemarketing/get_cookies/superswan.json"
-            with open(output_path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
-
-            print(f"✅ Get Super Swan Cookies + Bearer Token Successful ...")
-
-            # Browser Quit
-            browser.close()
-            Automation.cleanup()
-
     # =========================== DEPOSIT LIST ===========================
 
     # Deposit List (Player ID)
     @classmethod
-    def deposit_list_PID(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column):
+    def deposit_list_PID(cls, bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column):
+        
+        # Print Color Messages
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {team} {Fore.YELLOW} DEPOSIT LIST Data...{Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
 
         # Get today date and time
         today = datetime.now()
@@ -1451,7 +1132,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             )
             
             # Retry request...
-            return cls.deposit_list_PID(bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column)
+            return cls.deposit_list_PID(bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column)
 
 
         # For loop page and fetch data
@@ -1608,235 +1289,19 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         # Upload Data to Google Sheet by reading from MongoDB
         mongodb_2_gs.upload_to_google_sheet_DL_USERNAME(cls, collection, gs_id, gs_tab, start_column, end_column)
 
-    # SSBO Deposit List (Player ID)
-    @classmethod
-    def ssbo_deposit_list_PID(cls, merchants, currency, collection, gs_id, gs_tab):
-
-        # Get today and yesterday date
-        today = datetime.now().strftime("%Y-%m-%d")
-        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-
-        # Cookie File
-        cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/superswan.json"
-
-        # Auto-create file if missing
-        os.makedirs(os.path.dirname(cookie_file), exist_ok=True)
-        if not os.path.exists(cookie_file):
-            open(cookie_file, "w").write('{"user_cookie": ""}')
-
-        # Load cookie
-        with open(cookie_file, "r", encoding="utf-8") as f:
-            cookie_data = json.load(f)
-
-        user_cookie = cookie_data.get("user_cookie", "")
-        bearer_token = cookie_data.get("bearer_token", "")
-
-        # ======================================= PART 1: Get the ID ==========================================
-        
-        ids = []
-        page = 0
-        
-        while True:
-
-            url = "https://aw8.premium-bo.com/cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit"
-
-            params = {
-                "page": page,
-                "size": 2000,
-                "sort": ["membershipLevel,DESC", "createdDate,DESC"],
-                "tenantId": 35,
-                "merchants": merchants,
-                "merchant": merchants,
-                "merchantCode": merchants,
-                "currencies": currency,
-                "start": f"{yesterday}T16:00:00.000Z",
-                "startTime": f"{yesterday}T16:00:00.000Z",
-                "startCreatedTime": f"{yesterday}T16:00:00.000Z",
-                "end": f"{today}T15:59:59.000Z",
-                "endTime": f"{today}T15:59:59.000Z",
-                "endCreatedTime": f"{today}T15:59:59.000Z",
-                "transType": "D",
-                "approved": "true",
-                "rejected": "false",
-                "pending": "false",
-                "inProgress": "false",
-                "risk": "false",
-                "kyc": "false",
-                "isProcessingTime": "false",
-                "hasDepositHideProcessingFees": "false",
-                "isAllowViewAccountNumber": "false",
-                "maskReloadAccountNumberCurrencyList": "",
-                "firstDeposit": "ALL",
-                "hiddenColumns": [
-                    "merchant",
-                    "region",
-                    "affiliateGroupCategory",
-                    "affiliateLogin",
-                    "processingFee",
-                    "bankStatus"
-                ],
-                "isSeamlessWalletMerchant": "null",
-                "cacheBuster": str(int(time.time() * 1000))
-            }
-
-
-            headers = {
-            'accept': 'application/json, text/plain, */*',
-            'accept-language': 'en-US,en;q=0.9',
-            'authorization': f'Bearer {bearer_token}',
-            'cache-control': 'no-cache',
-            'pragma': 'no-cache',
-            'priority': 'u=1, i',
-            'referer': 'https://aw8.premium-bo.com/',
-            'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"macOS"',
-            'sec-fetch-dest': 'empty',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-site': 'same-origin',
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
-            'Cookie': f'_ga={user_cookie}',
-            }
-
-            # Get Post Response
-            query = urlencode(params, doseq=True)
-            full_url = f"{url}?{query}"
-
-            response = requests.get(full_url, headers=headers)
-
-            # Handle auth errors before trying to parse JSON
-            if response.status_code in (401, 403):
-                print(f"⚠️ Received {response.status_code} from server. Attempting to refresh cookies + bearer token...")
-                Automation.chrome_CDP()
-                cls._ssbo_get_cookies()
-                print("⚠️ Cookies + bearer token refreshed ... Retrying request...\n")
-                cls.ssbo_member_info(merchants, currency, collection, gs_id, gs_tab)
-                return
-            
-            # Try to parse JSON safely
-            try:
-                data = response.json()
-            except ValueError:
-                print("⚠️ Response is not valid JSON.")
-                print("Status code:", response.status_code)
-                print("Text preview:", response.text[:500])
-                return
-
-            # List store all Member ID
-            ids = []
-            try:
-                data = response.json()  # Try converting to JSON
-                if isinstance(data, list):
-                    ids = [item.get("id") for item in data if isinstance(item, dict) and "id" in item]
-                    # print("All IDs:", ids)
-                else:
-                    print("⚠️ Unexpected JSON format:", data)
-            except ValueError:
-                print("⚠️ Response not valid JSON:")
-                print(response.text)
-
-            print(f"✅ Page {page}: Total IDs found:", len(ids))
-            
-            # ======================================= PART 2: Use IDs to GET DATA  (funny lol) ==========================================
-            
-            if not ids:
-                print("⚠️ No transaction IDs found — break")
-                break
-
-            base_url = "https://aw8.premium-bo.com/cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit-details"
-            params = {
-                "page": 0,
-                "size": 2000,
-                "sort": ["membershipLevel,ASC", "createdDate,ASC"],
-                "tenantId": 35,
-                "merchants": merchants,
-                "merchant": merchants,
-                "merchantCode": merchants,
-                "currencies": currency,
-                "start": f"{yesterday}T16:00:00.000Z",
-                "startTime": f"{yesterday}T16:00:00.000Z",
-                "startCreatedTime": f"{yesterday}T16:00:00.000Z",
-                "end": f"{today}T15:59:59.000Z",
-                "endTime": f"{today}T15:59:59.000Z",
-                "endCreatedTime": f"{today}T15:59:59.000Z",
-                "transType": "D",
-                "approved": "true",
-                "rejected": "false",
-                "pending": "false",
-                "inProgress": "false",
-                "risk": "false",
-                "kyc": "false",
-                "isProcessingTime": "false",
-                "hasDepositHideProcessingFees": "false",
-                "isAllowViewAccountNumber": "false",
-                "maskReloadAccountNumberCurrencyList": "",
-                "firstDeposit": "ALL",
-                "hiddenColumns": [
-                    "merchant",
-                    "region",
-                    "affiliateGroupCategory",
-                    "affiliateLogin",
-                    "processingFee",
-                    "bankStatus"
-                ],
-                "isSeamlessWalletMerchant": "null",
-                "cacheBuster": str(int(time.time() * 1000))
-            }
-
-            base_query = urlencode(params, doseq=True)
-            transaction_ids_query = "transactionIds=" + "%2C".join(str(i) for i in ids)
-            url = f"{base_url}?{base_query}&{transaction_ids_query}"
-
-            headers = {
-                'accept': 'application/json, text/plain, */*',
-                'accept-language': 'en-US,en;q=0.9',
-                'authorization': f'Bearer {bearer_token}',
-                'cache-control': 'no-cache',
-                'pragma': 'no-cache',
-                'priority': 'u=1, i',
-                'referer': 'https://aw8.premium-bo.com/',
-                'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"',
-                'sec-ch-ua-mobile': '?0',
-                'sec-ch-ua-platform': '"macOS"',
-                'sec-fetch-dest': 'empty',
-                'sec-fetch-mode': 'cors',
-                'sec-fetch-site': 'same-origin',
-                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
-                'Cookie': f'_ga={user_cookie}',
-            }
-
-            response = requests.get(url, headers=headers)
-            print(response.json())
-
-            # Safe JSON Handling
-            try:
-                data = response.json()
-            except Exception:
-                print("Invalid JSON response from API!")
-                print("Status Code:", response.status_code)
-                print("Response text:", response.text[:500])
-                return
-
-            rows = data.get("data", [])
-            print(f"\nPage {page} → {len(rows)} rows")
-
-            # STOP when no data
-            if not rows:
-                print(f"Finished. Last page = {page-1}")
-                break
-
-            # Insert into MongoDB
-            if "data" in data and len(data["data"]) > 0:
-                cls.mongodbAPI_ssbo_DL_PID(data["data"], collection)
-            else:
-                print("No data returned from API.")
-
 
     # =========================== Member Info ===========================
 
     # Member Info
     @classmethod
-    def member_info(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column):
+    def member_info(cls, bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column):
+        
+        # Print Team Name Messages
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {team} {Fore.YELLOW} MEMBER INFO Data...{Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
 
         # Get today date and time
         today = datetime.now()
@@ -1864,7 +1329,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         "currency": [
             currency
         ],
-        "register_from": "2025-11-01",
+        "register_from": today,
         "register_to": today,
         "merchant_id": 1,
         "admin_id": 581,
@@ -1921,7 +1386,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             )
             
             # Retry request...
-            return cls.member_info(bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column)
+            return cls.member_info(bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column)
 
         # For loop page and fetch data
         for page in range(1, 10000): 
@@ -1955,12 +1420,18 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 print("No data returned from API.")
 
         # Upload Data to Google Sheet by reading from MongoDB
-        mongodb_2_gs.upload_to_google_sheet_no_duplicate(collection, gs_id, gs_tab)
-        # mongodb_2_gs.upload_to_google_sheet_MI(collection, gs_id, gs_tab)
+        mongodb_2_gs.upload_to_google_sheet_MI(collection, gs_id, gs_tab)
 
     # Member Info (Split data)
     @classmethod
-    def member_info_SPLIT_DATA(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab):
+    def member_info_SPLIT_DATA(cls, bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab):
+        
+        # Print Team Name Messages
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {team} {Fore.YELLOW} MEMBER INFO Data...{Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
 
         # Get today date and time
         today = datetime.now()
@@ -2044,7 +1515,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             )
             
             # Retry request...
-            return cls.member_info_SPLIT_DATA(bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab)
+            return cls.member_info_SPLIT_DATA(bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab)
             
         # For loop page and fetch data
         for page in range(1, 10000): 
@@ -2080,226 +1551,6 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         # Upload Data to Google Sheet by reading from MongoDB
         mongodb_2_gs.upload_to_google_sheet_MI_SPLIT_DATA(collection, gs_id, gs_tab)
 
-    # SSBO Member Info (merchants name = aw8, ip9, uea)
-    @classmethod
-    def ssbo_member_info(cls, merchants, currency, collection, gs_id, gs_tab):
-
-        # Get today and yesterday date
-        today = datetime.now().strftime("%Y-%m-%d")
-        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-
-        # Cookie File
-        cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/superswan.json"
-
-        # Auto-create file if missing
-        os.makedirs(os.path.dirname(cookie_file), exist_ok=True)
-        if not os.path.exists(cookie_file):
-            open(cookie_file, "w").write('{"user_cookie": ""}')
-
-        # Load cookie
-        with open(cookie_file, "r", encoding="utf-8") as f:
-            cookie_data = json.load(f)
-
-        user_cookie = cookie_data.get("user_cookie", "")
-        bearer_token = cookie_data.get("bearer_token", "")
-
-        # ======================================= PART 1: Get the Member ID ==========================================
-
-        ids = []
-        page = 0
-
-        while True:
-
-            url = f"https://aw8.premium-bo.com/cashmarket/api/sbo/member-management/get-member-list-by-filter?page={page}&size=200&sort=m.id,DESC&cacheBuster=1762790852830"
-
-            payload = json.dumps({
-            "tenantId": 35,
-            "merchants": [
-                merchants
-            ],
-            "merchant": merchants,
-            "merchantCode": merchants,
-            "currencies": currency,
-            "loginID": None,
-            "matchFullPhone": True,
-            "status": None,
-            "name": None,
-            "bankAccount": None,
-            "cryptoAddress": None,
-            "id": None,
-            "affiliate": None,
-            "contactType": None,
-            "phone": None,
-            "group": None,
-            "kyc": None,
-            "kycStatus": None,
-            "applicantLevel": None,
-            "approvedKycLevel": None,
-            "referralSource": None,
-            "provider": None,
-            "playID": None,
-            "risk": None,
-            "referrerLogin": None,
-            "refCode": None,
-            "fingerprint": None,
-            "created_date_from": f"{yesterday}T16:00:00.000Z",
-            "created_date": f"{today}T15:59:59.000Z",
-            "registerDate": None,
-            "last_login_date_from": None,
-            "last_login_date_to": None,
-            "bankGroupId": None,
-            "complianceViewMemberSocialMediaDetails": True,
-            "tagIds": None,
-            "keyword": None,
-            "multiple": None,
-            "affiliateGroupCategoryId": None,
-            "hiddenColumns": [
-                "disableWithdrawalOneTimeTurnover"
-            ],
-            "socialMediaProvider": None,
-            "flagLegends": None,
-            "disableWithdrawalOneTimeTurnover": None,
-            "enableShowTotalWallet": False,
-            "bankGroupFeature": None,
-            "statusMemberWithdrawLimit": None,
-            "dobDateFrom": None,
-            "dobDateTo": None,
-            "mask": False
-            })
-            headers = {
-            'accept': 'application/json, text/plain, */*',
-            'accept-language': 'en-US,en;q=0.9',
-            'authorization': f'Bearer {bearer_token}',
-            'cache-control': 'no-cache',
-            'content-type': 'application/json',
-            'origin': 'https://aw8.premium-bo.com',
-            'pragma': 'no-cache',
-            'priority': 'u=1, i',
-            'referer': 'https://aw8.premium-bo.com/',
-            'sec-ch-ua': '"Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-            'sec-fetch-dest': 'empty',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-site': 'same-origin',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
-            'Cookie': f'_ga={user_cookie}'
-            }
-
-            # Get Post Response
-            response = requests.request("POST", url, headers=headers, data=payload)
-
-            # Handle auth errors before trying to parse JSON
-            if response.status_code in (401, 403):
-                print(f"⚠️ Received {response.status_code} from server. Attempting to refresh cookies + bearer token...")
-                Automation.chrome_CDP()
-                cls._ssbo_get_cookies()
-                print("⚠️ Cookies + bearer token refreshed ... Retrying request...\n")
-                cls.ssbo_member_info(merchants, currency, collection, gs_id, gs_tab)
-                return
-            
-            # Try to parse JSON safely
-            try:
-                data = response.json()
-            except ValueError:
-                print("⚠️ Response is not valid JSON.")
-                print("Status code:", response.status_code)
-                print("Text preview:", response.text[:500])
-                return
-
-            # List store all Member ID
-            ids = []
-            try:
-                data = response.json()  # Try converting to JSON
-                if isinstance(data, list):
-                    ids = [item.get("id") for item in data if isinstance(item, dict) and "id" in item]
-                    # print("All IDs:", ids)
-                else:
-                    print("⚠️ Unexpected JSON format:", data)
-            except ValueError:
-                print("⚠️ Response not valid JSON:")
-                print(response.text)
-
-            print(f"✅ Page {page}: Total IDs found:", len(ids))
-
-
-            # ======================================= PART 2: Use Member ID to GET DATA  (funny lol) ==========================================
-            
-            if not ids:
-                print("⚠️ No transaction IDs found — break")
-                break
-
-
-            # Build URL dynamically with all memberIds as repeated params
-            base_url = "https://aw8.premium-bo.com/cashmarket/api/sbo/member-management/get-member-info-details-by-ids"
-            params = {
-                "page": 0,
-                "size": 200,
-                "sort": "m.id,DESC",
-                "tenantId": 35,
-                "currencies": currency,
-                "matchFullPhone": "true",
-                "createdDateFrom": f"{yesterday}T16:00:00.000Z",
-                "createdDate": f"{today}T15:59:59.000Z",
-                "complianceViewMemberSocialMediaDetails": "true",
-                "enableShowTotalWallet": "false",
-                "mask": "false",
-                "merchants": merchants,
-                "merchant": merchants,
-                "merchantCode": merchants
-            }
-            # Build repeated memberIds params
-            member_ids_query = "&".join([f"memberIds={mid}" for mid in ids])
-            base_query = urlencode(params, doseq=True)
-            url = f"{base_url}?{base_query}&{member_ids_query}"
-
-            payload = {}
-            headers = {
-                'accept': 'application/json, text/plain, */*',
-                'accept-language': 'en-US,en;q=0.9',
-                'authorization': f'Bearer {bearer_token}',
-                'cache-control': 'no-cache',
-                'pragma': 'no-cache',
-                'priority': 'u=1, i',
-                'referer': 'https://aw8.premium-bo.com/',
-                'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"',
-                'sec-ch-ua-mobile': '?0',
-                'sec-ch-ua-platform': '"macOS"',
-                'sec-fetch-dest': 'empty',
-                'sec-fetch-mode': 'cors',
-                'sec-fetch-site': 'same-origin',
-                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
-                'Cookie': f'_ga={user_cookie}',
-            }
-
-            response = requests.request("GET", url, headers=headers, data=payload)
-
-            # Normalize rows from list or dict
-            if isinstance(response.json(), list):
-                rows = response.json()            # SSBO returns list of dicts
-            elif isinstance(response.json(), dict):
-                rows = response.json().get("data", [])
-            else:
-                rows = []
-
-            # Insert into MongoDB ONLY if rows contain SSBO fields
-            valid_rows = [
-                r for r in rows
-                if isinstance(r, dict) and (
-                    "login" in r or
-                    "name" in r or
-                    "registerDate" in r or
-                    "phone" in r
-                )
-            ]
-
-            if valid_rows:
-                cls.mongodbAPI_ssbo_MI(valid_rows, collection)
-            else:
-                print("No valid SSBO rows returned from API.")
-            
-            page+=1
-
 
 ###############=================================== CODE RUN HERE =======================================############
 
@@ -2312,29 +1563,34 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 
 while True:
     try:
-        # =-=-=-=-==-=-=-=-=-= DEPOSIT LIST =-=-=-=-==-=-=-=-=-=
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-=-= S5T DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=
+        # ==========================================================================
 
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} S5T {Fore.YELLOW} DEPOSIT LIST Data...{Style.RESET_ALL}\n"
-        for ch in msg:
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-            time.sleep(0.01)
+        # S55 (S5T) (DEPOSIT LIST)
+        Fetch.deposit_list_PID("s55bo.com", "s55", "S5T" "THB", "+07:00", "S55_S5T_DL", "12Eu4ZGeRkcqgUWscQ-ZNetBq-Xz0xQGWvifWRbzXqL4", "DEPOSIT LIST", "A", "C")
 
-        # # S55 (S5T) 
-        Fetch.deposit_list_PID("s55bo.com", "s55", "THB", "+07:00", "S55_S5T_DL", "12Eu4ZGeRkcqgUWscQ-ZNetBq-Xz0xQGWvifWRbzXqL4", "DEPOSIT LIST", "A", "C")
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= JOLIBEE MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=
+        # ==========================================================================
 
-        # # =-=-=-=-==-=-=-=-= MEMBER INFO =-=-=-=-==-=-=-=-=-=
+        # Krisitian & Amber (MEMBER INFO)
+        gs_ids = ["1zhn-TsD-oblmZ4sf4WWA2im9sV2AobV5QwkYlexjihc", "1gGp54nbz8cUIAbRWuc4blnwEUS-MVwgr9zwTgtAebFo"]
+        Fetch.member_info_SPLIT_DATA("jolibetbo.com", "joli", "Kristian & Amber", "PHP", "+08:00", "JOLI_MI", gs_ids, "jp")
 
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} JOLI {Fore.YELLOW} MEMBER INFO Data...{Style.RESET_ALL}\n"
-        for ch in msg:
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-            time.sleep(0.01)
+        # Krisitian & Amber (DEPOSIT LIST)
+        Fetch.deposit_list_PID("jolibetbo.com", "joli", "Joli Kristian", "PHP", "+08:00", "JOLI_DL", "1zhn-TsD-oblmZ4sf4WWA2im9sV2AobV5QwkYlexjihc", "DEPOSIT LIST", "A", "C")
+        Fetch.deposit_list_PID("jolibetbo.com", "joli", "Joli Amber", "PHP", "+08:00", "JOLI_DL", "1gGp54nbz8cUIAbRWuc4blnwEUS-MVwgr9zwTgtAebFo", "DEPOSIT LIST", "A", "C")
 
-        # Input 2 Google Sheet ID
-        gs_ids = ["1Lh8HI7YSz7I2XvwQ63lYK_b1b09AMeIvEBwRAxFXchA", "1JBHT3uCvRjmX5ruxkkGDfgH7c19KFjyd0qQl_iJVaCs"]
-        # Jolibeee GMT+8
-        Fetch.member_info_SPLIT_DATA("jolibetbo.com", "joli", "PHP", "+08:00", "JOLI_MI", gs_ids, "joli")
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= S369T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # S369T (MEMBER INFO)
+        Fetch.member_info("uhy3umx.com", "s369", "S369T" "THB", "+07:00", "S369_S369T_MI", "1lKc2k0gnsPeyUpXC1mUyxVO628dX2tWjuATIWqybC_8", "S369T", "A", "E")
+        
+        # S369T (DEPOSIT LIST)
+        Fetch.deposit_list_PID("uhy3umx.com", "s369", "S369T", "THB", "+07:00", "S369_S369T_DL", "1lKc2k0gnsPeyUpXC1mUyxVO628dX2tWjuATIWqybC_8", "DEPOSIT LIST", "A", "C")
 
         time.sleep(600)
 
@@ -2344,3 +1600,4 @@ while True:
     except Exception:
         logger.exception("Unexpected error; retrying in 60 seconds.")
         time.sleep(60)
+

@@ -33,7 +33,7 @@ if not logger.handlers:
     logger.setLevel(logging.INFO)
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 
-    file_handler = logging.FileHandler(LOG_DIR / "superswan_errors.log", encoding="utf-8")
+    file_handler = logging.FileHandler(LOG_DIR / "j8ms_aw8s_errors.log", encoding="utf-8")
     file_handler.setLevel(logging.ERROR)
     file_handler.setFormatter(formatter)
 
