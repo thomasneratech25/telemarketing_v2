@@ -1893,3 +1893,112 @@ Traceback (most recent call last):
   File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 558, in wrap_api_call
     raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
 playwright._impl._errors.TargetClosedError: Page.wait_for_timeout: Target page, context or browser has been closed
+2025-11-26 10:05:04,635 [ERROR] Unexpected error; retrying in 60 seconds.
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US.py", line 4107, in <module>
+    time.sleep(0.01)
+    ~~~~~~~~~~^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US.py", line 3967, in ssbo_deposit_list_PID
+    cls.mongodbAPI_ssbo_DL_PID(rows, collection)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US.py", line 1715, in mongodbAPI_ssbo_DL_PID
+    client = MongoClient(MONGODB_URI)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 891, in __init__
+    self._get_topology()  # type: ignore[unused-coroutine]
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1758, in _get_topology
+    self._resolve_srv()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 910, in _resolve_srv
+    res = uri_parser._parse_srv(
+        entity,
+    ...<6 lines>...
+        srv_max_hosts=srv_max_hosts,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/uri_parser.py", line 169, in _parse_srv
+    dns_options = dns_resolver.get_options()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/srv_resolver.py", line 110, in get_options
+    raise ConfigurationError(str(exc)) from None
+pymongo.errors.ConfigurationError: The resolution lifetime expired after 21.154 seconds: Server Do53:10.0.0.1@53 answered The DNS operation timed out.; Server Do53:10.0.0.1@53 answered The DNS operation timed out.; Server Do53:10.0.0.1@53 answered The DNS operation timed out.; Server Do53:10.0.0.1@53 answered The DNS operation timed out.; Server Do53:10.0.0.1@53 answered The DNS operation timed out.; Server Do53:10.0.0.1@53 answered The DNS operation timed out.; Server Do53:10.0.0.1@53 answered The DNS operation timed out.
+2025-11-26 11:23:01,465 [ERROR] Unexpected error; retrying in 60 seconds.
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.29018465.asia', port=443): Max retries exceeded with url: /api/be/report/get-all-member-report (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US.py", line 3999, in <module>
+    print("\n>>== UM AMR ==<<")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US.py", line 2591, in allmemberReport
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='v3-bo.29018465.asia', port=443): Max retries exceeded with url: /api/be/report/get-all-member-report (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-11-26 11:24:02,185 [ERROR] Unexpected error; retrying in 60 seconds.
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.29018465.asia', port=443): Max retries exceeded with url: /api/be/report/get-all-member-report (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US.py", line 3999, in <module>
+    print("\n>>== UM AMR ==<<")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US.py", line 2591, in allmemberReport
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='v3-bo.29018465.asia', port=443): Max retries exceeded with url: /api/be/report/get-all-member-report (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))

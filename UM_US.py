@@ -2615,7 +2615,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             rows = data.get("data", [])
             pagination = data.get("pagination", {})
 
-            print(f"Page {page} → {len(rows)} rows")
+            print(f"\nPage {page} → {len(rows)} rows")
 
             if not isinstance(rows, list):
                 rows = []
@@ -2918,7 +2918,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             if not isinstance(rows, list):
                 rows = []
 
-            print(f"Page {page} → {len(rows)} rows")
+            print(f"\nPage {page} → {len(rows)} rows")
 
             if not rows:
                 finish_reason = "no_data" if page == 1 else "completed"
@@ -3106,7 +3106,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             if not isinstance(rows, list):
                 rows = []
 
-            print(f"Page {page} → {len(rows)} rows")
+            print(f"\nPage {page} → {len(rows)} rows")
 
             # STOP when no data
             if not rows:
@@ -3250,7 +3250,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 return
 
             rows = data.get("data", [])
-            print(f"Page {page} → {len(rows)} rows")
+            print(f"\nPage {page} → {len(rows)} rows")
 
             # STOP when no data
             if not rows:
@@ -3603,7 +3603,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 return
 
             rows = data.get("data", [])
-            # print(f"\nPage {page} → {len(rows)} rows")
+            print(f"\nPage {page} → {len(rows)} rows")
 
             # STOP when no data
             if not rows:
@@ -3721,7 +3721,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 return
 
             rows = data.get("data", [])
-            # print(f"\nPage {page} → {len(rows)} rows")
+            print(f"\nPage {page} → {len(rows)} rows")
 
             # STOP when no data
             if not rows:
@@ -3955,7 +3955,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 print("⚠️ Unexpected response type:", type(data))
                 return
 
-            # print(f"Page {page} → {len(rows)} rows")
+            print(f"\nPage {page} → {len(rows)} rows")
 
             # STOP when no data
             if not rows:

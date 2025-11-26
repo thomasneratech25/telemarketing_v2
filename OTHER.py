@@ -44,6 +44,31 @@ if not logger.handlers:
     logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
 
+def safe_call(func, *args, description=None, retries=5, delay=60, **kwargs):
+    """
+    Call a function safely with retries.
+
+    Parameters:
+        func: callable to execute.
+        description: Optional string used in logs for readability.
+        retries: Number of attempts before giving up.
+        delay: Seconds to wait between retries.
+    """
+    attempt = 1
+    label = description or getattr(func, "__name__", "callable")
+    while True:
+        try:
+            return func(*args, **kwargs)
+        except KeyboardInterrupt:
+            raise
+        except Exception:
+            logger.exception("Error during %s (attempt %s/%s)", label, attempt, retries)
+            if attempt >= retries:
+                logger.error("Giving up on %s after %s attempts.", label, retries)
+                return None
+            attempt += 1
+            time.sleep(delay)
+
 # Chrome Settings
 class Automation:
 
@@ -244,6 +269,11 @@ class BO_Account:
             "merchant_code": os.getenv("MERCHANT_CODE_UEA8"),
             "acc_ID": os.getenv("ACC_ID_UEA8"),
             "acc_PASS": os.getenv("ACC_PASS_UEA8")
+        },
+        "nex8": {
+            "merchant_code": os.getenv("MERCHANT_CODE_NEX8"),
+            "acc_ID": os.getenv("ACC_ID_NEX8"),
+            "acc_PASS": os.getenv("ACC_PASS_NEX8")
         },
     }
 
@@ -1294,7 +1324,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 
     # Member Info
     @classmethod
-    def member_info(cls, bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column):
+    def member_info(cls, bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab):
         
         # Print Team Name Messages
         msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {team} {Fore.YELLOW} MEMBER INFO Data...{Style.RESET_ALL}\n"
@@ -1386,7 +1416,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             )
             
             # Retry request...
-            return cls.member_info(bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column)
+            return cls.member_info(bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab)
 
         # For loop page and fetch data
         for page in range(1, 10000): 
@@ -1554,7 +1584,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 
 ###############=================================== CODE RUN HERE =======================================############
 
-### ==== README YO!!!! ==== ####
+### ==== 🥹🥹🥹 README 🥹🥹🥹 ==== ####
 # member_info format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name)
 # member_info_2 format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name)
 # deposit_list format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name, google sheet start column, google sheet end column)
@@ -1568,7 +1598,7 @@ while True:
         # ==========================================================================
 
         # S55 (S5T) (DEPOSIT LIST)
-        Fetch.deposit_list_PID("s55bo.com", "s55", "S5T" "THB", "+07:00", "S55_S5T_DL", "12Eu4ZGeRkcqgUWscQ-ZNetBq-Xz0xQGWvifWRbzXqL4", "DEPOSIT LIST", "A", "C")
+        safe_call(Fetch.deposit_list_PID, "s55bo.com", "s55", "S5T", "THB", "+07:00", "S55_S5T_DL", "12Eu4ZGeRkcqgUWscQ-ZNetBq-Xz0xQGWvifWRbzXqL4", "DEPOSIT LIST", "A", "C", description="S55 S5T deposit list")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= JOLIBEE MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=
@@ -1576,21 +1606,71 @@ while True:
 
         # Krisitian & Amber (MEMBER INFO)
         gs_ids = ["1zhn-TsD-oblmZ4sf4WWA2im9sV2AobV5QwkYlexjihc", "1gGp54nbz8cUIAbRWuc4blnwEUS-MVwgr9zwTgtAebFo"]
-        Fetch.member_info_SPLIT_DATA("jolibetbo.com", "joli", "Kristian & Amber", "PHP", "+08:00", "JOLI_MI", gs_ids, "jp")
+        safe_call(Fetch.member_info_SPLIT_DATA, "jolibetbo.com", "joli", "Kristian & Amber", "PHP", "+08:00", "JOLI_MI", gs_ids, "jp", description="Jolibet Kristian & Amber member info")
 
         # Krisitian & Amber (DEPOSIT LIST)
-        Fetch.deposit_list_PID("jolibetbo.com", "joli", "Joli Kristian", "PHP", "+08:00", "JOLI_DL", "1zhn-TsD-oblmZ4sf4WWA2im9sV2AobV5QwkYlexjihc", "DEPOSIT LIST", "A", "C")
-        Fetch.deposit_list_PID("jolibetbo.com", "joli", "Joli Amber", "PHP", "+08:00", "JOLI_DL", "1gGp54nbz8cUIAbRWuc4blnwEUS-MVwgr9zwTgtAebFo", "DEPOSIT LIST", "A", "C")
+        safe_call(Fetch.deposit_list_PID, "jolibetbo.com", "joli", "Joli Kristian", "PHP", "+08:00", "JOLI_DL", "1zhn-TsD-oblmZ4sf4WWA2im9sV2AobV5QwkYlexjihc", "DEPOSIT LIST", "A", "C", description="Jolibet Kristian deposit list")
+        safe_call(Fetch.deposit_list_PID, "jolibetbo.com", "joli", "Joli Amber", "PHP", "+08:00", "JOLI_DL", "1gGp54nbz8cUIAbRWuc4blnwEUS-MVwgr9zwTgtAebFo", "DEPOSIT LIST", "A", "C", description="Jolibet Amber deposit list")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= S369T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
         # ==========================================================================
 
         # S369T (MEMBER INFO)
-        Fetch.member_info("uhy3umx.com", "s369", "S369T" "THB", "+07:00", "S369_S369T_MI", "1lKc2k0gnsPeyUpXC1mUyxVO628dX2tWjuATIWqybC_8", "S369T", "A", "E")
+        safe_call(Fetch.member_info, "uhy3umx.com", "s369", "S369T", "THB", "+07:00", "S369_S369T_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S369T", description="S369T member info")
         
         # S369T (DEPOSIT LIST)
-        Fetch.deposit_list_PID("uhy3umx.com", "s369", "S369T", "THB", "+07:00", "S369_S369T_DL", "1lKc2k0gnsPeyUpXC1mUyxVO628dX2tWjuATIWqybC_8", "DEPOSIT LIST", "A", "C")
+        safe_call(Fetch.deposit_list_PID, "uhy3umx.com", "s369", "S369T", "THB", "+07:00", "S369_S369T_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S369T DEPOSIT LIST", "A", "C", description="S369T deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= A8V MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # A8V (MEMBER INFO)
+        safe_call(Fetch.member_info, "aw8bo.com", "aw8", "A8V", "VND", "+07:00", "A8W_A8V_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "A8V", description="A8V member info")
+        
+        # A8V (DEPOSIT LIST)
+        safe_call(Fetch.deposit_list_PID, "aw8bo.com", "aw8", "A8V", "VND", "+07:00", "A8W_A8V_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "A8V DEPOSIT LIST", "A", "C", description="A8V deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= S2T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # S2T (MEMBER INFO)
+        safe_call(Fetch.member_info, "m3v5r6cx.com", "s212", "S2T", "THB", "+07:00", "S212_S2T_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S2T", description="S2T member info")
+        
+        # S2T (DEPOSIT LIST)
+        safe_call(Fetch.deposit_list_PID, "m3v5r6cx.com", "s212", "S2T", "THB", "+07:00", "S212_S2T_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S2T DEPOSIT LIST", "A", "C", description="S2T deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= S6T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # S6T (MEMBER INFO)
+        safe_call(Fetch.member_info, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S66_S6T_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S6T", description="S6T member info")
+        
+        # S6T (DEPOSIT LIST)
+        safe_call(Fetch.deposit_list_PID, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S66_S6T_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S6T DEPOSIT LIST", "A", "C", description="S6T deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= N8Y MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # N8Y (MEMBER INFO)
+        safe_call(Fetch.member_info, "nex8bo.com", "nex8", "N8Y", "MMK", "+07:00", "NEX8_N8Y_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "N8Y", description="N8Y member info")
+        
+        # N8Y (DEPOSIT LIST)
+        safe_call(Fetch.deposit_list_PID, "nex8bo.com", "nex8", "N8Y", "MMK", "+07:00", "NEX8_N8Y_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "N8Y DEPOSIT LIST", "A", "C", description="N8Y deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= S345T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # S345T (MEMBER INFO)
+        safe_call(Fetch.member_info, "57249022.asia", "s345", "S345T", "THB", "+07:00", "S345_S345T_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S345T", description="S345T member info")
+        
+        # S345T (DEPOSIT LIST)
+        safe_call(Fetch.deposit_list_PID, "57249022.asia", "s345", "S345T", "THB", "+07:00", "S345_S345T_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S345T DEPOSIT LIST", "A", "C", description="S345T deposit list")
 
         time.sleep(600)
 
@@ -1600,4 +1680,3 @@ while True:
     except Exception:
         logger.exception("Unexpected error; retrying in 60 seconds.")
         time.sleep(60)
-

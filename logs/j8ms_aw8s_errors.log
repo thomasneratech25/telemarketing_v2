@@ -1,0 +1,776 @@
+2025-11-26 03:50:57,847 [ERROR] Unexpected error; retrying in 60 seconds.
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 466, in receive_message
+    return receive_message(self, request_id, self.max_message_size)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/network_layer.py", line 778, in receive_message
+    data = receive_data(conn, length - 16, deadline)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/network_layer.py", line 353, in receive_data
+    chunk_length = conn.conn.recv_into(mv[bytes_read:])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/network_layer.py", line 469, in recv_into
+    return self.conn.recv_into(buffer)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pyopenssl_context.py", line 162, in recv_into
+    return self._call(super().recv_into, *args, **kwargs)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pyopenssl_context.py", line 124, in _call
+    return call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/OpenSSL/SSL.py", line 2321, in recv_into
+    self._raise_ssl_error(self._ssl, result)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/OpenSSL/SSL.py", line 2014, in _raise_ssl_error
+    raise SysCallError(errno, errorcode.get(errno))
+OpenSSL.SSL.SysCallError: (54, 'ECONNRESET')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2251, in <module>
+    mongodb_2_gs.upload_to_google_sheet_DL_PID("J8M_DL", "1n5gSpeFd24pGjdazgGvXay3rf57-SOdQbwUHCiD5mrE", "DEPOSIT LIST", "A", "C")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 860, in upload_to_google_sheet_DL_PID
+    documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1289, in __next__
+    return self.next()
+           ~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1265, in next
+    if len(self._data) or self._refresh():
+                          ~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1236, in _refresh
+    self._send_message(g)
+    ~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1108, in _send_message
+    response = client._run_operation(
+        operation, self._unpack_response, address=self._address
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1938, in _run_operation
+    return self._retryable_read(
+           ~~~~~~~~~~~~~~~~~~~~^
+        _cmd,
+        ^^^^^
+    ...<4 lines>...
+        operation=operation.name,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2047, in _retryable_read
+    return self._retry_internal(
+           ~~~~~~~~~~~~~~~~~~~~^
+        func,
+        ^^^^^
+    ...<7 lines>...
+        operation_id=operation_id,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2014, in _retry_internal
+    ).run()
+      ~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2765, in run
+    return self._read() if self._is_read else self._write()
+           ~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2926, in _read
+    return self._func(self._session, self._server, conn, read_pref)  # type: ignore
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1929, in _cmd
+    return server.run_operation(
+           ~~~~~~~~~~~~~~~~~~~~^
+        conn,
+        ^^^^^
+    ...<4 lines>...
+        self,
+        ^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/helpers.py", line 47, in inner
+    return func(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/server.py", line 208, in run_operation
+    reply = conn.receive_message(request_id)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 469, in receive_message
+    self._raise_connection_failure(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 643, in _raise_connection_failure
+    _raise_connection_failure(self.address, error, timeout_details=details)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pool_shared.py", line 150, in _raise_connection_failure
+    raise AutoReconnect(msg) from error
+pymongo.errors.AutoReconnect: ac-xfzdix9-shard-00-01.kqgprz4.mongodb.net:27017: (54, 'ECONNRESET') (configured timeouts: connectTimeoutMS: 20000.0ms)
+2025-11-26 11:19:11,539 [ERROR] Unexpected error; retrying in 60 seconds.
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127135509 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2187, in <module>
+    Fetch.ssbo_deposit_list_PID("aw8", ["MYR"], "SSBO_A8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "I", "K", upload_to_sheet=False)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2022, in ssbo_deposit_list_PID
+    response = requests.get(full_url, headers=headers)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127135509 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-11-26 11:20:28,352 [ERROR] Unexpected error; retrying in 60 seconds.
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127212331 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2187, in <module>
+    Fetch.ssbo_deposit_list_PID("aw8", ["MYR"], "SSBO_A8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "I", "K", upload_to_sheet=False)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2022, in ssbo_deposit_list_PID
+    response = requests.get(full_url, headers=headers)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127212331 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-11-26 11:21:29,147 [ERROR] Unexpected error; retrying in 60 seconds.
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127289133 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2187, in <module>
+    Fetch.ssbo_deposit_list_PID("aw8", ["MYR"], "SSBO_A8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "I", "K", upload_to_sheet=False)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2022, in ssbo_deposit_list_PID
+    response = requests.get(full_url, headers=headers)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127289133 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-11-26 11:22:29,954 [ERROR] Unexpected error; retrying in 60 seconds.
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127349923 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2187, in <module>
+    Fetch.ssbo_deposit_list_PID("aw8", ["MYR"], "SSBO_A8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "I", "K", upload_to_sheet=False)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2022, in ssbo_deposit_list_PID
+    response = requests.get(full_url, headers=headers)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127349923 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-11-26 11:23:30,741 [ERROR] Unexpected error; retrying in 60 seconds.
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127410724 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2187, in <module>
+    Fetch.ssbo_deposit_list_PID("aw8", ["MYR"], "SSBO_A8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "I", "K", upload_to_sheet=False)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2022, in ssbo_deposit_list_PID
+    response = requests.get(full_url, headers=headers)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127410724 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-11-26 11:24:31,527 [ERROR] Unexpected error; retrying in 60 seconds.
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127471510 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2187, in <module>
+    Fetch.ssbo_deposit_list_PID("aw8", ["MYR"], "SSBO_A8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "I", "K", upload_to_sheet=False)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2022, in ssbo_deposit_list_PID
+    response = requests.get(full_url, headers=headers)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127471510 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-11-26 11:30:33,977 [ERROR] Unexpected error; retrying in 60 seconds.
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127833949 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2187, in <module>
+    Fetch.ssbo_deposit_list_PID("aw8", ["MYR"], "SSBO_A8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "I", "K", upload_to_sheet=False)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2022, in ssbo_deposit_list_PID
+    response = requests.get(full_url, headers=headers)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-11-25T16%3A00%3A00.000Z&startTime=2025-11-25T16%3A00%3A00.000Z&startCreatedTime=2025-11-25T16%3A00%3A00.000Z&end=2025-11-26T15%3A59%3A59.000Z&endTime=2025-11-26T15%3A59%3A59.000Z&endCreatedTime=2025-11-26T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764127833949 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-11-26 11:36:12,497 [ERROR] Unexpected error; retrying in 60 seconds.
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2193, in <module>
+    Fetch.deposit_list_PID("jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "A", "C")
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 1764, in deposit_list_PID
+    cls._get_cookies(
+    ~~~~~~~~~~~~~~~~^
+        bo_link,
+        ^^^^^^^^
+    ...<3 lines>...
+        f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 1526, in _get_cookies
+    page.wait_for_selector("//span[normalize-space()='Dashboard']", state="visible", timeout=300000)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_generated.py", line 8182, in wait_for_selector
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.wait_for_selector(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            selector=selector, timeout=timeout, state=state, strict=strict
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_page.py", line 423, in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_frame.py", line 369, in wait_for_selector
+    await self._channel.send(
+        "waitForSelector", self._timeout, locals_to_params(locals())
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 558, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TargetClosedError: Page.wait_for_selector: Target page, context or browser has been closed
+Call log:
+  - waiting for locator("//span[normalize-space()='Dashboard']") to be visible
+
+2025-11-26 11:36:43,304 [ERROR] Unexpected error; retrying in 60 seconds.
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2193, in <module>
+    Fetch.deposit_list_PID("jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "A", "C")
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 1764, in deposit_list_PID
+    cls._get_cookies(
+    ~~~~~~~~~~~~~~~~^
+        bo_link,
+        ^^^^^^^^
+    ...<3 lines>...
+        f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 1499, in _get_cookies
+    page.goto(f"https://v3-bo.{bo_link}", wait_until="load", timeout=0)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_generated.py", line 9019, in goto
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.goto(
+        ^^^^^^^^^^^^^^^^^^^^
+            url=url, timeout=timeout, waitUntil=wait_until, referer=referer
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_page.py", line 556, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_frame.py", line 153, in goto
+    await self._channel.send(
+        "goto", self._navigation_timeout, locals_to_params(locals())
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 558, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.Error: Page.goto: net::ERR_ABORTED at https://v3-bo.jw8bo.com/
+Call log:
+  - navigating to "https://v3-bo.jw8bo.com/", waiting until "load"
+
+2025-11-26 11:37:06,981 [ERROR] Unexpected error; retrying in 60 seconds.
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2193, in <module>
+    Fetch.deposit_list_PID("jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "A", "C")
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 1803, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 749, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-11-26 12:09:19,701 [ERROR] Unexpected error; retrying in 60 seconds.
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2221, in <module>
+    Fetch.deposit_list_USERNAME("jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL_USERNAME", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "DEPOSIT LIST", "A", "C")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 1926, in deposit_list_USERNAME
+    mongodb_2_gs.upload_to_google_sheet_DL_USERNAME(cls, collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 1057, in upload_to_google_sheet_DL_USERNAME
+    cls._sort_rows_by_datetime(rows, "completed_at")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 326, in _sort_rows_by_datetime
+    rows.sort(key=sort_key, reverse=descending)
+    ^^^^^^^^^
+AttributeError: 'str' object has no attribute 'sort'
+2025-11-26 12:30:16,917 [ERROR] Unexpected error; retrying in 60 seconds.
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2262, in <module>
+    Fetch.deposit_list_USERNAME("aw8bo.com", "aw8", "MYR", "+08:00", "A8M_DL_USERNAME", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "DEPOSIT LIST", "I", "K", extra_mongo_collections=["SSBO_A8M_DL"])
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Fetch.deposit_list_USERNAME() got an unexpected keyword argument 'extra_mongo_collections'
+2025-11-26 12:34:27,855 [ERROR] Unexpected error; retrying in 60 seconds.
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2262, in <module>
+    Fetch.deposit_list_USERNAME("aw8bo.com", "aw8", "MYR", "+08:00", "A8M_DL_USERNAME", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8MS J8MS DEPOSIT LIST 2", "I", "K", extra_mongo_collections=["SSBO_A8M_DL"])
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Fetch.deposit_list_USERNAME() got an unexpected keyword argument 'extra_mongo_collections'
+2025-11-26 12:38:55,684 [ERROR] Unexpected error; retrying in 60 seconds.
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connection.py", line 565, in getresponse
+    httplib_response = super().getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 300, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+                             " response")
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+The above exception was the direct cause of the following exception:
+
+urllib3.exceptions.ProxyError: ('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response'))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.aw8bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2261, in <module>
+    Fetch.deposit_list_USERNAME("aw8bo.com", "aw8", "MYR", "+08:00", "A8M_DL_USERNAME", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8MS J8MS DEPOSIT LIST 2", "I", "K", extra_mongo_collections=["SSBO_A8M_DL"])
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 1934, in deposit_list_USERNAME
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 671, in send
+    raise ProxyError(e, request=request)
+requests.exceptions.ProxyError: HTTPSConnectionPool(host='v3-bo.aw8bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))
+2025-11-26 13:32:21,927 [ERROR] Unexpected error; retrying in 60 seconds.
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.jw8bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2195, in <module>
+    Fetch.deposit_list_PID("jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "A", "C")
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 1756, in deposit_list_PID
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='v3-bo.jw8bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-11-26 13:33:09,370 [ERROR] Unexpected error; retrying in 60 seconds.
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pool_shared.py", line 496, in _configured_socket_interface
+    ssl_sock = ssl_context.wrap_socket(sock, server_hostname=host)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pyopenssl_context.py", line 412, in wrap_socket
+    ssl_conn.do_handshake()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pyopenssl_context.py", line 149, in do_handshake
+    return self._call(super().do_handshake, *args, **kwargs)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pyopenssl_context.py", line 145, in _call
+    raise _socket.timeout("timed out") from None
+TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2195, in <module>
+    Fetch.deposit_list_PID("jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "A", "C")
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 1805, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 733, in mongodbAPI_DL_PID
+    collection.create_index(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        [("player_id", 1), ("amount", 1), ("completed_at", 1)],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        unique=True
+        ^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/collection.py", line 2387, in create_index
+    return (self._create_indexes([index], session, **cmd_options))[0]
+            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/collection.py", line 2240, in _create_indexes
+    with self._conn_for_writes(session, operation=_Op.CREATE_INDEXES) as conn:
+         ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1777, in _checkout
+    with server.checkout(handler=err_handler) as conn:
+         ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 1118, in checkout
+    conn = self._get_conn(checkout_started_time, handler=handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 1280, in _get_conn
+    conn = self.connect(handler=handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 1032, in connect
+    networking_interface = _configured_socket_interface(self.address, self.opts)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pool_shared.py", line 510, in _configured_socket_interface
+    _raise_connection_failure(address, exc, "SSL handshake failed: ", timeout_details=details)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pool_shared.py", line 142, in _raise_connection_failure
+    raise NetworkTimeout(msg) from error
+pymongo.errors.NetworkTimeout: SSL handshake failed: ac-xfzdix9-shard-00-01.kqgprz4.mongodb.net:27017: timed out (configured timeouts: connectTimeoutMS: 20000.0ms)
+2025-11-26 15:17:14,102 [ERROR] Unexpected error; retrying in 60 seconds.
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 2195, in <module>
+    print("\n>>== IBS J8M MY ==<<")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 1810, in deposit_list_PID
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2.py", line 881, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 923, in execute
+    resp, content = _retry_request(
+                    ~~~~~~~~~~~~~~^
+        http,
+        ^^^^^
+    ...<7 lines>...
+        headers=self.headers,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 222, in _retry_request
+    raise exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 191, in _retry_request
+    resp, content = http.request(uri, method, *args, **kwargs)
+                    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google_auth_httplib2.py", line 218, in request
+    response, content = self.http.request(
+                        ~~~~~~~~~~~~~~~~~^
+        uri,
+        ^^^^
+    ...<5 lines>...
+        **kwargs
+        ^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1727, in request
+    (response, content) = self._request(
+                          ~~~~~~~~~~~~~^
+        conn, authority, uri, request_uri, method, body, headers, redirections, cachekey,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1447, in _request
+    (response, content) = self._conn_request(conn, request_uri, method, body, headers)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1399, in _conn_request
+    response = conn.getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+TimeoutError: The read operation timed out
+2025-11-26 15:53:26,368 [ERROR] Unexpected error; retrying in 60 seconds.
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2_separate.py", line 2080, in <module>
+    Fetch.deposit_list_USERNAME("jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL_USERNAME", "1s-URpvv2VFM9PjAO69ZqBOWvvJ9aiCPM6sLMTwq86Y8", "DEPOSIT LIST", "A", "C")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2_separate.py", line 1817, in deposit_list_USERNAME
+    cls.upload_to_google_sheet_DL_USERNAME(collection, gs_id, gs_tab, start_column, end_column, rows=None, extra_mongo_collections=extra_mongo_collections)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_v2_separate.py", line 1087, in upload_to_google_sheet_DL_USERNAME
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 400 when requesting https://sheets.googleapis.com/v4/spreadsheets/1s-URpvv2VFM9PjAO69ZqBOWvvJ9aiCPM6sLMTwq86Y8/values/%27DEPOSIT%20LIST%27%21A4%3AC:clear?alt=json returned "You are trying to edit a protected cell or object. Please contact the spreadsheet owner to remove protection if you need to edit.". Details: "You are trying to edit a protected cell or object. Please contact the spreadsheet owner to remove protection if you need to edit.">
