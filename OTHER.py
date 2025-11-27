@@ -3,7 +3,6 @@ import re
 import sys
 import time
 import json
-import socket
 import atexit
 import logging
 import requests
@@ -451,11 +450,6 @@ class mongodb_2_gs:
         body = {"values": rows, "majorDimension": "ROWS"}
 
         print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
-        # Clear previous data then write the fresh rows
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME
-        ).execute()
 
         try:
             sheet.values().update(
@@ -612,11 +606,6 @@ class mongodb_2_gs:
         body = {"values": rows, "majorDimension": "ROWS"}
 
         print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
-        # Clear previous data then write the fresh rows
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME
-        ).execute()
 
         try:
             sheet.values().update(
@@ -774,11 +763,6 @@ class mongodb_2_gs:
         body = {"values": rows, "majorDimension": "ROWS"}
 
         print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
-        # Clear previous data then write the fresh rows
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME
-        ).execute()
 
         try:
             sheet.values().update(
@@ -865,12 +849,6 @@ class mongodb_2_gs:
             print(f"Uploading {len(chunk)} rows → Sheet {idx+1} ({SPREADSHEET_ID})")
 
             body = {"values": chunk, "majorDimension": "ROWS"}
-
-            # Clear existing rows
-            sheet.values().clear(
-                spreadsheetId=SPREADSHEET_ID,
-                range=RANGE_NAME
-            ).execute()
 
             # Upload
             sheet.values().update(
@@ -1486,7 +1464,7 @@ while True:
         # =-=-=-=-==-=-=-=-=-= S5T DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=
         # ==========================================================================
 
-        # # S55 (S5T) (DEPOSIT LIST)
+        # S55 (S5T) (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "s55bo.com", "s55", "S5T", "THB", "+07:00", "S55_S5T_DL", "12Eu4ZGeRkcqgUWscQ-ZNetBq-Xz0xQGWvifWRbzXqL4", "DEPOSIT LIST", "A", "C", description="S55 S5T deposit list")
 
         # ==========================================================================
@@ -1511,9 +1489,9 @@ while True:
         # S369T (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "uhy3umx.com", "s369", "S369T", "THB", "+07:00", "S369_S369T_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S369T DEPOSIT LIST", "A", "C", description="S369T deposit list")
 
-        # # ==========================================================================
-        # # =-=-=-=-==-=-=-=-= A8V MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # # ==========================================================================
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= A8V MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
 
         # A8V (MEMBER INFO)
         safe_call(Fetch.member_info, "aw8bo.com", "aw8", "A8V", "VND", "+07:00", "A8W_A8V_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "A8V", description="A8V member info")
@@ -1521,9 +1499,9 @@ while True:
         # A8V (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "aw8bo.com", "aw8", "A8V", "VND", "+07:00", "A8W_A8V_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "A8V DEPOSIT LIST", "A", "C", description="A8V deposit list")
 
-        # # ==========================================================================
-        # # =-=-=-=-==-=-=-=-= S2T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # # ==========================================================================
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= S2T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
 
         # S2T (MEMBER INFO)
         safe_call(Fetch.member_info, "m3v5r6cx.com", "s212", "S2T", "THB", "+07:00", "S212_S2T_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S2T", description="S2T member info")
@@ -1531,9 +1509,9 @@ while True:
         # S2T (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "m3v5r6cx.com", "s212", "S2T", "THB", "+07:00", "S212_S2T_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S2T DEPOSIT LIST", "A", "C", description="S2T deposit list")
 
-        # # ==========================================================================
-        # # =-=-=-=-==-=-=-=-= S6T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # # ==========================================================================
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= S6T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
 
         # S6T (MEMBER INFO)
         safe_call(Fetch.member_info, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S66_S6T_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S6T", description="S6T member info")
@@ -1541,9 +1519,9 @@ while True:
         # S6T (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S66_S6T_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S6T DEPOSIT LIST", "A", "C", description="S6T deposit list")
 
-        # # ==========================================================================
-        # # =-=-=-=-==-=-=-=-= N8Y MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # # ==========================================================================
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= N8Y MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
 
         # N8Y (MEMBER INFO)
         safe_call(Fetch.member_info, "nex8bo.com", "nex8", "N8Y", "MMK", "+07:00", "NEX8_N8Y_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "N8Y", description="N8Y member info")
@@ -1551,9 +1529,9 @@ while True:
         # N8Y (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "nex8bo.com", "nex8", "N8Y", "MMK", "+07:00", "NEX8_N8Y_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "N8Y DEPOSIT LIST", "A", "C", description="N8Y deposit list")
 
-        # # ==========================================================================
-        # # =-=-=-=-==-=-=-=-= S345T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # # ==========================================================================
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= S345T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
 
         # S345T (MEMBER INFO)
         safe_call(Fetch.member_info, "57249022.asia", "s345", "S345T", "THB", "+07:00", "S345_S345T_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S345T", description="S345T member info")

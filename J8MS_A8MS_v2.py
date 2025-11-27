@@ -671,12 +671,6 @@ class mongodb_2_gs:
             print("No rows found to upload to Google Sheet.")
             return
 
-        clear_range = cls._build_a1_range(gs_tab, start_column, 3, end_column)
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=clear_range
-        ).execute()
-
         first_empty_row = 3
         end_row = first_empty_row + len(rows) - 1
         target_range = cls._build_a1_range(gs_tab, start_column, first_empty_row, end_column, end_row)
@@ -870,15 +864,7 @@ class mongodb_2_gs:
             print("No rows found to upload to Google Sheet.")
             return
 
-        clear_before_write = overwrite or (start_column, end_column) in {("A", "C"), ("E", "G")}
-        if extra_mongo_collections:
-            clear_before_write = True
-        if clear_before_write:
-            clear_range = cls._build_a1_range(gs_tab, start_column, 3, end_column)
-            sheet.values().clear(
-                spreadsheetId=SPREADSHEET_ID,
-                range=clear_range
-            ).execute()
+        if overwrite or extra_mongo_collections or (start_column, end_column) in {("A", "C"), ("E", "G")}:
             first_empty_row = 3
         else:
             first_empty_row = cls._find_first_empty_row(
@@ -1076,15 +1062,7 @@ class mongodb_2_gs:
             print("No rows found to upload to Google Sheet.")
             return
 
-        clear_before_write = overwrite or (start_column, end_column) in {("A", "C"), ("E", "G")}
-        if extra_mongo_collections:
-            clear_before_write = True
-        if clear_before_write:
-            clear_range = cls._build_a1_range(gs_tab, start_column, 3, end_column)
-            sheet.values().clear(
-                spreadsheetId=SPREADSHEET_ID,
-                range=clear_range
-            ).execute()
+        if overwrite or extra_mongo_collections or (start_column, end_column) in {("A", "C"), ("E", "G")}:
             first_empty_row = 3
         else:
             first_empty_row = cls._find_first_empty_row(
@@ -1122,116 +1100,6 @@ class mongodb_2_gs:
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- MEMBER INFO =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     # ====================================================================================
     
-    # Duplicate Check No Overwrite
-    @classmethod
-    def sync_append_no_overwrite(cls, collection, gs_id, gs_tab, start_column, end_column):
-        """
-        Incremental sync (no overwrite):
-        - Reads Google Sheet existing keys
-        - Compares with MongoDB documents
-        - Writes only missing rows to the first empty row from the top (starting at row 3), without shifting other rows.
-        Duplicate check based ONLY on PhoneNumber + PLAYERID
-        """
-
-        # Authenticate GS
-        creds = cls.googleAPI()
-        service = build("sheets", "v4", credentials=creds)
-        sheet = service.spreadsheets()
-        
-        # Google Sheet Range
-        RANGE_NAME = cls._build_a1_range(gs_tab, start_column, 3, end_column)
-
-        # ---------------------------------------------------------
-        # NORMALIZE helper (fix GS formatting issues)
-        # ---------------------------------------------------------
-        def normalize(value):
-            if value is None:
-                return ""
-            v = str(value).strip()
-            # Remove leading apostrophe from Google Sheet
-            if v.startswith("'"):
-                v = v[1:]
-            return v
-
-        # ---------------------------------------------------------
-        # 1) Read Google Sheet existing rows
-        # ---------------------------------------------------------
-        result = sheet.values().get(
-            spreadsheetId=gs_id,
-            range=RANGE_NAME
-        ).execute()
-
-        gs_rows = result.get("values", [])
-
-        # Build set of existing GS keys (PhoneNumber + PLAYERID)
-        gs_keys = set()
-        for row in gs_rows:
-            phone = normalize(row[3]) if len(row) > 3 else ""
-            playerid = normalize(row[4]) if len(row) > 4 else ""
-            key = f"{phone}|{playerid}"
-            gs_keys.add(key)
-
-        # ---------------------------------------------------------
-        # 2) Load data from MongoDB
-        # ---------------------------------------------------------
-        load_dotenv()
-        MONGODB_URI = os.getenv("MONGODB_API_KEY")
-        client = MongoClient(MONGODB_URI)
-
-        db = client["Telemarketing"]
-        col = db[collection]
-        docs = list(col.find({}, {"_id": 0}))
-
-        # ---------------------------------------------------------
-        # 3) Build missing rows list
-        # ---------------------------------------------------------
-        missing_rows = []
-
-        for d in docs:
-            phone = normalize(d.get("mobileno"))
-            playerid = normalize(d.get("member_id"))
-            key = f"{phone}|{playerid}"
-
-            if key not in gs_keys:
-                # Full row in GS order: Username | PlayerName | RegisterDate | Phone | PlayerID
-                missing_rows.append([
-                    normalize(d.get("username")),
-                    normalize(d.get("first_name")),
-                    normalize(d.get("register_info_date")),
-                    phone,
-                    playerid,
-                ])
-
-        if not missing_rows:
-            print("✔ No missing rows. Google Sheet is fully synced.")
-            return
-
-        print(f"✔ Missing rows detected: {len(missing_rows)}")
-
-        # ---------------------------------------------------------
-        # 4) Write missing rows to the TOP empty row (no overwrite)
-        # ---------------------------------------------------------
-        # Determine first empty row (A3 is absolute row index 3)
-        first_empty_row = 3
-        for idx, row in enumerate(gs_rows, start=3):
-            if not row or all(str(c).strip() == "" for c in row):
-                first_empty_row = idx
-                break
-        else:
-            first_empty_row = len(gs_rows) + 3
-
-        start_cell = cls._build_a1_range(gs_tab, start_column, first_empty_row)
-        body = {"values": missing_rows, "majorDimension": "ROWS"}
-
-        sheet.values().update(
-            spreadsheetId=gs_id,
-            range=start_cell,
-            valueInputOption="USER_ENTERED",
-            body=body
-        ).execute()
-
-        print(f"✔ Missing rows written starting at row {first_empty_row}.")
-
     # MongoDB Database (Member Info)
     def mongodbAPI_MI(rows, collection):
 
@@ -1251,7 +1119,7 @@ class mongodb_2_gs:
 
        # Set and Ensure when upload data this 3 Field is Unique Data
         collection.create_index(
-            [("username", 1), ("register_info_date", 1), ("mobileno", 1)],
+            [("username", 1), ("first_name", 1), ("register_info_date", 1)],
             unique=True
         )
 
@@ -1370,11 +1238,6 @@ class mongodb_2_gs:
         body = {"values": rows, "majorDimension": "ROWS"}
 
         print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
-        # Clear previous data then write the fresh rows
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME
-        ).execute()
 
         try:
             sheet.values().update(
@@ -1461,12 +1324,6 @@ class mongodb_2_gs:
             print(f"Uploading {len(chunk)} rows → Sheet {idx+1} ({SPREADSHEET_ID})")
 
             body = {"values": chunk, "majorDimension": "ROWS"}
-
-            # Clear existing rows
-            sheet.values().clear(
-                spreadsheetId=SPREADSHEET_ID,
-                range=RANGE_NAME
-            ).execute()
 
             # Upload
             sheet.values().update(

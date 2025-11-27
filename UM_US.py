@@ -3,7 +3,6 @@ import re
 import sys
 import time
 import json
-import socket
 import atexit
 import shutil
 import zipfile
@@ -736,10 +735,6 @@ class mongodb_2_gs:
         body = {"values": rows, "majorDimension": "ROWS"}
 
         print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME
-        ).execute()
 
         try:
             sheet.values().update(
@@ -1012,11 +1007,6 @@ class mongodb_2_gs:
         body = {"values": rows, "majorDimension": "ROWS"}
 
         print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
-        # Clear previous data then write the fresh rows
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME
-        ).execute()
 
         try:
             sheet.values().update(
@@ -1252,11 +1242,6 @@ class mongodb_2_gs:
         body = {"values": rows, "majorDimension": "ROWS"}
 
         print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
-        # Clear previous data then write the fresh rows
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME
-        ).execute()
 
         try:
             sheet.values().update(
@@ -1437,11 +1422,6 @@ class mongodb_2_gs:
         body = {"values": rows, "majorDimension": "ROWS"}
 
         print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
-        # Clear previous data then write the fresh rows
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME
-        ).execute()
 
         try:
             sheet.values().update(
@@ -1668,11 +1648,6 @@ class mongodb_2_gs:
         body = {"values": rows, "majorDimension": "ROWS"}
 
         print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
-        # Clear previous data then write the fresh rows
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME
-        ).execute()
 
         try:
             sheet.values().update(
@@ -1860,13 +1835,14 @@ class mongodb_2_gs:
             print("No rows found to upload to Google Sheet.")
             return
 
-        clear_range = cls._build_a1_range(gs_tab, start_column, 3, end_column)
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=clear_range
-        ).execute()
-
-        first_empty_row = 3
+        first_empty_row = cls._find_first_empty_row(
+            sheet,
+            SPREADSHEET_ID,
+            gs_tab,
+            start_column,
+            end_column,
+            start_row=3
+        )
         end_row = first_empty_row + len(rows) - 1
         target_range = cls._build_a1_range(gs_tab, start_column, first_empty_row, end_column, end_row)
 
@@ -2059,15 +2035,7 @@ class mongodb_2_gs:
             print("No rows found to upload to Google Sheet.")
             return
 
-        clear_before_write = overwrite or (start_column, end_column) in {("A", "C"), ("E", "G")}
-        if extra_mongo_collections:
-            clear_before_write = True
-        if clear_before_write:
-            clear_range = cls._build_a1_range(gs_tab, start_column, 3, end_column)
-            sheet.values().clear(
-                spreadsheetId=SPREADSHEET_ID,
-                range=clear_range
-            ).execute()
+        if overwrite or extra_mongo_collections or (start_column, end_column) in {("A", "C"), ("E", "G")}:
             first_empty_row = 3
         else:
             first_empty_row = cls._find_first_empty_row(
@@ -2265,15 +2233,7 @@ class mongodb_2_gs:
             print("No rows found to upload to Google Sheet.")
             return
 
-        clear_before_write = overwrite or (start_column, end_column) in {("A", "C"), ("E", "G")}
-        if extra_mongo_collections:
-            clear_before_write = True
-        if clear_before_write:
-            clear_range = cls._build_a1_range(gs_tab, start_column, 3, end_column)
-            sheet.values().clear(
-                spreadsheetId=SPREADSHEET_ID,
-                range=clear_range
-            ).execute()
+        if overwrite or extra_mongo_collections or (start_column, end_column) in {("A", "C"), ("E", "G")}:
             first_empty_row = 3
         else:
             first_empty_row = cls._find_first_empty_row(
@@ -3107,6 +3067,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 rows = []
 
             print(f"\nPage {page} → {len(rows)} rows")
+            print(f"MongoDB Summary → Inserted: {total_inserted}, Skipped: {total_skipped}")
 
             # STOP when no data
             if not rows:
@@ -3125,7 +3086,6 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         if finish_reason is None and page >= max_pages:
             finish_reason = "safety_stop"
 
-        print(f"MongoDB Summary → Inserted: {total_inserted}, Skipped: {total_skipped}")
         if finish_reason == "no_data":
             print("⚠️ No transaction IDs found — break")
         elif finish_reason == "safety_stop":

@@ -671,12 +671,6 @@ class mongodb_2_gs:
             print("No rows found to upload to Google Sheet.")
             return
 
-        clear_range = cls._build_a1_range(gs_tab, start_column, 4, end_column)
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=clear_range
-        ).execute()
-
         first_empty_row = 4
         end_row = first_empty_row + len(rows) - 1
         target_range = cls._build_a1_range(gs_tab, start_column, first_empty_row, end_column, end_row)
@@ -870,25 +864,7 @@ class mongodb_2_gs:
             print("No rows found to upload to Google Sheet.")
             return
 
-        clear_before_write = overwrite or (start_column, end_column) in {("A", "C"), ("E", "G")}
-        if extra_mongo_collections:
-            clear_before_write = True
-        if clear_before_write:
-            clear_range = cls._build_a1_range(gs_tab, start_column, 3, end_column)
-            sheet.values().clear(
-                spreadsheetId=SPREADSHEET_ID,
-                range=clear_range
-            ).execute()
-            first_empty_row = 3
-        else:
-            first_empty_row = cls._find_first_empty_row(
-                sheet,
-                SPREADSHEET_ID,
-                gs_tab,
-                start_column,
-                end_column,
-                start_row=3
-            )
+        first_empty_row = 4
         end_row = first_empty_row + len(rows) - 1
         target_range = cls._build_a1_range(gs_tab, start_column, first_empty_row, end_column, end_row)
 
@@ -1076,25 +1052,7 @@ class mongodb_2_gs:
             print("No rows found to upload to Google Sheet.")
             return
 
-        clear_before_write = overwrite or (start_column, end_column) in {("A", "C"), ("E", "G")}
-        if extra_mongo_collections:
-            clear_before_write = True
-        if clear_before_write:
-            clear_range = cls._build_a1_range(gs_tab, start_column, 4, end_column)
-            sheet.values().clear(
-                spreadsheetId=SPREADSHEET_ID,
-                range=clear_range
-            ).execute()
-            first_empty_row = 4
-        else:
-            first_empty_row = cls._find_first_empty_row(
-                sheet,
-                SPREADSHEET_ID,
-                gs_tab,
-                start_column,
-                end_column,
-                start_row=3
-            )
+        first_empty_row = 4
         end_row = first_empty_row + len(rows) - 1
         target_range = cls._build_a1_range(gs_tab, start_column, first_empty_row, end_column, end_row)
 
@@ -1221,7 +1179,7 @@ class mongodb_2_gs:
 
         # Google Sheet ID and Sheet Tab Name (range name)
         SPREADSHEET_ID = gs_id
-        RANGE_NAME = cls._build_a1_range(gs_tab, "A", 3, "E")
+        RANGE_NAME = cls._build_a1_range(gs_tab, "A", 4, "E")
 
         # Convert from MongoDB (dics) to Google Sheet API (list), because Google Sheets API only accept "list".
         def sanitize_rows(raw_rows):
@@ -1260,11 +1218,6 @@ class mongodb_2_gs:
         body = {"values": rows, "majorDimension": "ROWS"}
 
         print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
-        # Clear previous data then write the fresh rows
-        sheet.values().clear(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME
-        ).execute()
 
         try:
             sheet.values().update(
@@ -1346,18 +1299,11 @@ class mongodb_2_gs:
                 break
 
             SPREADSHEET_ID = gs_ids[idx]
-            RANGE_NAME = cls._build_a1_range(gs_tab, "A", 3, "E")
+            RANGE_NAME = cls._build_a1_range(gs_tab, "A", 4, "E")
 
             print(f"Uploading {len(chunk)} rows → Sheet {idx+1} ({SPREADSHEET_ID})")
 
             body = {"values": chunk, "majorDimension": "ROWS"}
-
-            # Clear existing rows
-            sheet.values().clear(
-                spreadsheetId=SPREADSHEET_ID,
-                range=RANGE_NAME
-            ).execute()
-
             # Upload
             sheet.values().update(
                 spreadsheetId=SPREADSHEET_ID,
