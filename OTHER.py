@@ -636,116 +636,6 @@ class mongodb_2_gs:
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- MEMBER INFO =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     # ====================================================================================
     
-    # Duplicate Check No Overwrite
-    @classmethod
-    def sync_append_no_overwrite(cls, collection, gs_id, gs_tab, start_column, end_column):
-        """
-        Incremental sync (no overwrite):
-        - Reads Google Sheet existing keys
-        - Compares with MongoDB documents
-        - Writes only missing rows to the first empty row from the top (starting at row 3), without shifting other rows.
-        Duplicate check based ONLY on PhoneNumber + PLAYERID
-        """
-
-        # Authenticate GS
-        creds = cls.googleAPI()
-        service = build("sheets", "v4", credentials=creds)
-        sheet = service.spreadsheets()
-        
-        # Google Sheet Range
-        RANGE_NAME = f"{gs_tab}!{start_column}3:{end_column}"
-
-        # ---------------------------------------------------------
-        # NORMALIZE helper (fix GS formatting issues)
-        # ---------------------------------------------------------
-        def normalize(value):
-            if value is None:
-                return ""
-            v = str(value).strip()
-            # Remove leading apostrophe from Google Sheet
-            if v.startswith("'"):
-                v = v[1:]
-            return v
-
-        # ---------------------------------------------------------
-        # 1) Read Google Sheet existing rows
-        # ---------------------------------------------------------
-        result = sheet.values().get(
-            spreadsheetId=gs_id,
-            range=RANGE_NAME
-        ).execute()
-
-        gs_rows = result.get("values", [])
-
-        # Build set of existing GS keys (PhoneNumber + PLAYERID)
-        gs_keys = set()
-        for row in gs_rows:
-            phone = normalize(row[3]) if len(row) > 3 else ""
-            playerid = normalize(row[4]) if len(row) > 4 else ""
-            key = f"{phone}|{playerid}"
-            gs_keys.add(key)
-
-        # ---------------------------------------------------------
-        # 2) Load data from MongoDB
-        # ---------------------------------------------------------
-        load_dotenv()
-        MONGODB_URI = os.getenv("MONGODB_API_KEY")
-        client = MongoClient(MONGODB_URI)
-
-        db = client["OTHER"]
-        col = db[collection]
-        docs = list(col.find({}, {"_id": 0}))
-
-        # ---------------------------------------------------------
-        # 3) Build missing rows list
-        # ---------------------------------------------------------
-        missing_rows = []
-
-        for d in docs:
-            phone = normalize(d.get("mobileno"))
-            playerid = normalize(d.get("member_id"))
-            key = f"{phone}|{playerid}"
-
-            if key not in gs_keys:
-                # Full row in GS order: Username | PlayerName | RegisterDate | Phone | PlayerID
-                missing_rows.append([
-                    normalize(d.get("username")),
-                    normalize(d.get("first_name")),
-                    normalize(d.get("register_info_date")),
-                    phone,
-                    playerid,
-                ])
-
-        if not missing_rows:
-            print("✔ No missing rows. Google Sheet is fully synced.")
-            return
-
-        print(f"✔ Missing rows detected: {len(missing_rows)}")
-
-        # ---------------------------------------------------------
-        # 4) Write missing rows to the TOP empty row (no overwrite)
-        # ---------------------------------------------------------
-        # Determine first empty row (A3 is absolute row index 3)
-        first_empty_row = 3
-        for idx, row in enumerate(gs_rows, start=3):
-            if not row or all(str(c).strip() == "" for c in row):
-                first_empty_row = idx
-                break
-        else:
-            first_empty_row = len(gs_rows) + 3
-
-        start_cell = f"{gs_tab}!{start_column}{first_empty_row}"
-        body = {"values": missing_rows, "majorDimension": "ROWS"}
-
-        sheet.values().update(
-            spreadsheetId=gs_id,
-            range=start_cell,
-            valueInputOption="USER_ENTERED",
-            body=body
-        ).execute()
-
-        print(f"✔ Missing rows written starting at row {first_empty_row}.")
-
     # MongoDB Database (Member Info)
     def mongodbAPI_MI(rows, collection):
 
@@ -763,9 +653,9 @@ class mongodb_2_gs:
         except Exception:
             pass
 
-       # Set and Ensure when upload data this 3 Field is Unique Data
+        # Set and Ensure when upload data this 3 Field is Unique Data
         collection.create_index(
-            [("username", 1), ("first_name", 1), ("register_info_date", 1)],
+            [("username", 1), ("register_info_date", 1), ("mobileno", 1)],
             unique=True
         )
 
@@ -1319,7 +1209,6 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         # Upload Data to Google Sheet by reading from MongoDB
         mongodb_2_gs.upload_to_google_sheet_DL_USERNAME(cls, collection, gs_id, gs_tab, start_column, end_column)
 
-
     # =========================== Member Info ===========================
 
     # Member Info
@@ -1597,7 +1486,7 @@ while True:
         # =-=-=-=-==-=-=-=-=-= S5T DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=
         # ==========================================================================
 
-        # S55 (S5T) (DEPOSIT LIST)
+        # # S55 (S5T) (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "s55bo.com", "s55", "S5T", "THB", "+07:00", "S55_S5T_DL", "12Eu4ZGeRkcqgUWscQ-ZNetBq-Xz0xQGWvifWRbzXqL4", "DEPOSIT LIST", "A", "C", description="S55 S5T deposit list")
 
         # ==========================================================================
@@ -1622,9 +1511,9 @@ while True:
         # S369T (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "uhy3umx.com", "s369", "S369T", "THB", "+07:00", "S369_S369T_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S369T DEPOSIT LIST", "A", "C", description="S369T deposit list")
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= A8V MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
+        # # ==========================================================================
+        # # =-=-=-=-==-=-=-=-= A8V MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # # ==========================================================================
 
         # A8V (MEMBER INFO)
         safe_call(Fetch.member_info, "aw8bo.com", "aw8", "A8V", "VND", "+07:00", "A8W_A8V_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "A8V", description="A8V member info")
@@ -1632,9 +1521,9 @@ while True:
         # A8V (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "aw8bo.com", "aw8", "A8V", "VND", "+07:00", "A8W_A8V_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "A8V DEPOSIT LIST", "A", "C", description="A8V deposit list")
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= S2T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
+        # # ==========================================================================
+        # # =-=-=-=-==-=-=-=-= S2T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # # ==========================================================================
 
         # S2T (MEMBER INFO)
         safe_call(Fetch.member_info, "m3v5r6cx.com", "s212", "S2T", "THB", "+07:00", "S212_S2T_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S2T", description="S2T member info")
@@ -1642,9 +1531,9 @@ while True:
         # S2T (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "m3v5r6cx.com", "s212", "S2T", "THB", "+07:00", "S212_S2T_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S2T DEPOSIT LIST", "A", "C", description="S2T deposit list")
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= S6T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
+        # # ==========================================================================
+        # # =-=-=-=-==-=-=-=-= S6T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # # ==========================================================================
 
         # S6T (MEMBER INFO)
         safe_call(Fetch.member_info, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S66_S6T_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S6T", description="S6T member info")
@@ -1652,9 +1541,9 @@ while True:
         # S6T (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S66_S6T_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S6T DEPOSIT LIST", "A", "C", description="S6T deposit list")
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= N8Y MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
+        # # ==========================================================================
+        # # =-=-=-=-==-=-=-=-= N8Y MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # # ==========================================================================
 
         # N8Y (MEMBER INFO)
         safe_call(Fetch.member_info, "nex8bo.com", "nex8", "N8Y", "MMK", "+07:00", "NEX8_N8Y_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "N8Y", description="N8Y member info")
@@ -1662,9 +1551,9 @@ while True:
         # N8Y (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "nex8bo.com", "nex8", "N8Y", "MMK", "+07:00", "NEX8_N8Y_DL", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "N8Y DEPOSIT LIST", "A", "C", description="N8Y deposit list")
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= S345T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
+        # # ==========================================================================
+        # # =-=-=-=-==-=-=-=-= S345T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # # ==========================================================================
 
         # S345T (MEMBER INFO)
         safe_call(Fetch.member_info, "57249022.asia", "s345", "S345T", "THB", "+07:00", "S345_S345T_MI", "1PLzkJ_vfg6DvylV0N_WgQSfUB_ClR5ojVeOAbzXbXEM", "S345T", description="S345T member info")

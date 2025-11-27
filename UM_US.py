@@ -1309,7 +1309,7 @@ class mongodb_2_gs:
 
        # Set and Ensure when upload data this 3 Field is Unique Data
         collection.create_index(
-            [("username", 1), ("first_name", 1), ("register_info_date", 1)],
+            [("username", 1), ("register_info_date", 1), ("mobileno", 1)],
             unique=True
         )
 
