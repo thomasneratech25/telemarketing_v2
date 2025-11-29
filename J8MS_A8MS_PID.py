@@ -32,7 +32,7 @@ if not logger.handlers:
     logger.setLevel(logging.INFO)
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 
-    file_handler = logging.FileHandler(LOG_DIR / "j8ms_aw8s_errors.log", encoding="utf-8")
+    file_handler = logging.FileHandler(LOG_DIR / "J8MS_A8MS_PID_errors.log", encoding="utf-8")
     file_handler.setLevel(logging.ERROR)
     file_handler.setFormatter(formatter)
 
@@ -671,7 +671,7 @@ class mongodb_2_gs:
             print("No rows found to upload to Google Sheet.")
             return
 
-        first_empty_row = 4
+        first_empty_row = 3
         end_row = first_empty_row + len(rows) - 1
         target_range = cls._build_a1_range(gs_tab, start_column, first_empty_row, end_column, end_row)
 
@@ -864,7 +864,17 @@ class mongodb_2_gs:
             print("No rows found to upload to Google Sheet.")
             return
 
-        first_empty_row = 4
+        if overwrite or extra_mongo_collections or (start_column, end_column) in {("A", "C"), ("E", "G")}:
+            first_empty_row = 3
+        else:
+            first_empty_row = cls._find_first_empty_row(
+                sheet,
+                SPREADSHEET_ID,
+                gs_tab,
+                start_column,
+                end_column,
+                start_row=3
+            )
         end_row = first_empty_row + len(rows) - 1
         target_range = cls._build_a1_range(gs_tab, start_column, first_empty_row, end_column, end_row)
 
@@ -1052,7 +1062,17 @@ class mongodb_2_gs:
             print("No rows found to upload to Google Sheet.")
             return
 
-        first_empty_row = 4
+        if overwrite or extra_mongo_collections or (start_column, end_column) in {("A", "C"), ("E", "G")}:
+            first_empty_row = 3
+        else:
+            first_empty_row = cls._find_first_empty_row(
+                sheet,
+                SPREADSHEET_ID,
+                gs_tab,
+                start_column,
+                end_column,
+                start_row=3
+            )
         end_row = first_empty_row + len(rows) - 1
         target_range = cls._build_a1_range(gs_tab, start_column, first_empty_row, end_column, end_row)
 
@@ -1099,7 +1119,7 @@ class mongodb_2_gs:
 
        # Set and Ensure when upload data this 3 Field is Unique Data
         collection.create_index(
-            [("username", 1), ("register_info_date", 1), ("mobileno", 1)],
+            [("username", 1), ("first_name", 1), ("register_info_date", 1)],
             unique=True
         )
 
@@ -1179,7 +1199,7 @@ class mongodb_2_gs:
 
         # Google Sheet ID and Sheet Tab Name (range name)
         SPREADSHEET_ID = gs_id
-        RANGE_NAME = cls._build_a1_range(gs_tab, "A", 4, "E")
+        RANGE_NAME = cls._build_a1_range(gs_tab, "A", 3, "E")
 
         # Convert from MongoDB (dics) to Google Sheet API (list), because Google Sheets API only accept "list".
         def sanitize_rows(raw_rows):
@@ -1299,11 +1319,12 @@ class mongodb_2_gs:
                 break
 
             SPREADSHEET_ID = gs_ids[idx]
-            RANGE_NAME = cls._build_a1_range(gs_tab, "A", 4, "E")
+            RANGE_NAME = cls._build_a1_range(gs_tab, "A", 3, "E")
 
             print(f"Uploading {len(chunk)} rows → Sheet {idx+1} ({SPREADSHEET_ID})")
 
             body = {"values": chunk, "majorDimension": "ROWS"}
+
             # Upload
             sheet.values().update(
                 spreadsheetId=SPREADSHEET_ID,
@@ -2009,64 +2030,42 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 while True:
     try:
 
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # # ============================================================== IBS J8M AVA  ======================================================================================
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
- 
-        # msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[J8M AVA] {Fore.YELLOW} DEPOSIT LIST Data... (USERNAME){Style.RESET_ALL}\n"
-        # for ch in msg:
-        #     sys.stdout.write(ch)
-        #     sys.stdout.flush()
-        #     time.sleep(0.01)
-
-
-        # # IBS J8M MY
-        # print("\n>>== IBS J8M MY ==<<")
-        # Fetch.deposit_list_USERNAME("jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL_USERNAME", "1s-URpvv2VFM9PjAO69ZqBOWvvJ9aiCPM6sLMTwq86Y8", "DEPOSIT LIST", "A", "C")
-
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # # ============================================================== IBS J8M PEI ======================================================================================
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
- 
-        # msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[J8M PEI] {Fore.YELLOW} DEPOSIT LIST Data... (USERNAME){Style.RESET_ALL}\n"
-        # for ch in msg:
-        #     sys.stdout.write(ch)
-        #     sys.stdout.flush()
-        #     time.sleep(0.01)
-
-
-        # # IBS J8M MY
-        # print("\n>>== IBS J8M MY ==<<")
-        # mongodb_2_gs.upload_to_google_sheet_DL_USERNAME("J8M_DL", "1AYQ4vcayP7GLdAP0vdeaxhO64n52V6OqhSgCF7MOKXE", "DEPOSIT LIST", "A", "C")
-
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== IBS & SSBO A8M ANGIE  =========================================================================
+        # ============================================================== J8MS A8MS EMILLIA =============================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[IBS & SSBO A8M ANGIE] {Fore.YELLOW} DEPOSIT LIST Data... (USERNAME){Style.RESET_ALL}\n"
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[EMILLIA] {Fore.YELLOW} DEPOSIT LIST Data... (Player ID){Style.RESET_ALL}\n"
         for ch in msg:
             sys.stdout.write(ch)
             sys.stdout.flush()
             time.sleep(0.01)
 
+
         # SSBO A8M MY
         print("\n>>== SSBO A8M MY ==<<")
-        mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID("SSBO_A8M_DL", "1Sz5-AVvX2JwgxWY93oneWfbcmUa7CkVmOKpoP_FOakw", "Deposit List", "A", "C")
-
+        Fetch.ssbo_deposit_list_PID("aw8", ["MYR"], "SSBO_A8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "I", "K", upload_to_sheet=False)
+        # SSBO A8S SG
+        print("\n>>== SSBO A8S SG ==<<")
+        Fetch.ssbo_deposit_list_PID("aw8", ["SGD"], "SSBO_A8S_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "M", "O", upload_to_sheet=False)
+        # IBS J8M MY
+        print("\n>>== IBS J8M MY ==<<")
+        Fetch.deposit_list_PID("jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "A", "C")
+        # IBS J8S SG 
+        print(">>== IBS J8S SG  ==<<")
+        Fetch.deposit_list_PID("jw8bo.com", "jw8", "SGD", "+08:00", "J8S_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "E", "G")
         # IBS A8M MY 
         print(">>== IBS A8M MY ==<<")
-        Fetch.deposit_list_USERNAME("aw8bo.com", "aw8", "MYR", "+08:00", "A8M_DL_USERNAME", "1Sz5-AVvX2JwgxWY93oneWfbcmUa7CkVmOKpoP_FOakw", "Deposit List", "E", "G")
+        Fetch.deposit_list_PID("aw8bo.com", "aw8", "MYR", "+08:00", "A8M_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "I", "K", extra_mongo_collections=["SSBO_A8M_DL"])
+        # IBS A8S SG  
+        print(">>== IBS A8S SG ==<<")
+        Fetch.deposit_list_PID("aw8bo.com", "aw8", "SGD", "+08:00", "A8S_DL", "1EMg9G6-WgD-hbIbL6Z0YBPP_BqLP8MRpwHXLP_Ji9MA", "DEPOSIT LIST", "M", "O", extra_mongo_collections=["SSBO_A8S_DL"])
         
-        
+
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== IBS & SSBO A8M ANGIE 2  =======================================================================
+        # ============================================================== J8MS A8MS KAYREEN =============================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[IBS & SSBO A8M ANGIE 2] {Fore.YELLOW} DEPOSIT LIST Data... (USERNAME){Style.RESET_ALL}\n"
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[KAYREEN] {Fore.YELLOW} DEPOSIT LIST Data... (Player ID){Style.RESET_ALL}\n"
         for ch in msg:
             sys.stdout.write(ch)
             sys.stdout.flush()
@@ -2074,77 +2073,52 @@ while True:
 
         # SSBO A8M MY
         print("\n>>== SSBO A8M MY ==<<")
-        mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID("SSBO_A8M_DL", "1cyi4qENq3PXXcr6lTmuaDoXrta69eEb79A6BhR28nlM", "Deposit List", "A", "C")
-
+        mongodb_2_gs.upload_to_google_sheet_DL_PID("SSBO_A8M_DL", "1mg2YVYUWwut0XZ0MRg31X-1Wjp8FZRUbqrrimYKD_hE", "DEPOSIT LIST", "I", "K",  upload_to_sheet=False)
+        # SSBO A8S SG
+        print("\n>>== SSBO A8S SG ==<<")
+        mongodb_2_gs.upload_to_google_sheet_DL_PID("SSBO_A8S_DL", "1mg2YVYUWwut0XZ0MRg31X-1Wjp8FZRUbqrrimYKD_hE", "DEPOSIT LIST", "M", "O", upload_to_sheet=False)
+        # IBS J8M MY
+        print("\n>>== IBS J8M MY ==<<")
+        mongodb_2_gs.upload_to_google_sheet_DL_PID("J8M_DL", "1mg2YVYUWwut0XZ0MRg31X-1Wjp8FZRUbqrrimYKD_hE", "DEPOSIT LIST", "A", "C")
+        # IBS J8S SG 
+        print(">>== IBS J8S SG  ==<<")
+        mongodb_2_gs.upload_to_google_sheet_DL_PID("J8S_DL", "1mg2YVYUWwut0XZ0MRg31X-1Wjp8FZRUbqrrimYKD_hE", "DEPOSIT LIST", "E", "G")
         # IBS A8M MY 
-        print("\n>>== IBS A8M MY ==<<")
-        mongodb_2_gs.upload_to_google_sheet_DL_USERNAME("A8M_DL", "1cyi4qENq3PXXcr6lTmuaDoXrta69eEb79A6BhR28nlM", "Deposit List", "E", "G")
+        print(">>== IBS A8M MY ==<<")
+        mongodb_2_gs.upload_to_google_sheet_DL_PID("A8M_DL", "1mg2YVYUWwut0XZ0MRg31X-1Wjp8FZRUbqrrimYKD_hE", "DEPOSIT LIST", "I", "K", extra_mongo_collections=["SSBO_A8M_DL"])
+        # IBS A8S SG  
+        print(">>== IBS A8S SG ==<<")
+        mongodb_2_gs.upload_to_google_sheet_DL_PID("A8S_DL", "1mg2YVYUWwut0XZ0MRg31X-1Wjp8FZRUbqrrimYKD_hE", "DEPOSIT LIST", "M", "O", extra_mongo_collections=["SSBO_A8S_DL"])
 
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # ============================================================== J8MS A8MS YVONNE =============================================================================
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # # ============================================================== IBS & SSBO A8M AVA  =======================================================================
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[IBS & SSBO A8M AVA] {Fore.YELLOW} DEPOSIT LIST Data... (USERNAME){Style.RESET_ALL}\n"
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[YVONNE] {Fore.YELLOW} DEPOSIT LIST Data... (Player ID){Style.RESET_ALL}\n"
         for ch in msg:
             sys.stdout.write(ch)
             sys.stdout.flush()
             time.sleep(0.01)
-
 
         # SSBO A8M MY
         print("\n>>== SSBO A8M MY ==<<")
-        mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID("SSBO_A8M_DL", "1aRDnliqc63hXZBxd1oOIFLPJg7rakHOf37AH9-ThqZc", "Deposit List", "A", "C")
-
+        mongodb_2_gs.upload_to_google_sheet_DL_PID("SSBO_A8M_DL", "1n5gSpeFd24pGjdazgGvXay3rf57-SOdQbwUHCiD5mrE", "DEPOSIT LIST", "I", "K", upload_to_sheet=False)
+        # SSBO A8S SG
+        print(">>== SSBO A8S SG ==<<")
+        mongodb_2_gs.upload_to_google_sheet_DL_PID("SSBO_A8S_DL", "1n5gSpeFd24pGjdazgGvXay3rf57-SOdQbwUHCiD5mrE", "DEPOSIT LIST", "M", "O", upload_to_sheet=False)
+        # IBS J8M MY
+        print(">>== IBS J8M MY ==<<")
+        mongodb_2_gs.upload_to_google_sheet_DL_PID("J8M_DL", "1n5gSpeFd24pGjdazgGvXay3rf57-SOdQbwUHCiD5mrE", "DEPOSIT LIST", "A", "C")
+        # IBS J8S SG 
+        print(">>== IBS J8S SG  ==<<")
+        mongodb_2_gs.upload_to_google_sheet_DL_PID("J8S_DL", "1n5gSpeFd24pGjdazgGvXay3rf57-SOdQbwUHCiD5mrE", "DEPOSIT LIST", "E", "G")
         # IBS A8M MY 
-        print("\n>>== IBS A8M MY ==<<")
-        mongodb_2_gs.upload_to_google_sheet_DL_USERNAME("A8M_DL", "1aRDnliqc63hXZBxd1oOIFLPJg7rakHOf37AH9-ThqZc", "Deposit List", "E", "G")
-
-
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== IBS & SSBO A8S AVA  =======================================================================
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[IBS & SSBO A8S AVA] {Fore.YELLOW} DEPOSIT LIST Data... (USERNAME){Style.RESET_ALL}\n"
-        for ch in msg:
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-            time.sleep(0.01)
-
-
-        # SSBO A8S SG
-        print("\n>>== SSBO A8S SG ==<<")
-        mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID("SSBO_A8S_DL", "1m7anE0hO1kok0KgHPHN2mAu18mcXO2dbe939UD9ZLX4", "Deposit List", "A", "C")
-
-        # IBS A8S SG 
+        print(">>== IBS A8M MY ==<<")
+        mongodb_2_gs.upload_to_google_sheet_DL_PID("A8M_DL", "1n5gSpeFd24pGjdazgGvXay3rf57-SOdQbwUHCiD5mrE", "DEPOSIT LIST", "I", "K", extra_mongo_collections=["SSBO_A8M_DL"])
+        # IBS A8S SG  
         print(">>== IBS A8S SG ==<<")
-        Fetch.deposit_list_USERNAME("aw8bo.com", "aw8", "SGD", "+08:00", "A8S_DL_USERNAME", "1m7anE0hO1kok0KgHPHN2mAu18mcXO2dbe939UD9ZLX4", "Deposit List", "E", "G")
-
-
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== IBS & SSBO A8S CINDY  =======================================================================
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
+        mongodb_2_gs.upload_to_google_sheet_DL_PID("A8S_DL", "1n5gSpeFd24pGjdazgGvXay3rf57-SOdQbwUHCiD5mrE", "DEPOSIT LIST", "M", "O", extra_mongo_collections=["SSBO_A8S_DL"])
         
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[IBS & SSBO A8S CINDY] {Fore.YELLOW} DEPOSIT LIST Data... (USERNAME){Style.RESET_ALL}\n"
-        for ch in msg:
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-            time.sleep(0.01)
-
-
-        # SSBO A8S SG
-        print("\n>>== SSBO A8S SG ==<<")
-        mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID("SSBO_A8S_DL", "1MZIxaCB_IaAhCZ42cDijHSDqvL3GqWYmPkbZd2CpQsw", "Deposit List", "A", "C")
-
-        # IBS A8S SG 
-        print(">>== IBS A8S SG ==<<")
-        mongodb_2_gs.upload_to_google_sheet_DL_USERNAME("A8S_DL", "1MZIxaCB_IaAhCZ42cDijHSDqvL3GqWYmPkbZd2CpQsw", "Deposit List", "E", "G")
-
-
-
         # Delay 10 minutes
         time.sleep(600)
 
