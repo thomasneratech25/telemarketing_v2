@@ -2691,7 +2691,7 @@ while True:
 
         # IBS A8S SG 
         print(">>== IBS A8S SG ==<<")
-        mongodb_2_gs.upload_to_google_sheet_DL_USERNAME("A8S_DL", "1MZIxaCB_IaAhCZ42cDijHSDqvL3GqWYmPkbZd2CpQsw", "Deposit List", "E", "G")
+        mongodb_2_gs.upload_to_google_sheet_DL_USERNAME("A8S_DL_USERNAME", "1MZIxaCB_IaAhCZ42cDijHSDqvL3GqWYmPkbZd2CpQsw", "Deposit List", "E", "G")
 
         # Delay 10 minutes
         time.sleep(600)

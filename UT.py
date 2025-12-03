@@ -1048,8 +1048,8 @@ class mongodb_2_gs:
 
             # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
             dt = datetime.fromisoformat(register_info_date)
-            register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
-
+            register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")   
+            
             # Build the new cleaned document (Use for upload data to MongoDB)
             doc = {
                 "username": username,
@@ -1241,13 +1241,17 @@ class mongodb_2_gs:
             if not register_info_date:
                 continue
 
-            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
+            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS) in GMT+7
+            register_info_date_fmt = ""
             try:
                 dt = datetime.fromisoformat(str(register_info_date).replace("Z", "+00:00"))
-            except ValueError:
-                dt = datetime.fromisoformat(str(register_info_date))
-            register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
-
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                dt = dt.astimezone(timezone(timedelta(hours=7)))
+                register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
+            except Exception:
+                register_info_date_fmt = str(register_info_date)
+            
             # Build the new cleaned document (Use for upload data to MongoDB)
             doc = {
                 "username": username,
@@ -1438,17 +1442,14 @@ class mongodb_2_gs:
             confirmedAmount = row.get("confirmedAmount")
             lastModifiedDate = row.get("lastModifiedDate")
 
-            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS) in GMT+8
+            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS) in GMT+7
             if lastModifiedDate:
                 try:
-                    # Convert Z → UTC datetime
-                    dt = datetime.fromisoformat(lastModifiedDate.replace("Z", "+00:00"))
-
-                    # Convert UTC → GMT+8 (Malaysia Time)
-                    myt = dt.astimezone(timezone(timedelta(hours=8)))
-
-                    # Format output
-                    lastModifiedDate_fmt = myt.strftime("%Y-%m-%d %H:%M:%S")
+                    dt = datetime.fromisoformat(str(lastModifiedDate).replace("Z", "+00:00"))
+                    if dt.tzinfo is None:
+                        dt = dt.replace(tzinfo=timezone.utc)
+                    dt = dt.astimezone(timezone(timedelta(hours=7)))
+                    lastModifiedDate_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
                 except Exception:
                     lastModifiedDate_fmt = lastModifiedDate
             else:
@@ -1562,14 +1563,7 @@ class mongodb_2_gs:
             print("No rows found to upload to Google Sheet.")
             return
 
-        first_empty_row = cls._find_first_empty_row(
-            sheet,
-            SPREADSHEET_ID,
-            gs_tab,
-            start_column,
-            end_column,
-            start_row=3
-        )
+        first_empty_row = 3
         end_row = first_empty_row + len(rows) - 1
         target_range = cls._build_a1_range(gs_tab, start_column, first_empty_row, end_column, end_row)
 
@@ -2689,6 +2683,13 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     # SSBO Member Info (merchants name = aw8, ip9, uea)
     @classmethod
     def ssbo_member_info(cls, merchants, currency, collection, gs_id, gs_tab, extra_mongo_collections=None):
+        
+        # Print title
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {collection} {Fore.YELLOW} MEMBER INFO Data ... {Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
 
         # Get today and yesterday date
         today = datetime.now().strftime("%Y-%m-%d")
@@ -2754,8 +2755,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             "referrerLogin": None,
             "refCode": None,
             "fingerprint": None,
-            "created_date_from": f"{yesterday}T16:00:00.000Z",
-            "created_date": f"{today}T15:59:59.000Z",
+            "created_date_from": f"{yesterday}T17:00:00.000Z",
+            "created_date": f"{today}T16:59:59.000Z",
             "registerDate": None,
             "last_login_date_from": None,
             "last_login_date_to": None,
@@ -2851,8 +2852,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "tenantId": 35,
                 "currencies": currency_list,
                 "matchFullPhone": "true",
-                "createdDateFrom": f"{yesterday}T16:00:00.000Z",
-                "createdDate": f"{today}T15:59:59.000Z",
+                "createdDateFrom": f"{yesterday}T17:00:00.000Z",
+                "createdDate": f"{today}T16:59:59.000Z",
                 "complianceViewMemberSocialMediaDetails": "true",
                 "enableShowTotalWallet": "false",
                 "mask": "false",
@@ -3159,6 +3160,13 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     @classmethod
     def ssbo_deposit_list_PID(cls, merchants, currency, collection, gs_id, gs_tab, start_column, end_column, upload_to_sheet=True):
         
+        # Print Title
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {collection} {Fore.YELLOW} DEPOSIT LIST Data ... (PLAYER_ID) {Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
+        
         # Get today and yesterday date
         today = datetime.now().strftime("%Y-%m-%d")
         yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
@@ -3196,12 +3204,12 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "merchant": merchants,
                 "merchantCode": merchants,
                 "currencies": currency,
-                "start": f"{yesterday}T16:00:00.000Z",
-                "startTime": f"{yesterday}T16:00:00.000Z",
-                "startCreatedTime": f"{yesterday}T16:00:00.000Z",
-                "end": f"{today}T15:59:59.000Z",
-                "endTime": f"{today}T15:59:59.000Z",
-                "endCreatedTime": f"{today}T15:59:59.000Z",
+                "start": f"{yesterday}T17:00:00.000Z",
+                "startTime": f"{yesterday}T17:00:00.000Z",
+                "startCreatedTime": f"{yesterday}T17:00:00.000Z",
+                "end": f"{today}T16:59:59.000Z",
+                "endTime": f"{today}T16:59:59.000Z",
+                "endCreatedTime": f"{today}T16:59:59.000Z",
                 "transType": "D",
                 "approved": "true",
                 "rejected": "false",
@@ -3300,12 +3308,12 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "merchant": merchants,
                 "merchantCode": merchants,
                 "currencies": currency,
-                "start": f"{yesterday}T16:00:00.000Z",
-                "startTime": f"{yesterday}T16:00:00.000Z",
-                "startCreatedTime": f"{yesterday}T16:00:00.000Z",
-                "end": f"{today}T15:59:59.000Z",
-                "endTime": f"{today}T15:59:59.000Z",
-                "endCreatedTime": f"{today}T15:59:59.000Z",
+                "start": f"{yesterday}T17:00:00.000Z",
+                "startTime": f"{yesterday}T17:00:00.000Z",
+                "startCreatedTime": f"{yesterday}T17:00:00.000Z",
+                "end": f"{today}T16:59:59.000Z",
+                "endTime": f"{today}T16:59:59.000Z",
+                "endCreatedTime": f"{today}T16:59:59.000Z",
                 "transType": "D",
                 "approved": "true",
                 "rejected": "false",
@@ -3404,124 +3412,18 @@ while True:
     try:
 
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== UM US FTD/STD ====================================================================================
+        # ============================================================== SSBO UT MEMBER INFO =============================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[UM] {Fore.YELLOW} FTD/STD Data ... {Style.RESET_ALL}\n"
-        for ch in msg:
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-            time.sleep(0.01)
-
-        # IBS UM MY
-        print("\n>>== IBS UM MY ==<<")
-        safe_call(Fetch.ftd_stdReport, "29018465.asia", "uea8", "MYR", "+08:00", "UM_FTD_STD", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM STD", upload_to_sheet=False, description="IBS UM MY FTD/STD")
-
-        # SSBO UM MY
-        print("\n>>== SSBO UM MY ==<<")
-        safe_call(Fetch.ssbo_ftd_stdReport, "uea", "MYR", "SSBO_UM_FTD_STD", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM STD", extra_mongo_collections=["UM_FTD_STD"], description="SSBO UM MY FTD/STD")
-
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[US] {Fore.YELLOW} FTD/STD Data ... {Style.RESET_ALL}\n"
-        for ch in msg:
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-            time.sleep(0.01)
-
-        # SSBO US SG
-        print("\n>>== SSBO US SG ==<<")
-        safe_call(Fetch.ssbo_ftd_stdReport, "uea", "SGD", "SSBO_US_FTD_STD", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "US STD", extra_mongo_collections=["US_FTD_STD"], description="SSBO US SG FTD/STD")
-
+        
+        safe_call(Fetch.ssbo_member_info, "uea", "THB", "SSBO_UT_MI", "1k4IpLnQAJjDGoUwhbxxLFeTgygI7RlzwRFsEWmk2xPk", "New Register", description="SSBO UT THAI MEMBER INFO")
 
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== UM US MEMBER INFO =============================================================================
+        # ============================================================== SSBO UT PLAYER ID ===============================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         
+        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["THB"], "SSBO_UT_DL", "1k4IpLnQAJjDGoUwhbxxLFeTgygI7RlzwRFsEWmk2xPk", "DEPOSIT LIST", "A", "C", description="SSBO UT THAI DL PID")
 
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[UM] {Fore.YELLOW} MEMBER INFO Data ... {Style.RESET_ALL}\n"
-        for ch in msg:
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-            time.sleep(0.01)
-
-        # IBS UM MY
-        print("\n>>== IBS UM MY ==<<")
-        safe_call(Fetch.member_info, "29018465.asia", "uea8", "MYR", "+08:00", "UM_MI", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM", upload_to_sheet=False, description="IBS UM MY MEMBER INFO")
-        # SSBO UM MY
-        print("\n>>== SSBO UM MY ==<<")
-        safe_call(Fetch.ssbo_member_info, "uea", "MYR", "SSBO_UM_MI", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM", extra_mongo_collections=["UM_MI"], description="SSBO UM MY MEMBER INFO")
-
-
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[US] {Fore.YELLOW} MEMBER INFO Data ... {Style.RESET_ALL}\n"
-        for ch in msg:
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-            time.sleep(0.01)
-
-        # SSBO US SG
-        print("\n>>== SSBO US SG ==<<")
-        safe_call(Fetch.ssbo_member_info, "uea", "SGD", "SSBO_US_MI", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "US", description="SSBO US SG MEMBER INFO")
-
-
-    #     # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    #     # ============================================================== UM US PLAYER ID ===============================================================================
-    #     # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[UM] {Fore.YELLOW} DEPOSIT LIST Data ... (PLAYER_ID) {Style.RESET_ALL}\n"
-        for ch in msg:
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-            time.sleep(0.01)
-
-        # SSBO UM MY
-        print("\n>>== SSBO UM MY ==<<")
-        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["MYR"], "SSBO_UM_DL", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM DEPOSIT LIST", "A", "C", upload_to_sheet=False, description="SSBO UM MY DL PID")
-
-        # IBS UM MY 
-        print(">>== IBS UM MY ==<<")
-        safe_call(Fetch.deposit_list_PID, "29018465.asia", "uea8", "MYR", "+08:00", "UM_DL", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM DEPOSIT LIST", "A", "C", extra_mongo_collections=["SSBO_UM_DL"], description="IBS UM MY DL PID")
-        
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[US] {Fore.YELLOW} DEPOSIT LIST Data ... (PLAYER_ID) {Style.RESET_ALL}\n"
-        for ch in msg:
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-            time.sleep(0.01)
-
-        # SSBO US SG
-        print(">>== SSBO US SG ==<<")
-        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["SGD"], "SSBO_US_DL", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "US DEPOSIT LIST", "A", "C", description="SSBO US SG DL PID")
-
-
-    #     # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    #     # ============================================================== UM US USERNAME ================================================================================
-    #     # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[UM] {Fore.YELLOW} DEPOSIT LIST Data ... (USERNAME) {Style.RESET_ALL}\n"
-        for ch in msg:
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-            time.sleep(0.01)
-
-        # SSBO UM MY
-        print("\n>>== SSBO UM MY ==<<")
-        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["MYR"], "SSBO_UM_DL", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM DEPOSIT LIST 2", "A", "C", upload_to_sheet=False, description="SSBO UM MY DL USERNAME")
-        
-        # IBS UM MY 
-        print(">>== IBS UM MY ==<<")
-        safe_call(Fetch.deposit_list_USERNAME, "29018465.asia", "uea8", "MYR", "+08:00", "UM_DL_USERNAME", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM DEPOSIT LIST 2", "A", "C", extra_mongo_collections=["SSBO_UM_DL"], description="IBS UM MY DL USERNAME")
-
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[US] {Fore.YELLOW} DEPOSIT LIST Data ... (USERNAME) {Style.RESET_ALL}\n"
-        for ch in msg:
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-            time.sleep(0.01)
-        
-        # SSBO US SG
-        print("\n>>== SSBO US SG ==<<")
-        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["SGD"], "SSBO_US_DL", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "US DEPOSIT LIST 2", "A", "C", description="SSBO US SG DL USERNAME")
-
-        # Delay 10 minutes
+        # delay 10 minutes
         time.sleep(600)
 
     except KeyboardInterrupt:

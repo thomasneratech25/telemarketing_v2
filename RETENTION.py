@@ -34,7 +34,7 @@ if not logger.handlers:
     logger.setLevel(logging.INFO)
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 
-    file_handler = logging.FileHandler(LOG_DIR / "AMR_errors.log", encoding="utf-8")
+    file_handler = logging.FileHandler(LOG_DIR / "RETENTION_errors.log", encoding="utf-8")
     file_handler.setLevel(logging.ERROR)
     file_handler.setFormatter(formatter)
 
@@ -44,6 +44,31 @@ if not logger.handlers:
 
     logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
+
+def safe_call(func, *args, description=None, retries=500, delay=60, **kwargs):
+    """
+    Call a function safely with retries.
+
+    Parameters:
+        func: callable to execute.
+        description: Optional string used in logs for readability.
+        retries: Number of attempts before giving up.
+        delay: Seconds to wait between retries.
+    """
+    attempt = 1
+    label = description or getattr(func, "__name__", "callable")
+    while True:
+        try:
+            return func(*args, **kwargs)
+        except KeyboardInterrupt:
+            raise
+        except Exception:
+            logger.exception("Error during %s (attempt %s/%s)", label, attempt, retries)
+            if attempt >= retries:
+                logger.error("Giving up on %s after %s attempts.", label, retries)
+                return None
+            attempt += 1
+            time.sleep(delay)
 
 # Chrome Settings
 class Automation:
@@ -813,6 +838,391 @@ class mongodb_2_gs:
 
         print(f"✅ Uploaded {len(df)} data rows to '{g_sheet_tab}' starting from row 2.")
 
+
+    # ====================================================================================
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= DEPOSIT LIST (USERNAME) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # ====================================================================================
+    
+    # MongoDB Database 
+    def mongodbAPI_DL_USERNAME(rows, collection):
+
+        # MongoDB API KEY
+        MONGODB_URI = os.getenv("MONGODB_API_KEY")
+
+        # Call MongoDB database and collection
+        client = MongoClient(MONGODB_URI)
+        db = client["Telemarketing"]
+        collection = db[collection]
+
+        # Set and Ensure when upload data this 3 Field is Unique Data
+        collection.create_index(
+            [("username", 1), ("amount", 1), ("completed_at", 1)],
+            unique=True
+        )
+
+        # Count insert and skip
+        inserted = 0
+        skipped = 0
+        cleaned_docs = []
+
+        batch = []
+
+        # for each rows in a list of JSON objects return
+        for row in rows:
+            # Extract only the fields you want (Extract Data from json file)
+            username = row.get("username")
+            amount = row.get("amount")
+            completed_at = row.get("completed_at")
+
+            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
+            dt = datetime.fromisoformat(completed_at)
+            completed_at_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
+
+            # Build the new cleaned document (Use for upload data to MongoDB)
+            doc = {
+                "username": username,
+                "amount": amount,
+                "completed_at": completed_at_fmt,
+            }
+
+            # Keep the version without _id for uploading later
+            cleaned_docs.append(doc.copy())
+            batch.append(doc)
+
+            if len(batch) == 500:
+                try:
+                    collection.insert_many(batch, ordered=False)
+                    inserted += len(batch)
+                except Exception as exc:
+                    if hasattr(exc, "details"):
+                        skipped += len(exc.details.get("writeErrors", []))
+                        inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                    else:
+                        skipped += 0
+                batch = []
+
+        # Insert any remaining documents in batch
+        if batch:
+            try:
+                collection.insert_many(batch, ordered=False)
+                inserted += len(batch)
+            except Exception as exc:
+                if hasattr(exc, "details"):
+                    skipped += len(exc.details.get("writeErrors", []))
+                    inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                else:
+                    skipped += 0
+
+        print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}")
+        return cleaned_docs
+
+        # Update Data to Google Sheet from MongoDB (Deposit List) (Username)
+    
+    # Upload Google Sheet
+    @classmethod
+    def upload_to_google_sheet_DL_USERNAME(cls, collection, gs_id, gs_tab, start_column, end_column, rows=None, extra_mongo_collections=None, overwrite=False, upload_to_sheet=True):
+
+        # Authenticate with OAuth2
+        creds = cls.googleAPI()
+        service = build("sheets", "v4", credentials=creds)
+        sheet = service.spreadsheets()
+
+        # Google Sheet ID and Sheet Tab Name (range name)
+        SPREADSHEET_ID = gs_id
+
+        # Convert from MongoDB (dics) to Google Sheet API (list), because Google Sheets API only accept "list".
+        def sanitize_rows(raw_rows):
+            """Normalize rows into list-of-lists; keep completed_at unchanged."""
+            sanitized = []
+            for r in raw_rows:
+                if isinstance(r, dict):
+                    username = (
+                        r.get("username")
+                        or r.get("player_id")
+                        or r.get("memberLogin")
+                        or ""
+                    )
+                    username = str(username)
+                    if username and not username.startswith("'"):
+                        username = f"'{username}"  # force Google Sheets to treat as text
+                    # --- BEGIN PATCHED AMOUNT HANDLING ---
+                    amount_raw = str(r.get("amount", ""))
+
+                    # Force 2 decimal places WITHOUT rounding
+                    if "." in amount_raw:
+                        whole, frac = amount_raw.split(".", 1)
+                        frac = (frac + "00")[:2]   # pad then truncate
+                        amount_clean = f"{whole}.{frac}"
+                    else:
+                        amount_clean = f"{amount_raw}.00"
+                    # --- END PATCHED AMOUNT HANDLING ---
+
+                    sanitized.append([
+                        username,
+                        amount_clean,
+                        r.get("completed_at", ""),
+                    ])
+                elif isinstance(r, (list, tuple)):
+                    pid = str(r[0]) if len(r) > 0 else ""
+                    if pid and not pid.startswith("'"):
+                        pid = f"'{pid}"
+                    sanitized.append([
+                        pid,
+                        str(r[1]) if len(r) > 1 else "",
+                        r[2] if len(r) > 2 else "",  # do not coerce to str
+                    ])
+                else:
+                    sanitized.append([str(r), "", ""])
+            return sanitized
+
+        # If no data upload to MongoDB, it auto upload data to google sheet
+        if not upload_to_sheet:
+            print(f"upload_to_sheet=False → Skipping Google Sheet update for tab '{gs_tab}'.")
+            return
+
+        if not rows:
+            load_dotenv()
+            MONGODB_URI = os.getenv("MONGODB_API_KEY")
+            if not MONGODB_URI:
+                raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
+            client = MongoClient(MONGODB_URI)
+
+            db = client["Telemarketing"]
+            collection = db[collection]
+            documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
+            rows = documents
+            
+        combined_rows = cls._normalize_pid_rows(rows)
+        if extra_mongo_collections:
+            combined_rows.extend(cls._fetch_extra_pid_rows(extra_mongo_collections))
+
+        cls._sort_rows_by_datetime(combined_rows, "completed_at")
+        rows = sanitize_rows(combined_rows)
+
+        if not rows:
+            print("No rows found to upload to Google Sheet.")
+            return
+
+        first_empty_row = 4
+        end_row = first_empty_row + len(rows) - 1
+        target_range = cls._build_a1_range(gs_tab, start_column, first_empty_row, end_column, end_row)
+
+        body = {"values": rows, "majorDimension": "ROWS"}
+
+        cls._ensure_sheet_row_capacity(service, SPREADSHEET_ID, gs_tab, end_row)
+
+        print(f"Uploading {len(rows)} rows to Google Sheet range {target_range}")
+
+        try:
+            sheet.values().update(
+                spreadsheetId=SPREADSHEET_ID,
+                range=target_range,
+                valueInputOption="USER_ENTERED",  # let Sheets parse dates/numbers
+                body=body
+            ).execute()
+        except Exception as exc:
+            print(f"Failed to upload to Google Sheets: {exc}")
+            raise
+
+        # print("Rows to upload:", rows)
+        print("Uploaded MongoDB data to Google Sheet.\n\n")
+
+    # ====================================================================================
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= SSBO DEPOSIT LIST (PLAYER ID) =-=-=-=-=-=-=-=-=-=-=-=-
+    # ====================================================================================
+
+    # MongoDB Database
+    def mongodbAPI_ssbo_DL_PID(rows, collection):
+
+        # MongoDB API KEY
+        MONGODB_URI = os.getenv("MONGODB_API_KEY")
+
+        # Call MongoDB database and collection
+        client = MongoClient(MONGODB_URI)
+        db = client["J8MS_A8MS"]
+        collection = db[collection]
+
+        # Set and Ensure when upload data this 3 Field are Unique Data
+        collection.create_index(
+            [("memberLogin", 1), ("confirmedAmount", 1), ("lastModifiedDate", 1)],
+            unique=True
+        )
+
+        # Count insert and skip
+        inserted = 0
+        skipped = 0
+        cleaned_docs = []
+
+        batch = []
+
+        # for each rows in a list of JSON objects return
+        for row in rows:
+            # Extract only the fields you want (Extract Data from json file)
+            memberLogin = row.get("memberLogin")
+            confirmedAmount = row.get("confirmedAmount")
+            lastModifiedDate = row.get("lastModifiedDate")
+
+            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS) in GMT+8
+            if lastModifiedDate:
+                try:
+                    # Convert Z → UTC datetime
+                    dt = datetime.fromisoformat(lastModifiedDate.replace("Z", "+00:00"))
+
+                    # Convert UTC → GMT+8 (Malaysia Time)
+                    myt = dt.astimezone(timezone(timedelta(hours=8)))
+
+                    # Format output
+                    lastModifiedDate_fmt = myt.strftime("%Y-%m-%d %H:%M:%S")
+                except Exception:
+                    lastModifiedDate_fmt = lastModifiedDate
+            else:
+                lastModifiedDate_fmt = ""
+
+            # Build the new cleaned document (Use for upload data to MongoDB)
+            doc = {
+                "memberLogin": memberLogin,
+                "confirmedAmount": confirmedAmount,
+                "lastModifiedDate": lastModifiedDate_fmt
+            }
+
+            # Keep the version without _id for uploading later
+            cleaned_docs.append(doc.copy())
+            batch.append(doc)
+
+            if len(batch) == 500:
+                try:
+                    collection.insert_many(batch, ordered=False)
+                    inserted += len(batch)
+                except Exception as exc:
+                    if hasattr(exc, "details"):
+                        skipped += len(exc.details.get("writeErrors", []))
+                        inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                    else:
+                        skipped += 0
+                batch = []
+
+        # Insert any remaining documents in batch
+        if batch:
+            try:
+                collection.insert_many(batch, ordered=False)
+                inserted += len(batch)
+            except Exception as exc:
+                if hasattr(exc, "details"):
+                    skipped += len(exc.details.get("writeErrors", []))
+                    inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                else:
+                    skipped += 0
+
+        print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}")
+        return cleaned_docs
+
+    # Update Data to Google Sheet from MongoDB
+    @classmethod
+    def upload_to_google_sheet_ssbo_DL_PID(cls, collection, gs_id, gs_tab, start_column, end_column, rows=None):
+
+        # Authenticate with OAuth2
+        creds = cls.googleAPI()
+        service = build("sheets", "v4", credentials=creds)
+        sheet = service.spreadsheets()
+
+        # Google Sheet ID and Sheet Tab Name (range name)
+        SPREADSHEET_ID = gs_id
+
+        # Convert from MongoDB (dicts) to Google Sheet API (list), because Google Sheets API only accept "list".
+        def sanitize_rows(raw_rows):
+            """Normalize rows into list-of-lists; SSBO mapping."""
+            sanitized = []
+            for r in raw_rows:
+                if isinstance(r, dict):
+                    pid = str(r.get("memberLogin", ""))
+                    if pid and not pid.startswith("'"):
+                        pid = f"'{pid}"  # force Google Sheets to treat as text
+                    # --- BEGIN PATCHED AMOUNT HANDLING ---
+                    amount_raw = str(r.get("confirmedAmount", ""))
+
+                    # Force 2 decimal places WITHOUT rounding
+                    if "." in amount_raw:
+                        whole, frac = amount_raw.split(".", 1)
+                        frac = (frac + "00")[:2]   # pad then truncate
+                        amount_clean = f"{whole}.{frac}"
+                    else:
+                        amount_clean = f"{amount_raw}.00"
+
+                    # --- END PATCHED AMOUNT HANDLING ---
+                    sanitized.append([
+                        pid,
+                        amount_clean,
+                        r.get("lastModifiedDate", ""),
+                    ])
+                elif isinstance(r, (list, tuple)):
+                    pid = str(r[0]) if len(r) > 0 else ""
+                    if pid and not pid.startswith("'"):
+                        pid = f"'{pid}"
+                    sanitized.append([
+                        pid,
+                        str(r[1]) if len(r) > 1 else "",
+                        r[2] if len(r) > 2 else "",
+                    ])
+                else:
+                    sanitized.append([str(r), "", ""])
+            return sanitized
+
+        # If no data upload to MongoDB, it auto upload data to google sheet
+        if not rows:
+            load_dotenv()
+            MONGODB_URI = os.getenv("MONGODB_API_KEY")
+            if not MONGODB_URI:
+                raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
+            client = MongoClient(MONGODB_URI)
+
+            db = client["J8MS_A8MS"]
+            collection = db[collection]
+            documents = list(collection.find({}, {"_id": 0}).sort("lastModifiedDate", 1))
+            rows = documents
+            
+        rows = sanitize_rows(rows)
+
+        if not rows:
+            print("No rows found to upload to Google Sheet.")
+            return
+
+        first_empty_row = 4
+        end_row = first_empty_row + len(rows) - 1
+        target_range = cls._build_a1_range(gs_tab, start_column, first_empty_row, end_column, end_row)
+
+        body = {"values": rows, "majorDimension": "ROWS"}
+
+        cls._ensure_sheet_row_capacity(service, SPREADSHEET_ID, gs_tab, end_row)
+
+        print(f"Uploading {len(rows)} rows to Google Sheet range {target_range}")
+
+        try:
+            sheet.values().update(
+                spreadsheetId=SPREADSHEET_ID,
+                range=target_range,
+                valueInputOption="USER_ENTERED",  # let Sheets parse dates/numbers
+                body=body
+            ).execute()
+        except Exception as exc:
+            print(f"Failed to upload to Google Sheets: {exc}")
+            raise
+
+        if (start_column, end_column) in {("I", "K"), ("M", "O")}:
+            cls._sort_range_by_column(
+                service,
+                SPREADSHEET_ID,
+                gs_tab,
+                start_column,
+                end_column,
+                start_row=first_empty_row,
+                end_row=end_row,
+                sort_column_letter=end_column,
+                descending=False
+            )
+
+        # print("Rows to upload:", rows)
+        print("Uploaded MongoDB data to Google Sheet.\n\n")
+
 # Fetch Data
 class Fetch(Automation, BO_Account, mongodb_2_gs):
     
@@ -1305,6 +1715,363 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             # Upload to Google Sheet
             cls.upload_to_google_sheet_SSBO_AMR(file_name, g_sheet_tab, g_sheet_ID)
     
+    # =========================== DEPOSIT LIST USERNAME ===========================
+
+    # Deposit List (Username)
+    @classmethod
+    def deposit_list_USERNAME(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=None):
+
+        # Get today date and time
+        today = datetime.now()
+        today = today.strftime("%Y-%m-%d")
+
+        # Cookie File
+        cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+
+        # Auto-create file if missing
+        os.makedirs(os.path.dirname(cookie_file), exist_ok=True)
+        if not os.path.exists(cookie_file):
+            open(cookie_file, "w").write('{"user_cookie": ""}')
+
+        # Load cookie
+        with open(cookie_file, "r", encoding="utf-8") as f:
+            user_cookie = json.load(f).get("user_cookie", "")
+        
+        url = f"https://v3-bo.{bo_link}/api/be/finance/get-deposit"
+
+        payload = {
+        "paginate": 100,
+        "page": 1,
+        "currency": [
+            currency
+        ],
+        "status": "approved",
+        "start_date": today,
+        "end_date": today,
+        "gmt": gmt_time,
+        "merchant_id": 1,
+        "admin_id": 337,
+        "aid": 337
+        }
+        headers = {
+        'accept': 'application/json',
+        'accept-language': 'en-US,en;q=0.9',
+        'cache-control': 'no-cache',
+        'content-type': 'application/json',
+        'domain': f'v3-bo.{bo_link}',
+        'gmt': gmt_time,
+        'lang': 'en-US',
+        'loggedin': 'true',
+        'origin': f'https://v3-bo.{bo_link}',
+        'page': '/en-us/finance-management/deposit',
+        'pragma': 'no-cache',
+        'priority': 'u=1, i',
+        'referer': f'https://v3-bo.{bo_link}/en-us/finance-management/deposit',
+        'sec-ch-ua': '"Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
+        'type': 'POST',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
+        'Cookie': f"i18n_redirected=en-us; user={user_cookie}",
+        }
+
+        # Post Response 
+        response = requests.post(url, headers=headers, json=payload)
+
+        # Check if return unauthorized (401) 
+        if response.json().get("statusCode") == 401:
+            
+            # Print 401 error
+            print("⚠️ Received 401 Unauthorized. Attempting to refresh cookies...")
+
+            # Get Cookies
+            Automation.chrome_CDP()
+            cls._get_cookies(
+                bo_link,
+                cls.accounts[bo_name]["merchant_code"],
+                cls.accounts[bo_name]["acc_ID"],
+                cls.accounts[bo_name]["acc_PASS"],
+                f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+            )
+            
+            # Retry request...
+            return cls.deposit_list_USERNAME(bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=extra_mongo_collections)
+
+        # For loop page and fetch data
+        for page in range(1, 10000): 
+
+            payload["page"] = page
+
+            # Send POST request (CORRECT WAY)
+            response = requests.post(url, headers=headers, json=payload)
+
+            # Safe JSON Handling
+            try:
+                data = response.json()
+            except Exception:
+                print("Invalid JSON response from API!")
+                print("Status Code:", response.status_code)
+                print("Response text:", response.text[:500])
+                return
+
+            rows = data.get("data", [])
+            print(f"\nPage {page} → {len(rows)} rows")
+
+            # STOP when no data
+            if not rows:
+                print(f"Finished. Last page = {page-1}")
+                break
+
+            # Insert into MongoDB
+            if "data" in data and len(data["data"]) > 0:
+                cls.mongodbAPI_DL_USERNAME(data["data"], collection)
+            else:
+                print("No data returned from API.")
+
+        # Upload Data to Google Sheet by reading from MongoDB
+        cls.upload_to_google_sheet_DL_USERNAME(collection, gs_id, gs_tab, start_column, end_column, rows=None, extra_mongo_collections=extra_mongo_collections)
+
+    # SSBO Deposit List (Player ID)
+    @classmethod
+    def ssbo_deposit_list_PID(cls, merchants, currency, collection, gs_id, gs_tab, start_column, end_column, upload_to_sheet=True):
+        
+        # Get today and yesterday date
+        today = datetime.now().strftime("%Y-%m-%d")
+        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        # yesterday = "2025-11-27"
+
+        # Cookie File
+        cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/superswan.json"
+
+        # Auto-create file if missing
+        os.makedirs(os.path.dirname(cookie_file), exist_ok=True)
+        if not os.path.exists(cookie_file):
+            open(cookie_file, "w").write('{"user_cookie": ""}')
+
+        # Load cookie
+        with open(cookie_file, "r", encoding="utf-8") as f:
+            cookie_data = json.load(f)
+
+        user_cookie = cookie_data.get("user_cookie", "")
+        bearer_token = cookie_data.get("bearer_token", "")
+
+        # ======================================= PART 1: Get the ID ==========================================
+        
+        ids = []
+        page = 0
+        
+        while True:
+
+            url = "https://aw8.premium-bo.com/cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit"
+
+            params = {
+                "page": page,
+                "size": 2000,
+                "sort": ["membershipLevel,DESC", "createdDate,DESC"],
+                "tenantId": 35,
+                "merchants": merchants,
+                "merchant": merchants,
+                "merchantCode": merchants,
+                "currencies": currency,
+                "start": f"{yesterday}T16:00:00.000Z",
+                "startTime": f"{yesterday}T16:00:00.000Z",
+                "startCreatedTime": f"{yesterday}T16:00:00.000Z",
+                "end": f"{today}T15:59:59.000Z",
+                "endTime": f"{today}T15:59:59.000Z",
+                "endCreatedTime": f"{today}T15:59:59.000Z",
+                "transType": "D",
+                "approved": "true",
+                "rejected": "false",
+                "pending": "false",
+                "inProgress": "false",
+                "risk": "false",
+                "kyc": "false",
+                "isProcessingTime": "false",
+                "hasDepositHideProcessingFees": "false",
+                "isAllowViewAccountNumber": "false",
+                "maskReloadAccountNumberCurrencyList": "",
+                "firstDeposit": "ALL",
+                "hiddenColumns": [
+                    "merchant",
+                    "region",
+                    "affiliateGroupCategory",
+                    "affiliateLogin",
+                    "processingFee",
+                    "bankStatus"
+                ],
+                "isSeamlessWalletMerchant": "null",
+                "cacheBuster": str(int(time.time() * 1000))
+            }
+
+
+            headers = {
+            'accept': 'application/json, text/plain, */*',
+            'accept-language': 'en-US,en;q=0.9',
+            'authorization': f'Bearer {bearer_token}',
+            'cache-control': 'no-cache',
+            'pragma': 'no-cache',
+            'priority': 'u=1, i',
+            'referer': 'https://aw8.premium-bo.com/',
+            'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"macOS"',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+            'Cookie': f'_ga={user_cookie}',
+            }
+
+            # Get Post Response
+            query = urlencode(params, doseq=True)
+            full_url = f"{url}?{query}"
+
+            response = requests.get(full_url, headers=headers)
+
+            # Handle auth errors before trying to parse JSON
+            if response.status_code in (401, 403):
+                print(f"⚠️ Received {response.status_code} from server. Attempting to refresh cookies + bearer token...")
+                Automation.chrome_CDP()
+                cls._ssbo_get_cookies()
+                print("⚠️ Cookies + bearer token refreshed ... Retrying request...\n")
+                cls.ssbo_deposit_list_PID(merchants, currency, collection, gs_id, gs_tab, start_column, end_column)
+                return
+            
+            # Try to parse JSON safely
+            try:
+                data = response.json()
+            except ValueError:
+                print("⚠️ Response is not valid JSON.")
+                print("Status code:", response.status_code)
+                print("Text preview:", response.text[:500])
+                return
+
+            # List store all Member ID
+            ids = []
+            try:
+                data = response.json()  # Try converting to JSON
+                if isinstance(data, list):
+                    ids = [item.get("id") for item in data if isinstance(item, dict) and "id" in item]
+                    # print("All IDs:", ids)
+                else:
+                    print("⚠️ Unexpected JSON format:", data)
+            except ValueError:
+                print("⚠️ Response not valid JSON:")
+                print(response.text)
+
+            # print(f"✅ Page {page}: Total IDs found:", len(ids))
+            
+            # ======================================= PART 2: Use IDs to GET DATA  (funny lol) ==========================================
+            
+            if not ids:
+                print("⚠️ No transaction IDs found — break\n")
+                break
+
+            base_url = "https://aw8.premium-bo.com/cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit-details"
+            params = {
+                "page": 0,
+                "size": 2000,
+                "sort": ["membershipLevel,ASC", "createdDate,ASC"],
+                "tenantId": 35,
+                "merchants": merchants,
+                "merchant": merchants,
+                "merchantCode": merchants,
+                "currencies": currency,
+                "start": f"{yesterday}T16:00:00.000Z",
+                "startTime": f"{yesterday}T16:00:00.000Z",
+                "startCreatedTime": f"{yesterday}T16:00:00.000Z",
+                "end": f"{today}T15:59:59.000Z",
+                "endTime": f"{today}T15:59:59.000Z",
+                "endCreatedTime": f"{today}T15:59:59.000Z",
+                "transType": "D",
+                "approved": "true",
+                "rejected": "false",
+                "pending": "false",
+                "inProgress": "false",
+                "risk": "false",
+                "kyc": "false",
+                "isProcessingTime": "false",
+                "hasDepositHideProcessingFees": "false",
+                "isAllowViewAccountNumber": "false",
+                "maskReloadAccountNumberCurrencyList": "",
+                "firstDeposit": "ALL",
+                "hiddenColumns": [
+                    "merchant",
+                    "region",
+                    "affiliateGroupCategory",
+                    "affiliateLogin",
+                    "processingFee",
+                    "bankStatus"
+                ],
+                "isSeamlessWalletMerchant": "null",
+                "cacheBuster": str(int(time.time() * 1000))
+            }
+
+            base_query = urlencode(params, doseq=True)
+            transaction_ids_query = "transactionIds=" + "%2C".join(str(i) for i in ids)
+            url = f"{base_url}?{base_query}&{transaction_ids_query}"
+
+            headers = {
+                'accept': 'application/json, text/plain, */*',
+                'accept-language': 'en-US,en;q=0.9',
+                'authorization': f'Bearer {bearer_token}',
+                'cache-control': 'no-cache',
+                'pragma': 'no-cache',
+                'priority': 'u=1, i',
+                'referer': 'https://aw8.premium-bo.com/',
+                'sec-ch-ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"macOS"',
+                'sec-fetch-dest': 'empty',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-site': 'same-origin',
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+                'Cookie': f'_ga={user_cookie}',
+            }
+
+            response = requests.get(url, headers=headers)
+            # print(response.json())
+
+            # Safe JSON Handling
+            try:
+                data = response.json()
+            except Exception:
+                print("Invalid JSON response from API!")
+                print("Status Code:", response.status_code)
+                print("Response text:", response.text[:500])
+                return
+
+            # Normalize data: SSBO sometimes returns a LIST, sometimes a DICT
+            if isinstance(data, list):
+                rows = data
+            elif isinstance(data, dict):
+                rows = data.get("data", [])
+            else:
+                print("⚠️ Unexpected response type:", type(data))
+                return
+
+            print(f"\nPage {page} → {len(rows)} rows")
+
+            # STOP when no data
+            if not rows:
+                print(f"Finished. Last page = {page-1}")
+                break
+
+            # Insert into MongoDB
+            if rows:
+                cls.mongodbAPI_ssbo_DL_PID(rows, collection)
+            else:
+                print("No valid data returned from API.")
+
+            page+=1
+
+        if upload_to_sheet:
+            cls.upload_to_google_sheet_ssbo_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+        
+
 ###############=================================== CODE RUN HERE =======================================############
 
 ### ==== README YO!!!! ==== ####
@@ -1320,96 +2087,164 @@ while True:
         # ============================================================== IBS BO ======================================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         
-        #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS UM  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        #
         
-        print("\n>>== IBS UM AMR ==<<")
-        Fetch.allmemberReport("IBS UM", "29018465.asia", "uea8", "MYR", "+08:00", "UM_AMR", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0", "UM AMR")
+        #
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J8M ALL MEMBER REPORT -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
+        #
 
-        print("======================================================\n")
-        
-        #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J8M  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        #
-        
         print(">>== IBS J8M MY (AVA) ==<<")
-        Fetch.allmemberReport("IBS J8M", "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_AMR", "1s-URpvv2VFM9PjAO69ZqBOWvvJ9aiCPM6sLMTwq86Y8", "TM - All Member Report")
-        
+        safe_call(Fetch.allmemberReport, "IBS J8M", "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_AMR", "12G0kDXi2fnB5EhA3RT4bDDtQ4Tq-g88Rg6VQL89U0aY", "TM - All Member Report")
+        print("======================================================\n")
+
         print(">>== IBS J8M MY (PEI) ==<<")
-        mongodb_2_gs.upload_to_google_sheet_AMR("J8M_AMR", "1AYQ4vcayP7GLdAP0vdeaxhO64n52V6OqhSgCF7MOKXE", "TM - All Member Report")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_AMR, "J8M_AMR", "1I54nHH_M-3UXs4DqQGaqBhDewvKksqIWxyorbaMRaJU", "TM - All Member Report")
+        print("======================================================\n")
 
         print(">>== IBS J8M MY (XY) ==<<")
-        mongodb_2_gs.upload_to_google_sheet_AMR("J8M_AMR", "1wNxpSRskLk6F1TkyzcToQfSuEUXTc0VmO5M-_eyMZDo", "TM - All Member Report")
-
+        safe_call(mongodb_2_gs.upload_to_google_sheet_AMR,"J8M_AMR", "1vOikI71wExfzh5luDpX8KQKoINnsKVKYxBMqi-Js0a8", "TM - All Member Report")
         print("======================================================\n")
 
         #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS A8M  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J8M DEPOSIT LIST (USERNAME) -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
+        #
+
+        print("\n>>== IBS J8M MY (AVA) ==<<")
+        safe_call(Fetch.deposit_list_USERNAME, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL_USERNAME", "12G0kDXi2fnB5EhA3RT4bDDtQ4Tq-g88Rg6VQL89U0aY", "Deposit List", "A", "C")
+        print("======================================================\n")
+
+        print("\n>>== IBS J8M MY (PEI) ==<<")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "J8M_DL_USERNAME", "1I54nHH_M-3UXs4DqQGaqBhDewvKksqIWxyorbaMRaJU", "Deposit List", "A", "C")
+        print("======================================================\n")
+
+        print("\n>>== IBS J8M MY (XY) ==<<")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "J8M_DL_USERNAME", "1vOikI71wExfzh5luDpX8KQKoINnsKVKYxBMqi-Js0a8", "Deposit List", "A", "C")
+        print("======================================================\n")
+
+
+
+
+        #
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J8S ALL MEMBER REPORT -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
+        #
+        
+        print(">>== IBS J8S SG (CINDY) ==<<")
+        safe_call(Fetch.allmemberReport, "IBS J8S", "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_AMR", "1nCKZWdO2qaNy-4-9Zl86wGkZtd3C7x_HjsrjYF81YKo", "TM - All Member Report")
+        print("======================================================\n")
+
+        #
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J8S DEPOSIT LIST (USERNAME) -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
+        #
+
+        print(">>== IBS J8S SG (CINDY) ==<<")
+        safe_call(Fetch.deposit_list_USERNAME, "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_DL_USERNAME", "1nCKZWdO2qaNy-4-9Zl86wGkZtd3C7x_HjsrjYF81YKo", "Deposit List", "A", "C")
+        print("======================================================\n")
+
+
+
+
+        #
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS A8M ALL MEMBER REPORT  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
         #
         
         print(">>== IBS A8M MY (ANGIE) ==<<")
-        Fetch.allmemberReport("IBS A8M", "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_AMR", "1Sz5-AVvX2JwgxWY93oneWfbcmUa7CkVmOKpoP_FOakw", "TM - All Member Report (IBS)")
-
+        safe_call(Fetch.allmemberReport, "IBS A8M", "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_AMR", "1xy2C52zKX0o6Odcc3TysmPHXuXXhdYIJJyi1NoRrDBw", "TM - All Member Report (IBS)")
+        print("======================================================\n")
+        
         print(">>== IBS A8M MY (ANGIE 2) ==<<")
-        mongodb_2_gs.upload_to_google_sheet_AMR("A8M_AMR", "1cyi4qENq3PXXcr6lTmuaDoXrta69eEb79A6BhR28nlM", "TM - All Member Report (IBS)")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_AMR, "A8M_AMR", "1OtitCR8PXD9WXrOoXrluUdfMPZvzzzN__u4sulB9bio", "TM - All Member Report (IBS)")
+        print("======================================================\n")
 
         print(">>== IBS A8M MY (AVA) ==<<")
-        mongodb_2_gs.upload_to_google_sheet_AMR("A8M_AMR", "1aRDnliqc63hXZBxd1oOIFLPJg7rakHOf37AH9-ThqZc", "TM - All Member Report (IBS)")
-
+        safe_call(mongodb_2_gs.upload_to_google_sheet_AMR, "A8M_AMR", "1bzFhQ6ji5Ch2sk-V1Cc3y2PNWk4CrSBllXhTN2deZX4", "TM - All Member Report (IBS)")
         print("======================================================\n")
 
         #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS A8S  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS & SSBO A8M DEPOSIT LIST (USERNAME)  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
+        #
+
+        ###### ANGIE #####
+        print("\n>>== SSBO A8M MY (ANGIE) ==<<")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8M_DL", "1xy2C52zKX0o6Odcc3TysmPHXuXXhdYIJJyi1NoRrDBw", "Deposit List", "A", "C")
+        safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_DL_USERNAME", "1xy2C52zKX0o6Odcc3TysmPHXuXXhdYIJJyi1NoRrDBw", "Deposit List", "E", "G")
+        print("======================================================\n")
+
+        ###### ANGIE2 #####
+        print(">>== IBS A8M MY (ANGIE 2) ==<<")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8M_DL", "1OtitCR8PXD9WXrOoXrluUdfMPZvzzzN__u4sulB9bio", "Deposit List", "A", "C")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "A8M_DL_USERNAME", "1OtitCR8PXD9WXrOoXrluUdfMPZvzzzN__u4sulB9bio", "Deposit List", "E", "G")
+        print("======================================================\n")
+
+        ###### AVA #####
+        print("\n>>== SSBO A8M MY (AVA) ==<<")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8M_DL", "1bzFhQ6ji5Ch2sk-V1Cc3y2PNWk4CrSBllXhTN2deZX4", "Deposit List", "A", "C")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "A8M_DL_USERNAME", "1bzFhQ6ji5Ch2sk-V1Cc3y2PNWk4CrSBllXhTN2deZX4", "Deposit List", "E", "G")
+        print("======================================================\n")
+
+
+
+
+
+        # #
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS A8S ALL MEMBER REPORT  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
         #
 
         print(">>== IBS A8S SG (AVA) ==<<")
-        Fetch.allmemberReport("IBS A8S", "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_AMR", "1m7anE0hO1kok0KgHPHN2mAu18mcXO2dbe939UD9ZLX4", "TM - All Member Report (IBS)")
+        safe_call(Fetch.allmemberReport, "IBS A8S", "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_AMR", "1V_qWbLfSJloA6KtEW7QdXz9qkox53WYRP46yRePgD90", "TM - All Member Report (IBS)")
+        print("======================================================\n")
 
         print(">>== IBS A8S SG (CINDY) ==<<")
-        mongodb_2_gs.upload_to_google_sheet_AMR("A8S_AMR", "1MZIxaCB_IaAhCZ42cDijHSDqvL3GqWYmPkbZd2CpQsw", "TM - All Member Report (IBS)")
-
+        safe_call(mongodb_2_gs.upload_to_google_sheet_AMR, "A8S_AMR", "1JmVXGT67naNtM_9GiqPgDKqZXYdarKD-4nfy4zKTeMU", "TM - All Member Report (IBS)")
         print("======================================================\n")
+
+        #
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS A8S DEPOSIT LIST  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
+        #
+
+        ###### AVA #####
+        print(">>== IBS A8S SG (AVA) ==<<")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8S_DL", "1V_qWbLfSJloA6KtEW7QdXz9qkox53WYRP46yRePgD90", "Deposit List", "A", "C")
+        safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_DL_USERNAME", "1V_qWbLfSJloA6KtEW7QdXz9qkox53WYRP46yRePgD90", "Deposit List", "E", "G")
+        print("======================================================\n")
+
+
+        ###### CINDY #####
+        print(">>== IBS A8S SG (AVA) ==<<")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8S_DL", "1JmVXGT67naNtM_9GiqPgDKqZXYdarKD-4nfy4zKTeMU", "Deposit List", "A", "C")
+        safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_DL_USERNAME", "1JmVXGT67naNtM_9GiqPgDKqZXYdarKD-4nfy4zKTeMU", "Deposit List", "E", "G")
+        print("======================================================\n")
+
+
 
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-
         # ============================================== SSBO UEAT IP9 ACEWIN8  =======================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-
         
+        
         # Run Chrome Browser
         Automation.chrome_CDP()
-
-        #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  SSBO UM & US  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        #
-
-        print("\n>>== UM AMR ==<<")
-        Fetch.ssbo_allmemberReport("UEABET", "Malaysia", "SSBO_UM_AMR", "SSBO UM AMR", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0")
-
-        print("\n>>== US AMR ==<<")
-        Fetch.ssbo_allmemberReport("UEABET", "Singapore", "SSBO_US_AMR", "SSBO US AMR", "1kp3WplRQJt79CTsq8fKcRc9N5f58I3xo1sxVHt_7SD0")
 
         #
         # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  SSBO A8M  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
         #
 
         print(">>== SSBO A8M MY (ANGIE) ==<<")
-        Fetch.ssbo_allmemberReport("Acewin8", "Malaysia", "SSBO_A8M_AMR", "TM - All Member Report (SS)", "1Sz5-AVvX2JwgxWY93oneWfbcmUa7CkVmOKpoP_FOakw")
+        safe_call(Fetch.ssbo_allmemberReport, "Acewin8", "Malaysia", "SSBO_A8M_AMR", "TM - All Member Report (SS)", "1xy2C52zKX0o6Odcc3TysmPHXuXXhdYIJJyi1NoRrDBw")
 
         print(">>== SSBO A8M MY (ANGIE 2) ==<<")
-        mongodb_2_gs.upload_to_google_sheet_SSBO_AMR("SSBO_A8M_AMR", "TM - All Member Report (SS)", "1cyi4qENq3PXXcr6lTmuaDoXrta69eEb79A6BhR28nlM")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_SSBO_AMR, "SSBO_A8M_AMR", "TM - All Member Report (SS)", "1OtitCR8PXD9WXrOoXrluUdfMPZvzzzN__u4sulB9bio")
 
         print(">>== SSBO A8M MY (AVA) ==<<")
-        mongodb_2_gs.upload_to_google_sheet_SSBO_AMR("SSBO_A8M_AMR", "TM - All Member Report (SS)", "1aRDnliqc63hXZBxd1oOIFLPJg7rakHOf37AH9-ThqZc")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_SSBO_AMR, "SSBO_A8M_AMR", "TM - All Member Report (SS)", "1bzFhQ6ji5Ch2sk-V1Cc3y2PNWk4CrSBllXhTN2deZX4")
 
-        #
+        
         # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  SSBO A8S  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        #
+        
 
         print(">>== SSBO A8S SG (AVA) ==<<")
-        Fetch.ssbo_allmemberReport("Acewin8", "Singapore", "SSBO_A8S_AMR", "TM - All Member Report (SS)", "1m7anE0hO1kok0KgHPHN2mAu18mcXO2dbe939UD9ZLX4")
+        safe_call(Fetch.ssbo_allmemberReport, "Acewin8", "Singapore", "SSBO_A8S_AMR", "TM - All Member Report (SS)", "1V_qWbLfSJloA6KtEW7QdXz9qkox53WYRP46yRePgD90")
 
         print(">>== SSBO A8S SG (CINDY) ==<<")
-        mongodb_2_gs.upload_to_google_sheet_SSBO_AMR("SSBO_A8S_AMR", "TM - All Member Report (SS)", "1MZIxaCB_IaAhCZ42cDijHSDqvL3GqWYmPkbZd2CpQsw")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_SSBO_AMR, "SSBO_A8S_AMR", "TM - All Member Report (SS)", "1JmVXGT67naNtM_9GiqPgDKqZXYdarKD-4nfy4zKTeMU")
 
         # Close Browser
         Automation.cleanup()
