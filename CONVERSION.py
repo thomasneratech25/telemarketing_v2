@@ -1027,12 +1027,28 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             sys.stdout.flush()
             time.sleep(0.01)
 
-        # Get today date and time (GMT+7)
-        gmt7 = pytz.timezone("Asia/Bangkok")  # GMT+7
+        
+        # Get TimeZone (GMT+7)
+        gmt7 = pytz.timezone("Asia/Bangkok")
         now_gmt7 = datetime.now(gmt7)
 
+        # Get Current Time (GMT +7)    
+        current_time = now_gmt7.time()
+        print(current_time, "GMT+7")
+        
+        # Today & Yesterday Date
         today = now_gmt7.strftime("%Y-%m-%d")
-        print(today)    
+        yesterday = (now_gmt7 - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Rule:
+        # 00:00 - 00:14 → use yesterday
+        # 00:15 onward → use today
+        if current_time < datetime.strptime("00:15", "%H:%M").time():
+            start_date = yesterday
+            end_date = yesterday
+        else:
+            start_date = today
+            end_date = today
 
         # Cookie File
         cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
@@ -1055,8 +1071,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             currency
         ],
         "status": "approved",
-        "start_date":  today,
-        "end_date": today,
+        "start_date":  start_date,
+        "end_date": end_date,
         "gmt": gmt_time,
         "merchant_id": 1,
         "admin_id": 337,
@@ -1160,12 +1176,27 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             time.sleep(0.01)
 
 
-        # Get today date and time (GMT+7)
-        gmt7 = pytz.timezone("Asia/Bangkok")  # GMT+7
+        # Get TimeZone (GMT+7)
+        gmt7 = pytz.timezone("Asia/Bangkok")
         now_gmt7 = datetime.now(gmt7)
 
+        # Get Current Time (GMT +7)    
+        current_time = now_gmt7.time()
+        print(current_time, "GMT+7")
+        
+        # Today & Yesterday Date
         today = now_gmt7.strftime("%Y-%m-%d")
-        print(today)
+        yesterday = (now_gmt7 - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Rule:
+        # 00:00 - 00:14 → use yesterday
+        # 00:15 onward → use today
+        if current_time < datetime.strptime("00:15", "%H:%M").time():
+            start_date = yesterday
+            end_date = yesterday
+        else:
+            start_date = today
+            end_date = today
 
         # Cookie File
         cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
@@ -1189,8 +1220,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         "currency": [
             currency
         ],
-        "register_from": today,
-        "register_to": today,
+        "register_from": start_date,
+        "register_to": end_date,
         "merchant_id": 1,
         "admin_id": 581,
         "aid": 581
@@ -1293,12 +1324,27 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             sys.stdout.flush()
             time.sleep(0.01)
 
-        # Get today date and time (GMT+7)
-        gmt7 = pytz.timezone("Asia/Bangkok")  # GMT+7
+        # Get TimeZone (GMT+7)
+        gmt7 = pytz.timezone("Asia/Bangkok")
         now_gmt7 = datetime.now(gmt7)
 
+        # Get Current Time (GMT +7)    
+        current_time = now_gmt7.time()
+        print(current_time, "GMT+7")
+        
+        # Today & Yesterday Date
         today = now_gmt7.strftime("%Y-%m-%d")
-        print(today)
+        yesterday = (now_gmt7 - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Rule:
+        # 00:00 - 00:14 → use yesterday
+        # 00:15 onward → use today
+        if current_time < datetime.strptime("00:15", "%H:%M").time():
+            start_date = yesterday
+            end_date = yesterday
+        else:
+            start_date = today
+            end_date = today
 
         # Cookie File
         cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
@@ -1321,8 +1367,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         "currency": [
             currency
         ],
-        "register_from": today,
-        "register_to": today,
+        "register_from": start_date,
+        "register_to": end_date,
         "merchant_id": 1,
         "admin_id": 581,
         "aid": 581
@@ -1593,7 +1639,7 @@ while True:
         # safe_call(Fetch.deposit_list_PID, "siam855bo.com", "s855", "S8T", "THB", "+07:00", "S855_S8T_DL", "1zlB2V3yi9HyVJLKBomkGX0wKkgKfrSV2G8jQa-dzhgI", "DEPOSIT LIST", "A", "C", description="S8T deposit list")
 
 
-        time.sleep(600)
+        time.sleep(300)
 
     except KeyboardInterrupt:
             logger.info("Execution interrupted by user.")

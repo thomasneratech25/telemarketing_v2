@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import time
+import pytz
 import json
 import atexit
 import shutil
@@ -1721,9 +1722,28 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     @classmethod
     def deposit_list_USERNAME(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=None):
 
-        # Get today date and time
-        today = datetime.now()
-        today = today.strftime("%Y-%m-%d")
+        # Get current time in GMT+8
+        gmt8 = pytz.timezone("Asia/Singapore")   # GMT+8
+        now_gmt8 = datetime.now(gmt8)
+
+        current_time = now_gmt8.time()
+        print(current_time, "GMT+8")
+
+        # Get today and yesterday date
+        today = now_gmt8.strftime("%Y-%m-%d")
+        yesterday = (now_gmt8 - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Rule:
+        # 00:00 - 00:14 → yesterday
+        # 00:15 onward → today
+        cutoff_time = datetime.strptime("00:15", "%H:%M").time()
+
+        if current_time < cutoff_time:
+            start_date = yesterday
+            end_date = yesterday
+        else:
+            start_date = today
+            end_date = today
 
         # Cookie File
         cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
@@ -1746,8 +1766,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             currency
         ],
         "status": "approved",
-        "start_date": today,
-        "end_date": today,
+        "start_date": start_date,
+        "end_date": end_date,
         "gmt": gmt_time,
         "merchant_id": 1,
         "admin_id": 337,
@@ -1838,10 +1858,28 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     @classmethod
     def ssbo_deposit_list_PID(cls, merchants, currency, collection, gs_id, gs_tab, start_column, end_column, upload_to_sheet=True):
         
+        # Get current time in GMT+8
+        gmt8 = pytz.timezone("Asia/Singapore")   # GMT+8
+        now_gmt8 = datetime.now(gmt8)
+
+        current_time = now_gmt8.time()
+        print(current_time, "GMT+8")
+
         # Get today and yesterday date
-        today = datetime.now().strftime("%Y-%m-%d")
-        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-        # yesterday = "2025-11-27"
+        today = now_gmt8.strftime("%Y-%m-%d")
+        yesterday = (now_gmt8 - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Rule:
+        # 00:00 - 00:14 → yesterday
+        # 00:15 onward → today
+        cutoff_time = datetime.strptime("00:15", "%H:%M").time()
+
+        if current_time < cutoff_time:
+            start_date = yesterday
+            end_date = yesterday
+        else:
+            start_date = today
+            end_date = today
 
         # Cookie File
         cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/superswan.json"
@@ -1876,9 +1914,9 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "merchant": merchants,
                 "merchantCode": merchants,
                 "currencies": currency,
-                "start": f"{yesterday}T16:00:00.000Z",
-                "startTime": f"{yesterday}T16:00:00.000Z",
-                "startCreatedTime": f"{yesterday}T16:00:00.000Z",
+                "start": f"{end_date}T16:00:00.000Z",
+                "startTime": f"{end_date}T16:00:00.000Z",
+                "startCreatedTime": f"{end_date}T16:00:00.000Z",
                 "end": f"{today}T15:59:59.000Z",
                 "endTime": f"{today}T15:59:59.000Z",
                 "endCreatedTime": f"{today}T15:59:59.000Z",
@@ -1980,9 +2018,9 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "merchant": merchants,
                 "merchantCode": merchants,
                 "currencies": currency,
-                "start": f"{yesterday}T16:00:00.000Z",
-                "startTime": f"{yesterday}T16:00:00.000Z",
-                "startCreatedTime": f"{yesterday}T16:00:00.000Z",
+                "start": f"{end_date}T16:00:00.000Z",
+                "startTime": f"{end_date}T16:00:00.000Z",
+                "startCreatedTime": f"{end_date}T16:00:00.000Z",
                 "end": f"{today}T15:59:59.000Z",
                 "endTime": f"{today}T15:59:59.000Z",
                 "endCreatedTime": f"{today}T15:59:59.000Z",

@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import time
+import pytz
 import json
 import atexit
 import logging
@@ -539,13 +540,12 @@ class mongodb_2_gs:
             combined.extend(cls._normalize_pid_rows(docs))
         return combined
 
-
-
     # ====================================================================================
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SSBO & IBS MEMBER INFO =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # ====================================================================================
     
-    # =-=-=--=-=-=-=-=-= IBS =-=-=-=-=-=-=-=-=-=-=-=-=
+    # -_-_-_-_-_-_-_- IBS -_-_-_-_-_-_-_-
+
     # MongoDB Database (Member Info)
     def mongodbAPI_MI(rows, collection):
 
@@ -554,18 +554,12 @@ class mongodb_2_gs:
 
         # Call MongoDB database and collection
         client = MongoClient(MONGODB_URI)
-        db = client["J8MS_A8MS"]
+        db = client["UEA8"]
         collection = db[collection]
 
-        # Ensure deposit-specific unique index does not block member inserts
-        try:
-            collection.drop_index("player_id_1_amount_1_completed_at_1")
-        except Exception:
-            pass
-
-       # Set and Ensure when upload data this 3 Field is Unique Data
+        # Set and Ensure when upload data this 3 Field is Unique Data
         collection.create_index(
-            [("username", 1), ("first_name", 1), ("register_info_date", 1)],
+            [("member_id", 1)],
             unique=True
         )
 
@@ -573,8 +567,6 @@ class mongodb_2_gs:
         inserted = 0
         skipped = 0
         cleaned_docs = []
-
-        batch = []
 
         # for each rows in a list of JSON objects return
         for row in rows:
@@ -584,7 +576,7 @@ class mongodb_2_gs:
                 continue
 
             # Extract only the fields you want (Extract Data from json file)
-            username= row.get("username")
+            username = row.get("username")
             first_name = row.get("first_name")
             register_info_date = row.get("register_info_date")
             mobileno = row.get("mobileno")
@@ -605,38 +597,25 @@ class mongodb_2_gs:
 
             # Keep the version without _id for uploading later
             cleaned_docs.append(doc.copy())
-            batch.append(doc)
 
-            if len(batch) == 500:
-                try:
-                    collection.insert_many(batch, ordered=False)
-                    inserted += len(batch)
-                except Exception as exc:
-                    if hasattr(exc, "details"):
-                        skipped += len(exc.details.get("writeErrors", []))
-                        inserted += len(batch) - len(exc.details.get("writeErrors", []))
-                    else:
-                        skipped += 0
-                batch = []
+            # Overwrite if member_id exists; otherwise insert new
+            result = collection.replace_one(
+                {"member_id": member_id},
+                doc,
+                upsert=True
+            )
 
-        # Insert any remaining documents in batch
-        if batch:
-            try:
-                collection.insert_many(batch, ordered=False)
-                inserted += len(batch)
-            except Exception as exc:
-                if hasattr(exc, "details"):
-                    skipped += len(exc.details.get("writeErrors", []))
-                    inserted += len(batch) - len(exc.details.get("writeErrors", []))
-                else:
-                    skipped += 0
+            if result.matched_count > 0:
+                inserted += 1  # overwrite counts as insert/update
+            else:
+                inserted += 1
 
         print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}\n")
         return cleaned_docs
 
     # Update Data to Google Sheet from MongoDB (MemberInfo)
     @classmethod
-    def upload_to_google_sheet_MI(cls, collection, gs_id, gs_tab, rows=None, extra_mongo_collections=None, upload_to_sheet=True):
+    def upload_to_google_sheet_MI(cls, collection, gs_id, gs_tab, rows=None, extra_mongo_collections=None):
         
         # Authenticate with OAuth2
         creds = cls.googleAPI()
@@ -669,7 +648,7 @@ class mongodb_2_gs:
         if not MONGODB_URI:
             raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
         client = MongoClient(MONGODB_URI)
-        db = client["J8MS_A8MS"]
+        db = client["UEA8"]
 
         # If no data upload to MongoDB, it auto upload data to google sheet
         if not rows:
@@ -688,9 +667,6 @@ class mongodb_2_gs:
 
         if not rows:
             print("No rows found to upload to Google Sheet.")
-            return
-        if not upload_to_sheet:
-            print(f"upload_to_sheet=False → Skipping upload for tab '{gs_tab}'.")
             return
 
         body = {"values": rows, "majorDimension": "ROWS"}
@@ -724,7 +700,8 @@ class mongodb_2_gs:
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n")
 
-    # =-=-=--=-=-=-=-=-= SSBO =-=-=-=-=-=-=-=-=-=-=-=-=
+    # -_-_-_-_-_-_-_- SSBO -_-_-_-_-_-_-_-
+
     # MongoDB Database (Member Info)
     def mongodbAPI_ssbo_MI(rows, collection):
 
@@ -733,43 +710,20 @@ class mongodb_2_gs:
 
         # Call MongoDB database and collection
         client = MongoClient(MONGODB_URI)
-        db = client["J8MS_A8MS"]
+        db = client["UEA8"]
         collection = db[collection]
 
-        # Ensure deposit-specific unique index does not block member inserts
-        try:
-            collection.drop_index("player_id_1_amount_1_completed_at_1")
-        except Exception:
-            pass
-        # Remove any legacy member indexes before recreating ours
-        for idx_name in (
-            "login_1_name_1_registerDate_1",
-            "ssbo_member_unique",
-            "username_1_first_name_1_register_info_date_1",
-        ):
-            try:
-                collection.drop_index(idx_name)
-            except Exception:
-                pass
-
-       # Set and Ensure when upload data this 3 Field is Unique Data
+        # Set and Ensure when upload data this 3 Field is Unique Data
         collection.create_index(
-            [("username", 1), ("first_name", 1), ("register_info_date", 1)],
-            name="ssbo_member_unique",
+            [("id", 1)],
+            name="ssbo_member_id_unique",
             unique=True,
-            partialFilterExpression={
-                "username": {"$type": "string"},
-                "first_name": {"$type": "string"},
-                "register_info_date": {"$type": "string"},
-            },
         )
 
         # Count insert and skip
         inserted = 0
         skipped = 0
         cleaned_docs = []
-
-        batch = []
 
         # for each rows in a list of JSON objects return
         for row in rows:
@@ -779,58 +733,40 @@ class mongodb_2_gs:
                 continue
 
             # Extract only the fields you want (Extract Data from json file)
-            username = row.get("username") or row.get("login")
-            first_name = row.get("first_name") or row.get("name")
-            register_info_date = row.get("register_info_date") or row.get("registerDate")
-            mobileno = row.get("mobileno") or row.get("phone")
-            member_id = row.get("member_id") or row.get("id")
+            login = row.get("login")
+            name = row.get("name")
+            registerDate = row.get("registerDate")
+            phone = row.get("phone")
+            id = row.get("id")
 
-            if not register_info_date:
-                continue
-
-            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
+            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS) in GMT+8
             try:
-                dt = datetime.fromisoformat(str(register_info_date).replace("Z", "+00:00"))
-            except ValueError:
-                dt = datetime.fromisoformat(str(register_info_date))
-            register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
+                dt = datetime.fromisoformat(str(registerDate).replace("Z", "+00:00"))
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                dt = dt.astimezone(timezone(timedelta(hours=8)))
+                register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
+            except Exception:
+                register_info_date_fmt = str(registerDate)
 
             # Build the new cleaned document (Use for upload data to MongoDB)
             doc = {
-                "username": username,
-                "first_name": first_name,
-                "register_info_date": register_info_date_fmt,
-                "mobileno": mobileno,
-                "member_id": member_id,
+                "login": login,
+                "name": name,
+                "registerDate": register_info_date_fmt,
+                "phone": phone,
+                "id": id,
             }
 
             # Keep the version without _id for uploading later
             cleaned_docs.append(doc.copy())
-            batch.append(doc)
 
-            if len(batch) == 500:
-                try:
-                    collection.insert_many(batch, ordered=False)
-                    inserted += len(batch)
-                except Exception as exc:
-                    if hasattr(exc, "details"):
-                        skipped += len(exc.details.get("writeErrors", []))
-                        inserted += len(batch) - len(exc.details.get("writeErrors", []))
-                    else:
-                        skipped += 0
-                batch = []
-
-        # Insert any remaining documents in batch
-        if batch:
+            # Overwrite if member_id exists; otherwise insert new
             try:
-                collection.insert_many(batch, ordered=False)
-                inserted += len(batch)
-            except Exception as exc:
-                if hasattr(exc, "details"):
-                    skipped += len(exc.details.get("writeErrors", []))
-                    inserted += len(batch) - len(exc.details.get("writeErrors", []))
-                else:
-                    skipped += 0
+                collection.replace_one({"id": id}, doc, upsert=True)
+                inserted += 1
+            except Exception:
+                skipped += 1
 
         print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}\n")
         return cleaned_docs
@@ -854,37 +790,32 @@ class mongodb_2_gs:
             sanitized = []
             for r in raw_rows:
                 if isinstance(r, dict):
-                    username = (
-                        r.get("username")
-                        or r.get("login")
+                    login = (
+                        r.get("login")
                         or ""
                     )
-                    first_name = (
-                        r.get("first_name")
-                        or r.get("name")
+                    name = (
+                        r.get("name")
                         or ""
                     )
-                    register_date = (
-                        r.get("register_info_date")
-                        or r.get("registerDate")
+                    registerDate = (
+                        r.get("registerDate")
                         or ""
                     )
                     phone = (
-                        r.get("mobileno")
-                        or r.get("phone")
+                        r.get("phone")
                         or ""
                     )
-                    member_id = (
-                        r.get("member_id")
-                        or r.get("id")
+                    id = (
+                        r.get("id")
                         or ""
                     )
                     sanitized.append([
-                        str(username),
-                        str(first_name),
-                        str(register_date),
+                        str(login),
+                        str(name),
+                        str(registerDate),
                         str(phone),
-                        str(member_id),
+                        str(id),
                     ])
                 else:
                     sanitized.append(["", "", "", "", ""])
@@ -895,20 +826,20 @@ class mongodb_2_gs:
         if not MONGODB_URI:
             raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
         client = MongoClient(MONGODB_URI)
-        db = client["J8MS_A8MS"]
+        db = client["UEA8"]
 
         # If no data upload to MongoDB, it auto upload data to google sheet
         if not rows:
             collection_ref = db[collection]
             documents = list(
-                collection_ref.find({}, {"_id": 0}).sort("register_info_date", 1)
+                collection_ref.find({}, {"_id": 0}).sort("registerDate", 1)
             )
             rows = documents
         if extra_mongo_collections:
             for extra_col in extra_mongo_collections:
                 extra_ref = db[extra_col]
                 extra_docs = list(
-                    extra_ref.find({}, {"_id": 0}).sort("register_info_date", 1)
+                    extra_ref.find({}, {"_id": 0}).sort("registerDate", 1)
                 )
                 rows.extend(extra_docs)
         
@@ -933,14 +864,15 @@ class mongodb_2_gs:
         except Exception as exc:
             print(f"Failed to upload to Google Sheets: {exc}")
             raise
-
+        
+        # Sorting, the reason need this because combine ibs + ssbo
         if row_count > 1:
             cls._sort_range_by_column(
                 service,
                 SPREADSHEET_ID,
                 gs_tab,
                 "A",
-                "E",
+                "F",
                 3,
                 3 + row_count - 1,
                 sort_column_letter="C",
@@ -949,10 +881,12 @@ class mongodb_2_gs:
 
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n")
-
+    
     # ====================================================================================
-    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= SSBO DEPOSIT LIST (PLAYER ID) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= DEPOSIT LIST (PLAYER ID) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     # ====================================================================================
+    
+    # -_-_-_-_-_-_-_- SSBO -_-_-_-_-_-_-_-
 
     # MongoDB Database
     def mongodbAPI_ssbo_DL_PID(rows, collection):
@@ -1146,9 +1080,7 @@ class mongodb_2_gs:
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n\n")
 
-    # ====================================================================================
-    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= DEPOSIT LIST (PLAYER ID) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    # ====================================================================================
+    # -_-_-_-_-_-_-_- IBS -_-_-_-_-_-_-_-
 
     # MongoDB Database
     def mongodbAPI_DL_PID(rows, collection):
@@ -1337,7 +1269,7 @@ class mongodb_2_gs:
         print("Uploaded MongoDB data to Google Sheet.\n\n")
 
     # ====================================================================================
-    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= DEPOSIT LIST (USERNAME) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= IBS DEPOSIT LIST (USERNAME) =-=-=-=-=-=-=-=-=-=-=-=-=-
     # ====================================================================================
     
     # MongoDB Database 
@@ -2111,9 +2043,28 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     @classmethod
     def deposit_list_PID(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=None):
 
-        # Get today date and time
-        today = datetime.now()
-        today = today.strftime("%Y-%m-%d")
+        # Get current time in GMT+8
+        gmt8 = pytz.timezone("Asia/Singapore")   # GMT+8
+        now_gmt8 = datetime.now(gmt8)
+
+        current_time = now_gmt8.time()
+        print(current_time, "GMT+8")
+
+        # Get today and yesterday date
+        today = now_gmt8.strftime("%Y-%m-%d")
+        yesterday = (now_gmt8 - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Rule:
+        # 00:00 - 00:14 → yesterday
+        # 00:15 onward → today
+        cutoff_time = datetime.strptime("00:15", "%H:%M").time()
+
+        if current_time < cutoff_time:
+            start_date = yesterday
+            end_date = yesterday
+        else:
+            start_date = today
+            end_date = today
 
         # Cookie File
         cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
@@ -2136,8 +2087,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             currency
         ],
         "status": "approved",
-        "start_date": today,
-        "end_date": today,
+        "start_date": start_date,
+        "end_date": end_date,
         "gmt": gmt_time,
         "merchant_id": 1,
         "admin_id": 337,
@@ -2229,9 +2180,28 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     @classmethod
     def deposit_list_USERNAME(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=None):
 
-        # Get today date and time
-        today = datetime.now()
-        today = today.strftime("%Y-%m-%d")
+        # Get current time in GMT+8
+        gmt8 = pytz.timezone("Asia/Singapore")   # GMT+8
+        now_gmt8 = datetime.now(gmt8)
+
+        current_time = now_gmt8.time()
+        print(current_time, "GMT+8")
+
+        # Get today and yesterday date
+        today = now_gmt8.strftime("%Y-%m-%d")
+        yesterday = (now_gmt8 - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Rule:
+        # 00:00 - 00:14 → yesterday
+        # 00:15 onward → today
+        cutoff_time = datetime.strptime("00:15", "%H:%M").time()
+
+        if current_time < cutoff_time:
+            start_date = yesterday
+            end_date = yesterday
+        else:
+            start_date = today
+            end_date = today
 
         # Cookie File
         cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
@@ -2254,8 +2224,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             currency
         ],
         "status": "approved",
-        "start_date": today,
-        "end_date": today,
+        "start_date": start_date,
+        "end_date": end_date,
         "gmt": gmt_time,
         "merchant_id": 1,
         "admin_id": 337,
@@ -2346,7 +2316,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     @classmethod
     def ssbo_deposit_list_PID(cls, merchants, currency, collection, gs_id, gs_tab, start_column, end_column, upload_to_sheet=True):
         
-        # Get today and yesterday date
+       # Get today and yesterday date
         today = datetime.now().strftime("%Y-%m-%d")
         yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 

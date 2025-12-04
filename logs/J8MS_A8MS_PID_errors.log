@@ -25398,3 +25398,492 @@ Traceback (most recent call last):
   File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pool_shared.py", line 142, in _raise_connection_failure
     raise NetworkTimeout(msg) from error
 pymongo.errors.NetworkTimeout: SSL handshake failed: ac-xfzdix9-shard-00-01.kqgprz4.mongodb.net:27017: timed out (configured timeouts: connectTimeoutMS: 20000.0ms)
+2025-12-03 22:53:07,763 [ERROR] Error during upload_to_google_sheet_DL_PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 1321, in upload_to_google_sheet_DL_PID
+    cls._ensure_sheet_row_capacity(service, SPREADSHEET_ID, gs_tab, end_row)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 473, in _ensure_sheet_row_capacity
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 923, in execute
+    resp, content = _retry_request(
+                    ~~~~~~~~~~~~~~^
+        http,
+        ^^^^^
+    ...<7 lines>...
+        headers=self.headers,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 222, in _retry_request
+    raise exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 191, in _retry_request
+    resp, content = http.request(uri, method, *args, **kwargs)
+                    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google_auth_httplib2.py", line 218, in request
+    response, content = self.http.request(
+                        ~~~~~~~~~~~~~~~~~^
+        uri,
+        ^^^^
+    ...<5 lines>...
+        **kwargs
+        ^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1727, in request
+    (response, content) = self._request(
+                          ~~~~~~~~~~~~~^
+        conn, authority, uri, request_uri, method, body, headers, redirections, cachekey,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1447, in _request
+    (response, content) = self._conn_request(conn, request_uri, method, body, headers)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1399, in _conn_request
+    response = conn.getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+TimeoutError: The read operation timed out
+2025-12-03 23:16:46,065 [ERROR] Error during ssbo_deposit_list_PID (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-12-02T16%3A00%3A00.000Z&startTime=2025-12-02T16%3A00%3A00.000Z&startCreatedTime=2025-12-02T16%3A00%3A00.000Z&end=2025-12-03T15%3A59%3A59.000Z&endTime=2025-12-03T15%3A59%3A59.000Z&endCreatedTime=2025-12-03T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764774941871 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2439, in ssbo_deposit_list_PID
+    response = requests.get(full_url, headers=headers)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-12-02T16%3A00%3A00.000Z&startTime=2025-12-02T16%3A00%3A00.000Z&startCreatedTime=2025-12-02T16%3A00%3A00.000Z&end=2025-12-03T15%3A59%3A59.000Z&endTime=2025-12-03T15%3A59%3A59.000Z&endCreatedTime=2025-12-03T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764774941871 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-03 23:50:35,544 [ERROR] Error during ssbo_deposit_list_PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2352, in ssbo_deposit_list_PID
+    current_time = datetime.time()
+TypeError: unbound method datetime.time() needs an argument
+2025-12-03 23:51:35,553 [ERROR] Error during ssbo_deposit_list_PID (attempt 2/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2352, in ssbo_deposit_list_PID
+    current_time = datetime.now()
+TypeError: unbound method datetime.time() needs an argument
+2025-12-03 23:52:35,565 [ERROR] Error during ssbo_deposit_list_PID (attempt 3/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2352, in ssbo_deposit_list_PID
+    current_time = datetime.now()
+TypeError: unbound method datetime.time() needs an argument
+2025-12-03 23:53:14,658 [ERROR] Error during ssbo_deposit_list_PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2362, in ssbo_deposit_list_PID
+    if current_time < datetime.strptime("00:15", "%H:%M").time():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: '<' not supported between instances of 'str' and 'datetime.time'
+2025-12-03 23:54:14,662 [ERROR] Error during ssbo_deposit_list_PID (attempt 2/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2362, in ssbo_deposit_list_PID
+    if current_time < datetime.strptime("00:15", "%H:%M").time():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: '<' not supported between instances of 'str' and 'datetime.time'
+2025-12-03 23:54:46,505 [ERROR] Error during ssbo_deposit_list_PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2362, in ssbo_deposit_list_PID
+    if current_time < datetime.strptime("00:15", "%H:%M").time():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: '<' not supported between instances of 'str' and 'datetime.time'
+2025-12-03 23:55:46,524 [ERROR] Error during ssbo_deposit_list_PID (attempt 2/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2362, in ssbo_deposit_list_PID
+    if current_time < datetime.strptime("00:15", "%H:%M").time():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: '<' not supported between instances of 'str' and 'datetime.time'
+2025-12-03 23:56:39,689 [ERROR] Error during ssbo_deposit_list_PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2361, in ssbo_deposit_list_PID
+    if current_time < datetime.strptime("00:15", "%H:%M").time():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: '<' not supported between instances of 'str' and 'datetime.time'
+2025-12-03 23:57:39,697 [ERROR] Error during ssbo_deposit_list_PID (attempt 2/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2361, in ssbo_deposit_list_PID
+    if current_time < datetime.strptime("00:15", "%H:%M").time():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: '<' not supported between instances of 'str' and 'datetime.time'
+2025-12-03 23:58:39,707 [ERROR] Error during ssbo_deposit_list_PID (attempt 3/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2361, in ssbo_deposit_list_PID
+    if current_time < datetime.strptime("00:15", "%H:%M").time():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: '<' not supported between instances of 'str' and 'datetime.time'
+2025-12-04 08:31:40,617 [ERROR] Error during upload_to_google_sheet_DL_PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 1322, in upload_to_google_sheet_DL_PID
+    cls._ensure_sheet_row_capacity(service, SPREADSHEET_ID, gs_tab, end_row)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 474, in _ensure_sheet_row_capacity
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 923, in execute
+    resp, content = _retry_request(
+                    ~~~~~~~~~~~~~~^
+        http,
+        ^^^^^
+    ...<7 lines>...
+        headers=self.headers,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 222, in _retry_request
+    raise exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 191, in _retry_request
+    resp, content = http.request(uri, method, *args, **kwargs)
+                    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google_auth_httplib2.py", line 218, in request
+    response, content = self.http.request(
+                        ~~~~~~~~~~~~~~~~~^
+        uri,
+        ^^^^
+    ...<5 lines>...
+        **kwargs
+        ^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1727, in request
+    (response, content) = self._request(
+                          ~~~~~~~~~~~~~^
+        conn, authority, uri, request_uri, method, body, headers, redirections, cachekey,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1447, in _request
+    (response, content) = self._conn_request(conn, request_uri, method, body, headers)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1399, in _conn_request
+    response = conn.getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+TimeoutError: The read operation timed out
+2025-12-04 09:05:02,265 [ERROR] Error during upload_to_google_sheet_DL_PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 1292, in upload_to_google_sheet_DL_PID
+    documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1289, in __next__
+    return self.next()
+           ~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1265, in next
+    if len(self._data) or self._refresh():
+                          ~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1213, in _refresh
+    self._send_message(q)
+    ~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1108, in _send_message
+    response = client._run_operation(
+        operation, self._unpack_response, address=self._address
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1938, in _run_operation
+    return self._retryable_read(
+           ~~~~~~~~~~~~~~~~~~~~^
+        _cmd,
+        ^^^^^
+    ...<4 lines>...
+        operation=operation.name,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2047, in _retryable_read
+    return self._retry_internal(
+           ~~~~~~~~~~~~~~~~~~~~^
+        func,
+        ^^^^^
+    ...<7 lines>...
+        operation_id=operation_id,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2014, in _retry_internal
+    ).run()
+      ~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2765, in run
+    return self._read() if self._is_read else self._write()
+           ~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2910, in _read
+    self._server = self._get_server()
+                   ~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2858, in _get_server
+    return self._client._select_server(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self._server_selector,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        operation_id=self._operation_id,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1833, in _select_server
+    server = topology.select_server(
+        server_selector,
+    ...<2 lines>...
+        operation_id=operation_id,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/topology.py", line 409, in select_server
+    server = self._select_server(
+        selector,
+    ...<4 lines>...
+        operation_id=operation_id,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/topology.py", line 387, in _select_server
+    servers = self.select_servers(
+        selector, operation, server_selection_timeout, address, operation_id
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/topology.py", line 294, in select_servers
+    server_descriptions = self._select_servers_loop(
+        selector, server_timeout, operation, operation_id, address
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/topology.py", line 344, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+        f"{self._error_message(selector)}, Timeout: {timeout}s, Topology Description: {self.description!r}"
+    )
+pymongo.errors.ServerSelectionTimeoutError: No replica set members match selector "Primary()", Timeout: 30s, Topology Description: <TopologyDescription id: 6930de20b41ff00ffaa3bc07, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-xfzdix9-shard-00-00.kqgprz4.mongodb.net', 27017) server_type: RSSecondary, rtt: 2.347517355149612>, <ServerDescription ('ac-xfzdix9-shard-00-01.kqgprz4.mongodb.net', 27017) server_type: Unknown, rtt: None>, <ServerDescription ('ac-xfzdix9-shard-00-02.kqgprz4.mongodb.net', 27017) server_type: RSSecondary, rtt: 0.107381279213354>]>
+2025-12-04 16:34:59,039 [ERROR] Error during ssbo_deposit_list_PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/response.py", line 779, in _error_catcher
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/response.py", line 1251, in read_chunked
+    chunk = self._handle_chunk(amt)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/response.py", line 1188, in _handle_chunk
+    value = self._fp._safe_read(amt)  # type: ignore[union-attr]
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 644, in _safe_read
+    raise IncompleteRead(data, amt-len(data))
+http.client.IncompleteRead: IncompleteRead(6839 bytes read, 3401 more expected)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/models.py", line 820, in generate
+    yield from self.raw.stream(chunk_size, decode_content=True)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/response.py", line 1088, in stream
+    yield from self.read_chunked(amt, decode_content=decode_content)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/response.py", line 1231, in read_chunked
+    with self._error_catcher():
+         ~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/response.py", line 806, in _error_catcher
+    raise ProtocolError(f"Connection broken: {e!r}", e) from e
+urllib3.exceptions.ProtocolError: ('Connection broken: IncompleteRead(6839 bytes read, 3401 more expected)', IncompleteRead(6839 bytes read, 3401 more expected))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2581, in ssbo_deposit_list_PID
+    response = requests.get(url, headers=headers)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 746, in send
+    r.content
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/models.py", line 902, in content
+    self._content = b"".join(self.iter_content(CONTENT_CHUNK_SIZE)) or b""
+                    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/models.py", line 822, in generate
+    raise ChunkedEncodingError(e)
+requests.exceptions.ChunkedEncodingError: ('Connection broken: IncompleteRead(6839 bytes read, 3401 more expected)', IncompleteRead(6839 bytes read, 3401 more expected))
+2025-12-04 17:11:04,978 [ERROR] Error during ssbo_deposit_list_PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pool_shared.py", line 496, in _configured_socket_interface
+    ssl_sock = ssl_context.wrap_socket(sock, server_hostname=host)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pyopenssl_context.py", line 412, in wrap_socket
+    ssl_conn.do_handshake()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pyopenssl_context.py", line 149, in do_handshake
+    return self._call(super().do_handshake, *args, **kwargs)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pyopenssl_context.py", line 145, in _call
+    raise _socket.timeout("timed out") from None
+TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2611, in ssbo_deposit_list_PID
+    cls.mongodbAPI_ssbo_DL_PID(rows, collection)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 970, in mongodbAPI_ssbo_DL_PID
+    collection.create_index(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        [("memberLogin", 1), ("confirmedAmount", 1), ("lastModifiedDate", 1)],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        unique=True
+        ^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/collection.py", line 2387, in create_index
+    return (self._create_indexes([index], session, **cmd_options))[0]
+            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/collection.py", line 2240, in _create_indexes
+    with self._conn_for_writes(session, operation=_Op.CREATE_INDEXES) as conn:
+         ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1777, in _checkout
+    with server.checkout(handler=err_handler) as conn:
+         ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 1118, in checkout
+    conn = self._get_conn(checkout_started_time, handler=handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 1280, in _get_conn
+    conn = self.connect(handler=handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 1032, in connect
+    networking_interface = _configured_socket_interface(self.address, self.opts)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pool_shared.py", line 510, in _configured_socket_interface
+    _raise_connection_failure(address, exc, "SSL handshake failed: ", timeout_details=details)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pool_shared.py", line 142, in _raise_connection_failure
+    raise NetworkTimeout(msg) from error
+pymongo.errors.NetworkTimeout: SSL handshake failed: ac-xfzdix9-shard-00-01.kqgprz4.mongodb.net:27017: timed out (configured timeouts: connectTimeoutMS: 20000.0ms)
+2025-12-04 20:43:13,595 [ERROR] Error during ssbo_deposit_list_PID (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit-details?page=0&size=2000&sort=membershipLevel%2CASC&sort=createdDate%2CASC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-12-03T16%3A00%3A00.000Z&startTime=2025-12-03T16%3A00%3A00.000Z&startCreatedTime=2025-12-03T16%3A00%3A00.000Z&end=2025-12-04T15%3A59%3A59.000Z&endTime=2025-12-04T15%3A59%3A59.000Z&endCreatedTime=2025-12-04T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764852140740&transactionIds=955981189%2C955979644%2C955975990%2C955975081%2C955974538%2C955972250%2C955969096%2C955968187%2C955966150%2C955965799%2C955958516%2C955954264%2C955952658%2C955947666%2C955943552%2C955942913%2C955941413%2C955934487%2C955934255%2C955933419%2C955932048%2C955929528%2C955929097%2C955922128%2C955913082%2C955908888%2C955908611%2C955908502%2C955906088%2C955899945%2C955896671%2C955887324%2C955887273%2C955886557%2C955885557%2C955881116%2C955878626%2C955878103%2C955876774%2C955875366%2C955874816%2C955874597%2C955873130%2C955870369%2C955869153%2C955863880%2C955857562%2C955855205%2C955854566%2C955846751%2C955844010%2C955843287%2C955842324%2C955840386%2C955840138%2C955838397%2C955834016%2C955829137%2C955827196%2C955808578%2C955808494%2C955808008%2C955802747%2C955800861%2C955800498%2C955797945%2C955789256%2C955785858%2C955783560%2C955781779%2C955777265%2C955774555%2C955773488%2C955772648%2C955770175%2C955769532%2C955768962%2C955768337%2C955761599%2C955750597%2C955746685%2C955742786%2C955742398%2C955737786%2C955730621%2C955729420%2C955722925%2C955722280%2C955722253%2C955713992%2C955713002%2C955709080%2C955705546%2C955704821%2C955701797%2C955699709%2C955696033%2C955693791%2C955693650%2C955690950%2C955690012%2C955687733%2C955672286%2C955671040%2C955665771%2C955663570%2C955656659%2C955653949%2C955652994%2C955652908%2C955651385%2C955651296%2C955650227%2C955648627%2C955645492%2C955645250%2C955640933%2C955636938%2C955631636%2C955625001%2C955623101%2C955620034%2C955618856%2C955613610%2C955613205%2C955610884%2C955607096%2C955603757%2C955601746%2C955598426%2C955597540%2C955596710%2C955595268%2C955593436%2C955589207%2C955588234%2C955587065%2C955579939%2C955570272%2C955570042%2C955569259%2C955563478%2C955562718%2C955560385%2C955553308%2C955549728%2C955549339%2C955545507%2C955543527%2C955538855%2C955534811%2C955514832%2C955481378%2C955480637%2C955476141%2C955474167%2C955473311%2C955471849%2C955469827%2C955468064%2C955464538%2C955464305%2C955463304%2C955461155%2C955455767%2C955455407%2C955448123%2C955444520%2C955441981%2C955440638%2C955436466%2C955434733%2C955433324%2C955430030%2C955428150%2C955426850%2C955423804%2C955423424%2C955422911%2C955419669%2C955419336%2C955417409%2C955401867%2C955400105%2C955399008%2C955397783%2C955396470%2C955396233%2C955396221%2C955390911%2C955387223%2C955386524%2C955386344%2C955383786%2C955378349%2C955376950%2C955376526%2C955375354%2C955374563%2C955372844 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/J8MS_A8MS_PID.py", line 2581, in ssbo_deposit_list_PID
+    # safe_call(Fetch.ssbo_member_info, "aw8", ["MYR"], "SSBO_A8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8M", extra_mongo_collections=["A8M_MI"], description="SSBO A8M MY MEMBER INFO")
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit-details?page=0&size=2000&sort=membershipLevel%2CASC&sort=createdDate%2CASC&tenantId=35&merchants=aw8&merchant=aw8&merchantCode=aw8&currencies=MYR&start=2025-12-03T16%3A00%3A00.000Z&startTime=2025-12-03T16%3A00%3A00.000Z&startCreatedTime=2025-12-03T16%3A00%3A00.000Z&end=2025-12-04T15%3A59%3A59.000Z&endTime=2025-12-04T15%3A59%3A59.000Z&endCreatedTime=2025-12-04T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764852140740&transactionIds=955981189%2C955979644%2C955975990%2C955975081%2C955974538%2C955972250%2C955969096%2C955968187%2C955966150%2C955965799%2C955958516%2C955954264%2C955952658%2C955947666%2C955943552%2C955942913%2C955941413%2C955934487%2C955934255%2C955933419%2C955932048%2C955929528%2C955929097%2C955922128%2C955913082%2C955908888%2C955908611%2C955908502%2C955906088%2C955899945%2C955896671%2C955887324%2C955887273%2C955886557%2C955885557%2C955881116%2C955878626%2C955878103%2C955876774%2C955875366%2C955874816%2C955874597%2C955873130%2C955870369%2C955869153%2C955863880%2C955857562%2C955855205%2C955854566%2C955846751%2C955844010%2C955843287%2C955842324%2C955840386%2C955840138%2C955838397%2C955834016%2C955829137%2C955827196%2C955808578%2C955808494%2C955808008%2C955802747%2C955800861%2C955800498%2C955797945%2C955789256%2C955785858%2C955783560%2C955781779%2C955777265%2C955774555%2C955773488%2C955772648%2C955770175%2C955769532%2C955768962%2C955768337%2C955761599%2C955750597%2C955746685%2C955742786%2C955742398%2C955737786%2C955730621%2C955729420%2C955722925%2C955722280%2C955722253%2C955713992%2C955713002%2C955709080%2C955705546%2C955704821%2C955701797%2C955699709%2C955696033%2C955693791%2C955693650%2C955690950%2C955690012%2C955687733%2C955672286%2C955671040%2C955665771%2C955663570%2C955656659%2C955653949%2C955652994%2C955652908%2C955651385%2C955651296%2C955650227%2C955648627%2C955645492%2C955645250%2C955640933%2C955636938%2C955631636%2C955625001%2C955623101%2C955620034%2C955618856%2C955613610%2C955613205%2C955610884%2C955607096%2C955603757%2C955601746%2C955598426%2C955597540%2C955596710%2C955595268%2C955593436%2C955589207%2C955588234%2C955587065%2C955579939%2C955570272%2C955570042%2C955569259%2C955563478%2C955562718%2C955560385%2C955553308%2C955549728%2C955549339%2C955545507%2C955543527%2C955538855%2C955534811%2C955514832%2C955481378%2C955480637%2C955476141%2C955474167%2C955473311%2C955471849%2C955469827%2C955468064%2C955464538%2C955464305%2C955463304%2C955461155%2C955455767%2C955455407%2C955448123%2C955444520%2C955441981%2C955440638%2C955436466%2C955434733%2C955433324%2C955430030%2C955428150%2C955426850%2C955423804%2C955423424%2C955422911%2C955419669%2C955419336%2C955417409%2C955401867%2C955400105%2C955399008%2C955397783%2C955396470%2C955396233%2C955396221%2C955390911%2C955387223%2C955386524%2C955386344%2C955383786%2C955378349%2C955376950%2C955376526%2C955375354%2C955374563%2C955372844 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
