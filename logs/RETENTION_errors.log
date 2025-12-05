@@ -343,3 +343,2708 @@ Call log:
        - waiting 500ms
     - waiting for element to be visible, enabled and stable
 
+2025-12-05 01:30:16,276 [ERROR] Error during deposit_list_USERNAME (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.aw8bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1802, in deposit_list_USERNAME
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='v3-bo.aw8bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 06:29:02,443 [ERROR] Error during upload_to_google_sheet_ssbo_DL_PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1206, in upload_to_google_sheet_ssbo_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 409 when requesting https://sheets.googleapis.com/v4/spreadsheets/1JmVXGT67naNtM_9GiqPgDKqZXYdarKD-4nfy4zKTeMU/values/%27Deposit%20List%27%21A4%3AC1803?valueInputOption=USER_ENTERED&alt=json returned "The operation was aborted.". Details: "The operation was aborted.">
+2025-12-05 08:42:29,775 [ERROR] Error during ssbo_allmemberReport (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1703, in ssbo_allmemberReport
+    page.locator("//button[normalize-space()='Export']").click(timeout=10000)   # ---> button click downnload csv file
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_generated.py", line 15543, in click
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.click(
+        ^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_locator.py", line 160, in click
+    return await self._frame.click(self._selector, strict=True, **params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_frame.py", line 549, in click
+    await self._channel.send("click", self._timeout, locals_to_params(locals()))
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 558, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.click: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator("//button[normalize-space()='Export']")
+    - locator resolved to <button _ngcontent-xjq-c204="" class="btn btn-primary"> Export </button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div ng-reflect-ng-class="[object Object]" class="block-ui-wrapper block-ui-main active">…</div> from <block-ui _ngcontent-xjq-c261="">…</block-ui> subtree intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div ng-reflect-ng-class="[object Object]" class="block-ui-wrapper block-ui-main active">…</div> from <block-ui _ngcontent-xjq-c261="">…</block-ui> subtree intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    19 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div ng-reflect-ng-class="[object Object]" class="block-ui-wrapper block-ui-main active">…</div> from <block-ui _ngcontent-xjq-c261="">…</block-ui> subtree intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 90, in __exit__
+    self._connection.stop_sync()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 317, in stop_sync
+    self._loop.run_until_complete(self._transport.wait_until_stopped())
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/asyncio/base_events.py", line 701, in run_until_complete
+    self._check_running()
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/asyncio/base_events.py", line 637, in _check_running
+    raise RuntimeError('This event loop is already running')
+RuntimeError: This event loop is already running
+2025-12-05 08:43:29,794 [ERROR] Error during ssbo_allmemberReport (attempt 2/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:44:29,806 [ERROR] Error during ssbo_allmemberReport (attempt 3/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:45:29,820 [ERROR] Error during ssbo_allmemberReport (attempt 4/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:46:29,833 [ERROR] Error during ssbo_allmemberReport (attempt 5/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:47:29,852 [ERROR] Error during ssbo_allmemberReport (attempt 6/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:48:29,868 [ERROR] Error during ssbo_allmemberReport (attempt 7/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:49:29,880 [ERROR] Error during ssbo_allmemberReport (attempt 8/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:50:29,896 [ERROR] Error during ssbo_allmemberReport (attempt 9/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:51:29,900 [ERROR] Error during ssbo_allmemberReport (attempt 10/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:52:29,908 [ERROR] Error during ssbo_allmemberReport (attempt 11/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:53:29,928 [ERROR] Error during ssbo_allmemberReport (attempt 12/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:54:29,942 [ERROR] Error during ssbo_allmemberReport (attempt 13/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:55:29,974 [ERROR] Error during ssbo_allmemberReport (attempt 14/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:56:29,985 [ERROR] Error during ssbo_allmemberReport (attempt 15/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:57:29,990 [ERROR] Error during ssbo_allmemberReport (attempt 16/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:58:30,002 [ERROR] Error during ssbo_allmemberReport (attempt 17/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 08:59:30,009 [ERROR] Error during ssbo_allmemberReport (attempt 18/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:00:30,021 [ERROR] Error during ssbo_allmemberReport (attempt 19/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:01:30,037 [ERROR] Error during ssbo_allmemberReport (attempt 20/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:02:30,053 [ERROR] Error during ssbo_allmemberReport (attempt 21/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:03:30,070 [ERROR] Error during ssbo_allmemberReport (attempt 22/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:04:30,086 [ERROR] Error during ssbo_allmemberReport (attempt 23/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:05:30,093 [ERROR] Error during ssbo_allmemberReport (attempt 24/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:06:30,108 [ERROR] Error during ssbo_allmemberReport (attempt 25/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:07:30,125 [ERROR] Error during ssbo_allmemberReport (attempt 26/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:08:30,145 [ERROR] Error during ssbo_allmemberReport (attempt 27/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:09:30,163 [ERROR] Error during ssbo_allmemberReport (attempt 28/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:10:30,180 [ERROR] Error during ssbo_allmemberReport (attempt 29/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:11:30,199 [ERROR] Error during ssbo_allmemberReport (attempt 30/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:12:30,214 [ERROR] Error during ssbo_allmemberReport (attempt 31/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:13:30,226 [ERROR] Error during ssbo_allmemberReport (attempt 32/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:14:30,230 [ERROR] Error during ssbo_allmemberReport (attempt 33/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:15:30,244 [ERROR] Error during ssbo_allmemberReport (attempt 34/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:16:30,258 [ERROR] Error during ssbo_allmemberReport (attempt 35/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:17:30,278 [ERROR] Error during ssbo_allmemberReport (attempt 36/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:18:30,295 [ERROR] Error during ssbo_allmemberReport (attempt 37/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:19:30,313 [ERROR] Error during ssbo_allmemberReport (attempt 38/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:20:30,322 [ERROR] Error during ssbo_allmemberReport (attempt 39/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:21:30,337 [ERROR] Error during ssbo_allmemberReport (attempt 40/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:22:30,350 [ERROR] Error during ssbo_allmemberReport (attempt 41/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:23:30,363 [ERROR] Error during ssbo_allmemberReport (attempt 42/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:24:30,379 [ERROR] Error during ssbo_allmemberReport (attempt 43/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:25:30,394 [ERROR] Error during ssbo_allmemberReport (attempt 44/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:26:30,402 [ERROR] Error during ssbo_allmemberReport (attempt 45/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:27:30,419 [ERROR] Error during ssbo_allmemberReport (attempt 46/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:28:30,410 [ERROR] Error during ssbo_allmemberReport (attempt 47/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:29:30,429 [ERROR] Error during ssbo_allmemberReport (attempt 48/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:30:30,446 [ERROR] Error during ssbo_allmemberReport (attempt 49/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:31:30,457 [ERROR] Error during ssbo_allmemberReport (attempt 50/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:32:30,468 [ERROR] Error during ssbo_allmemberReport (attempt 51/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:33:30,479 [ERROR] Error during ssbo_allmemberReport (attempt 52/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:34:30,495 [ERROR] Error during ssbo_allmemberReport (attempt 53/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:35:30,513 [ERROR] Error during ssbo_allmemberReport (attempt 54/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:36:30,519 [ERROR] Error during ssbo_allmemberReport (attempt 55/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:37:30,538 [ERROR] Error during ssbo_allmemberReport (attempt 56/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:38:30,552 [ERROR] Error during ssbo_allmemberReport (attempt 57/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:39:30,560 [ERROR] Error during ssbo_allmemberReport (attempt 58/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:40:30,566 [ERROR] Error during ssbo_allmemberReport (attempt 59/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:41:30,572 [ERROR] Error during ssbo_allmemberReport (attempt 60/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:42:30,581 [ERROR] Error during ssbo_allmemberReport (attempt 61/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:43:30,590 [ERROR] Error during ssbo_allmemberReport (attempt 62/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:44:30,606 [ERROR] Error during ssbo_allmemberReport (attempt 63/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:45:30,613 [ERROR] Error during ssbo_allmemberReport (attempt 64/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:46:30,630 [ERROR] Error during ssbo_allmemberReport (attempt 65/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:47:30,650 [ERROR] Error during ssbo_allmemberReport (attempt 66/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:48:30,668 [ERROR] Error during ssbo_allmemberReport (attempt 67/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:49:30,686 [ERROR] Error during ssbo_allmemberReport (attempt 68/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:50:30,702 [ERROR] Error during ssbo_allmemberReport (attempt 69/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:51:30,719 [ERROR] Error during ssbo_allmemberReport (attempt 70/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:52:30,736 [ERROR] Error during ssbo_allmemberReport (attempt 71/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:53:30,751 [ERROR] Error during ssbo_allmemberReport (attempt 72/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:54:30,771 [ERROR] Error during ssbo_allmemberReport (attempt 73/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:55:30,789 [ERROR] Error during ssbo_allmemberReport (attempt 74/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:56:30,805 [ERROR] Error during ssbo_allmemberReport (attempt 75/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:57:30,822 [ERROR] Error during ssbo_allmemberReport (attempt 76/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:58:30,833 [ERROR] Error during ssbo_allmemberReport (attempt 77/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 09:59:30,849 [ERROR] Error during ssbo_allmemberReport (attempt 78/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:00:30,861 [ERROR] Error during ssbo_allmemberReport (attempt 79/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:01:30,871 [ERROR] Error during ssbo_allmemberReport (attempt 80/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:02:30,881 [ERROR] Error during ssbo_allmemberReport (attempt 81/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:03:30,896 [ERROR] Error during ssbo_allmemberReport (attempt 82/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:04:30,913 [ERROR] Error during ssbo_allmemberReport (attempt 83/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:05:30,928 [ERROR] Error during ssbo_allmemberReport (attempt 84/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:06:30,944 [ERROR] Error during ssbo_allmemberReport (attempt 85/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:07:30,960 [ERROR] Error during ssbo_allmemberReport (attempt 86/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:08:30,969 [ERROR] Error during ssbo_allmemberReport (attempt 87/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:09:30,985 [ERROR] Error during ssbo_allmemberReport (attempt 88/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:10:30,996 [ERROR] Error during ssbo_allmemberReport (attempt 89/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:11:31,017 [ERROR] Error during ssbo_allmemberReport (attempt 90/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:12:31,027 [ERROR] Error during ssbo_allmemberReport (attempt 91/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:13:31,034 [ERROR] Error during ssbo_allmemberReport (attempt 92/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:14:31,050 [ERROR] Error during ssbo_allmemberReport (attempt 93/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:15:31,066 [ERROR] Error during ssbo_allmemberReport (attempt 94/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:16:31,076 [ERROR] Error during ssbo_allmemberReport (attempt 95/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:17:31,086 [ERROR] Error during ssbo_allmemberReport (attempt 96/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:18:31,101 [ERROR] Error during ssbo_allmemberReport (attempt 97/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:19:31,108 [ERROR] Error during ssbo_allmemberReport (attempt 98/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:20:31,125 [ERROR] Error during ssbo_allmemberReport (attempt 99/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:21:31,133 [ERROR] Error during ssbo_allmemberReport (attempt 100/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:22:31,154 [ERROR] Error during ssbo_allmemberReport (attempt 101/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:23:31,172 [ERROR] Error during ssbo_allmemberReport (attempt 102/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:24:31,191 [ERROR] Error during ssbo_allmemberReport (attempt 103/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:25:31,200 [ERROR] Error during ssbo_allmemberReport (attempt 104/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:26:31,212 [ERROR] Error during ssbo_allmemberReport (attempt 105/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:27:31,224 [ERROR] Error during ssbo_allmemberReport (attempt 106/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:28:31,238 [ERROR] Error during ssbo_allmemberReport (attempt 107/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:29:31,247 [ERROR] Error during ssbo_allmemberReport (attempt 108/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:30:31,260 [ERROR] Error during ssbo_allmemberReport (attempt 109/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:31:31,272 [ERROR] Error during ssbo_allmemberReport (attempt 110/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:32:31,285 [ERROR] Error during ssbo_allmemberReport (attempt 111/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:33:31,294 [ERROR] Error during ssbo_allmemberReport (attempt 112/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:34:31,299 [ERROR] Error during ssbo_allmemberReport (attempt 113/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:35:31,305 [ERROR] Error during ssbo_allmemberReport (attempt 114/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:36:31,327 [ERROR] Error during ssbo_allmemberReport (attempt 115/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:37:31,343 [ERROR] Error during ssbo_allmemberReport (attempt 116/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:38:31,352 [ERROR] Error during ssbo_allmemberReport (attempt 117/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:39:31,369 [ERROR] Error during ssbo_allmemberReport (attempt 118/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:40:31,386 [ERROR] Error during ssbo_allmemberReport (attempt 119/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:41:31,402 [ERROR] Error during ssbo_allmemberReport (attempt 120/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:42:31,415 [ERROR] Error during ssbo_allmemberReport (attempt 121/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:43:31,430 [ERROR] Error during ssbo_allmemberReport (attempt 122/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:44:31,439 [ERROR] Error during ssbo_allmemberReport (attempt 123/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:45:31,465 [ERROR] Error during ssbo_allmemberReport (attempt 124/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:46:31,482 [ERROR] Error during ssbo_allmemberReport (attempt 125/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:47:31,498 [ERROR] Error during ssbo_allmemberReport (attempt 126/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:48:31,519 [ERROR] Error during ssbo_allmemberReport (attempt 127/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:49:31,534 [ERROR] Error during ssbo_allmemberReport (attempt 128/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:50:31,550 [ERROR] Error during ssbo_allmemberReport (attempt 129/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:51:31,565 [ERROR] Error during ssbo_allmemberReport (attempt 130/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:52:31,507 [ERROR] Error during ssbo_allmemberReport (attempt 131/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:53:31,525 [ERROR] Error during ssbo_allmemberReport (attempt 132/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:54:31,541 [ERROR] Error during ssbo_allmemberReport (attempt 133/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:55:31,557 [ERROR] Error during ssbo_allmemberReport (attempt 134/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:56:31,571 [ERROR] Error during ssbo_allmemberReport (attempt 135/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:57:31,581 [ERROR] Error during ssbo_allmemberReport (attempt 136/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:58:31,601 [ERROR] Error during ssbo_allmemberReport (attempt 137/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 10:59:31,617 [ERROR] Error during ssbo_allmemberReport (attempt 138/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:00:31,634 [ERROR] Error during ssbo_allmemberReport (attempt 139/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:01:31,644 [ERROR] Error during ssbo_allmemberReport (attempt 140/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:02:31,660 [ERROR] Error during ssbo_allmemberReport (attempt 141/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:03:31,675 [ERROR] Error during ssbo_allmemberReport (attempt 142/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:04:31,680 [ERROR] Error during ssbo_allmemberReport (attempt 143/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:05:31,690 [ERROR] Error during ssbo_allmemberReport (attempt 144/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:06:31,704 [ERROR] Error during ssbo_allmemberReport (attempt 145/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:07:31,715 [ERROR] Error during ssbo_allmemberReport (attempt 146/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:08:31,724 [ERROR] Error during ssbo_allmemberReport (attempt 147/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:09:31,738 [ERROR] Error during ssbo_allmemberReport (attempt 148/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:10:31,747 [ERROR] Error during ssbo_allmemberReport (attempt 149/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:11:31,752 [ERROR] Error during ssbo_allmemberReport (attempt 150/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:12:31,769 [ERROR] Error during ssbo_allmemberReport (attempt 151/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:13:31,786 [ERROR] Error during ssbo_allmemberReport (attempt 152/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:14:31,800 [ERROR] Error during ssbo_allmemberReport (attempt 153/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:15:31,815 [ERROR] Error during ssbo_allmemberReport (attempt 154/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:16:31,832 [ERROR] Error during ssbo_allmemberReport (attempt 155/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:17:31,850 [ERROR] Error during ssbo_allmemberReport (attempt 156/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:18:31,860 [ERROR] Error during ssbo_allmemberReport (attempt 157/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:19:31,882 [ERROR] Error during ssbo_allmemberReport (attempt 158/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:20:31,897 [ERROR] Error during ssbo_allmemberReport (attempt 159/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:21:31,910 [ERROR] Error during ssbo_allmemberReport (attempt 160/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:22:31,925 [ERROR] Error during ssbo_allmemberReport (attempt 161/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:23:31,946 [ERROR] Error during ssbo_allmemberReport (attempt 162/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:24:31,958 [ERROR] Error during ssbo_allmemberReport (attempt 163/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:25:32,008 [ERROR] Error during ssbo_allmemberReport (attempt 164/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:26:32,047 [ERROR] Error during ssbo_allmemberReport (attempt 165/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:27:32,065 [ERROR] Error during ssbo_allmemberReport (attempt 166/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:28:32,083 [ERROR] Error during ssbo_allmemberReport (attempt 167/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:29:32,097 [ERROR] Error during ssbo_allmemberReport (attempt 168/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:30:32,115 [ERROR] Error during ssbo_allmemberReport (attempt 169/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:31:32,133 [ERROR] Error during ssbo_allmemberReport (attempt 170/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:32:32,147 [ERROR] Error during ssbo_allmemberReport (attempt 171/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:33:32,157 [ERROR] Error during ssbo_allmemberReport (attempt 172/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:34:32,169 [ERROR] Error during ssbo_allmemberReport (attempt 173/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:35:32,181 [ERROR] Error during ssbo_allmemberReport (attempt 174/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:36:32,191 [ERROR] Error during ssbo_allmemberReport (attempt 175/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:37:32,201 [ERROR] Error during ssbo_allmemberReport (attempt 176/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:38:32,210 [ERROR] Error during ssbo_allmemberReport (attempt 177/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:39:32,220 [ERROR] Error during ssbo_allmemberReport (attempt 178/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:40:32,238 [ERROR] Error during ssbo_allmemberReport (attempt 179/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:41:32,255 [ERROR] Error during ssbo_allmemberReport (attempt 180/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:42:32,264 [ERROR] Error during ssbo_allmemberReport (attempt 181/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:43:32,280 [ERROR] Error during ssbo_allmemberReport (attempt 182/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:44:32,295 [ERROR] Error during ssbo_allmemberReport (attempt 183/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:45:32,302 [ERROR] Error during ssbo_allmemberReport (attempt 184/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:46:32,314 [ERROR] Error during ssbo_allmemberReport (attempt 185/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:47:32,322 [ERROR] Error during ssbo_allmemberReport (attempt 186/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:48:32,358 [ERROR] Error during ssbo_allmemberReport (attempt 187/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:49:32,369 [ERROR] Error during ssbo_allmemberReport (attempt 188/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:50:32,381 [ERROR] Error during ssbo_allmemberReport (attempt 189/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 11:51:32,389 [ERROR] Error during ssbo_allmemberReport (attempt 190/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1603, in ssbo_allmemberReport
+    with sync_playwright() as p:
+         ~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_context_manager.py", line 47, in __enter__
+                raise Error(
+    ...<2 lines>...
+                )
+playwright._impl._errors.Error: It looks like you are using Playwright Sync API inside the asyncio loop.
+Please use the Async API instead.
+2025-12-05 16:39:49,652 [ERROR] Error during allmemberReport (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.jw8bo.com', port=443): Max retries exceeded with url: /api/be/report/get-all-member-report (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 1518, in allmemberReport
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='v3-bo.jw8bo.com', port=443): Max retries exceeded with url: /api/be/report/get-all-member-report (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 17:10:54,612 [ERROR] Error during upload_to_google_sheet_AMR (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 807, in upload_to_google_sheet_AMR
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 500 when requesting https://sheets.googleapis.com/v4/spreadsheets/1vOikI71wExfzh5luDpX8KQKoINnsKVKYxBMqi-Js0a8/values/%27TM%20-%20All%20Member%20Report%27%21A2%3AAM?valueInputOption=USER_ENTERED&alt=json returned "Internal error encountered.". Details: "Internal error encountered.">
+2025-12-05 17:12:55,235 [ERROR] Error during upload_to_google_sheet_AMR (attempt 2/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/RETENTION_GMT8.py", line 807, in upload_to_google_sheet_AMR
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 923, in execute
+    resp, content = _retry_request(
+                    ~~~~~~~~~~~~~~^
+        http,
+        ^^^^^
+    ...<7 lines>...
+        headers=self.headers,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 222, in _retry_request
+    raise exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 191, in _retry_request
+    resp, content = http.request(uri, method, *args, **kwargs)
+                    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google_auth_httplib2.py", line 218, in request
+    response, content = self.http.request(
+                        ~~~~~~~~~~~~~~~~~^
+        uri,
+        ^^^^
+    ...<5 lines>...
+        **kwargs
+        ^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1727, in request
+    (response, content) = self._request(
+                          ~~~~~~~~~~~~~^
+        conn, authority, uri, request_uri, method, body, headers, redirections, cachekey,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1447, in _request
+    (response, content) = self._conn_request(conn, request_uri, method, body, headers)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1399, in _conn_request
+    response = conn.getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+TimeoutError: The read operation timed out

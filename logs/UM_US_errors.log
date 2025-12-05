@@ -37475,3 +37475,1375 @@ Traceback (most recent call last):
     return self._sslobj.read(len, buffer)
            ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
 TimeoutError: The read operation timed out
+2025-12-04 22:45:47,574 [ERROR] Error during SSBO UM MY DL PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connection.py", line 565, in getresponse
+    httplib_response = super().getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 300, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+                             " response")
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+The above exception was the direct cause of the following exception:
+
+urllib3.exceptions.ProxyError: ('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response'))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=2&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=uea&merchant=uea&merchantCode=uea&currencies=MYR&start=2025-12-03T16%3A00%3A00.000Z&startTime=2025-12-03T16%3A00%3A00.000Z&startCreatedTime=2025-12-03T16%3A00%3A00.000Z&end=2025-12-04T15%3A59%3A59.000Z&endTime=2025-12-04T15%3A59%3A59.000Z&endCreatedTime=2025-12-04T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764859546222 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2.py", line 63, in safe_call
+    except KeyboardInterrupt:
+               ^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2.py", line 3299, in ssbo_deposit_list_PID
+    "maskReloadAccountNumberCurrencyList": "",
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 671, in send
+    raise ProxyError(e, request=request)
+requests.exceptions.ProxyError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=2&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=uea&merchant=uea&merchantCode=uea&currencies=MYR&start=2025-12-03T16%3A00%3A00.000Z&startTime=2025-12-03T16%3A00%3A00.000Z&startCreatedTime=2025-12-03T16%3A00%3A00.000Z&end=2025-12-04T15%3A59%3A59.000Z&endTime=2025-12-04T15%3A59%3A59.000Z&endCreatedTime=2025-12-04T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764859546222 (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))
+2025-12-04 23:47:51,529 [ERROR] Error during IBS UM MY MEMBER INFO (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 2652, in member_info
+    cls.mongodbAPI_MI(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 1019, in mongodbAPI_MI
+    collection.create_index(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        [("member_id", 1)],
+        ^^^^^^^^^^^^^^^^^^^
+        unique=True
+        ^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/collection.py", line 2387, in create_index
+    return (self._create_indexes([index], session, **cmd_options))[0]
+            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/collection.py", line 2261, in _create_indexes
+    self._command(
+    ~~~~~~~~~~~~~^
+        conn,
+        ^^^^^
+    ...<4 lines>...
+        session=session,
+        ^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/collection.py", line 621, in _command
+    return conn.command(
+           ~~~~~~~~~~~~^
+        self._database.name,
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<12 lines>...
+        user_fields=user_fields,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/helpers.py", line 47, in inner
+    return func(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 413, in command
+    return command(
+        self,
+    ...<20 lines>...
+        write_concern=write_concern,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/network.py", line 212, in command
+    helpers_shared._check_command_response(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        response_doc,
+        ^^^^^^^^^^^^^
+    ...<2 lines>...
+        parse_write_concern_error=parse_write_concern_error,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/helpers_shared.py", line 274, in _check_command_response
+    raise DuplicateKeyError(errmsg, code, response, max_wire_version)
+pymongo.errors.DuplicateKeyError: Index build failed: 5edf9aa1-69ba-4bd6-864a-b104cce38a84: Collection UEA8.UM_MI ( 91082a8b-5d62-4406-8544-0c0600dbfbc4 ) :: caused by :: E11000 duplicate key error collection: UEA8.UM_MI index: member_id_1 dup key: { member_id: "UEA8524AA" }, full error: {'ok': 0.0, 'errmsg': 'Index build failed: 5edf9aa1-69ba-4bd6-864a-b104cce38a84: Collection UEA8.UM_MI ( 91082a8b-5d62-4406-8544-0c0600dbfbc4 ) :: caused by :: E11000 duplicate key error collection: UEA8.UM_MI index: member_id_1 dup key: { member_id: "UEA8524AA" }', 'code': 11000, 'codeName': 'DuplicateKey', 'keyPattern': {'member_id': 1}, 'keyValue': {'member_id': 'UEA8524AA'}, '$clusterTime': {'clusterTime': Timestamp(1764863271, 7), 'signature': {'hash': b'\x9b\x1f.\n\xf1n\xd9\x15g\x1e\x0b\xe0\xbfee\x95\xa7,\x17\x05', 'keyId': 7574261924137795590}}, 'operationTime': Timestamp(1764863271, 7)}
+2025-12-05 00:19:08,750 [ERROR] Error during SSBO UM MY MEMBER INFO (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=MYR&matchFullPhone=true&createdDateFrom=2025-11-30T16%3A00%3A00.000Z&createdDate=2025-12-05T15%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=uea&merchant=uea&merchantCode=uea&memberIds=46110719&memberIds=46109008&memberIds=46107954&memberIds=46107720&memberIds=46106272&memberIds=46106190&memberIds=46105837&memberIds=46105653&memberIds=46105224&memberIds=46104730&memberIds=46102887&memberIds=46102550&memberIds=46102544&memberIds=46102464&memberIds=46102430&memberIds=46102225&memberIds=46102066&memberIds=46101969&memberIds=46101682&memberIds=46101034&memberIds=46101029&memberIds=46099820&memberIds=46099389&memberIds=46098020&memberIds=46094721&memberIds=46093861&memberIds=46093712&memberIds=46092551&memberIds=46092109&memberIds=46091583&memberIds=46091295&memberIds=46088771&memberIds=46088190&memberIds=46087499&memberIds=46087105&memberIds=46087034&memberIds=46086710&memberIds=46086521&memberIds=46086346&memberIds=46086056&memberIds=46086050&memberIds=46085997&memberIds=46085972&memberIds=46082120&memberIds=46081511&memberIds=46081195&memberIds=46081108&memberIds=46080999&memberIds=46080973&memberIds=46080837&memberIds=46080162&memberIds=46079731&memberIds=46079696&memberIds=46078846&memberIds=46078472&memberIds=46076650&memberIds=46076224&memberIds=46075180&memberIds=46073305&memberIds=46071893&memberIds=46071882&memberIds=46071541&memberIds=46070810&memberIds=46070538&memberIds=46070494&memberIds=46070491&memberIds=46070488&memberIds=46070462&memberIds=46070457&memberIds=46070442&memberIds=46070434&memberIds=46070424&memberIds=46070413&memberIds=46070377&memberIds=46070303&memberIds=46070207&memberIds=46065248&memberIds=46065008&memberIds=46063840&memberIds=46063749&memberIds=46061689&memberIds=46060059&memberIds=46057947&memberIds=46057319&memberIds=46056644&memberIds=46056311&memberIds=46056274&memberIds=46056249&memberIds=46056151&memberIds=46056139&memberIds=46056094&memberIds=46056085&memberIds=46056078&memberIds=46056059&memberIds=46056056&memberIds=46056023&memberIds=46056011&memberIds=46055825&memberIds=46054725&memberIds=46054617&memberIds=46053326&memberIds=46052432 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2.py", line 2888, in ssbo_member_info
+    response = requests.request("GET", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=MYR&matchFullPhone=true&createdDateFrom=2025-11-30T16%3A00%3A00.000Z&createdDate=2025-12-05T15%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=uea&merchant=uea&merchantCode=uea&memberIds=46110719&memberIds=46109008&memberIds=46107954&memberIds=46107720&memberIds=46106272&memberIds=46106190&memberIds=46105837&memberIds=46105653&memberIds=46105224&memberIds=46104730&memberIds=46102887&memberIds=46102550&memberIds=46102544&memberIds=46102464&memberIds=46102430&memberIds=46102225&memberIds=46102066&memberIds=46101969&memberIds=46101682&memberIds=46101034&memberIds=46101029&memberIds=46099820&memberIds=46099389&memberIds=46098020&memberIds=46094721&memberIds=46093861&memberIds=46093712&memberIds=46092551&memberIds=46092109&memberIds=46091583&memberIds=46091295&memberIds=46088771&memberIds=46088190&memberIds=46087499&memberIds=46087105&memberIds=46087034&memberIds=46086710&memberIds=46086521&memberIds=46086346&memberIds=46086056&memberIds=46086050&memberIds=46085997&memberIds=46085972&memberIds=46082120&memberIds=46081511&memberIds=46081195&memberIds=46081108&memberIds=46080999&memberIds=46080973&memberIds=46080837&memberIds=46080162&memberIds=46079731&memberIds=46079696&memberIds=46078846&memberIds=46078472&memberIds=46076650&memberIds=46076224&memberIds=46075180&memberIds=46073305&memberIds=46071893&memberIds=46071882&memberIds=46071541&memberIds=46070810&memberIds=46070538&memberIds=46070494&memberIds=46070491&memberIds=46070488&memberIds=46070462&memberIds=46070457&memberIds=46070442&memberIds=46070434&memberIds=46070424&memberIds=46070413&memberIds=46070377&memberIds=46070303&memberIds=46070207&memberIds=46065248&memberIds=46065008&memberIds=46063840&memberIds=46063749&memberIds=46061689&memberIds=46060059&memberIds=46057947&memberIds=46057319&memberIds=46056644&memberIds=46056311&memberIds=46056274&memberIds=46056249&memberIds=46056151&memberIds=46056139&memberIds=46056094&memberIds=46056085&memberIds=46056078&memberIds=46056059&memberIds=46056056&memberIds=46056023&memberIds=46056011&memberIds=46055825&memberIds=46054725&memberIds=46054617&memberIds=46053326&memberIds=46052432 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 00:42:43,204 [ERROR] Error during SSBO UM MY FTD/STD (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2.py", line 2547, in ssbo_ftd_stdReport
+    cls.upload_to_google_sheet_ssbo_FTD_STD(collection, g_sheet_ID, g_sheet_tab, extra_mongo_collections=extra_mongo_collections)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2.py", line 980, in upload_to_google_sheet_ssbo_FTD_STD
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 923, in execute
+    resp, content = _retry_request(
+                    ~~~~~~~~~~~~~~^
+        http,
+        ^^^^^
+    ...<7 lines>...
+        headers=self.headers,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 222, in _retry_request
+    raise exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 191, in _retry_request
+    resp, content = http.request(uri, method, *args, **kwargs)
+                    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google_auth_httplib2.py", line 218, in request
+    response, content = self.http.request(
+                        ~~~~~~~~~~~~~~~~~^
+        uri,
+        ^^^^
+    ...<5 lines>...
+        **kwargs
+        ^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1727, in request
+    (response, content) = self._request(
+                          ~~~~~~~~~~~~~^
+        conn, authority, uri, request_uri, method, body, headers, redirections, cachekey,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1447, in _request
+    (response, content) = self._conn_request(conn, request_uri, method, body, headers)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1369, in _conn_request
+    conn.connect()
+    ~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1161, in connect
+    self.sock = self._context.wrap_socket(sock, server_hostname=self.host)
+                ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sock=sock,
+        ^^^^^^^^^^
+    ...<5 lines>...
+        session=session
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1076, in _create
+    self.do_handshake()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1372, in do_handshake
+    self._sslobj.do_handshake()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+TimeoutError: _ssl.c:1018: The handshake operation timed out
+2025-12-05 00:46:28,220 [ERROR] Error during SSBO UT THAI DL PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UT.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UT.py", line 3400, in ssbo_deposit_list_PID
+    cls.upload_to_google_sheet_ssbo_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/UT.py", line 1557, in upload_to_google_sheet_ssbo_DL_PID
+    documents = list(collection.find({}, {"_id": 0}).sort("lastModifiedDate", 1))
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1289, in __next__
+    return self.next()
+           ~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1265, in next
+    if len(self._data) or self._refresh():
+                          ~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1236, in _refresh
+    self._send_message(g)
+    ~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1108, in _send_message
+    response = client._run_operation(
+        operation, self._unpack_response, address=self._address
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1938, in _run_operation
+    return self._retryable_read(
+           ~~~~~~~~~~~~~~~~~~~~^
+        _cmd,
+        ^^^^^
+    ...<4 lines>...
+        operation=operation.name,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2047, in _retryable_read
+    return self._retry_internal(
+           ~~~~~~~~~~~~~~~~~~~~^
+        func,
+        ^^^^^
+    ...<7 lines>...
+        operation_id=operation_id,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2014, in _retry_internal
+    ).run()
+      ~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2765, in run
+    return self._read() if self._is_read else self._write()
+           ~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2926, in _read
+    return self._func(self._session, self._server, conn, read_pref)  # type: ignore
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1929, in _cmd
+    return server.run_operation(
+           ~~~~~~~~~~~~~~~~~~~~^
+        conn,
+        ^^^^^
+    ...<4 lines>...
+        self,
+        ^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/helpers.py", line 47, in inner
+    return func(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/server.py", line 208, in run_operation
+    reply = conn.receive_message(request_id)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 469, in receive_message
+    self._raise_connection_failure(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 466, in receive_message
+    return receive_message(self, request_id, self.max_message_size)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/network_layer.py", line 778, in receive_message
+    data = receive_data(conn, length - 16, deadline)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/network_layer.py", line 361, in receive_data
+    raise _OperationCancelled("operation cancelled") from None
+pymongo.errors._OperationCancelled: operation cancelled
+2025-12-05 02:04:32,314 [ERROR] Error during IBS UM MY FTD/STD (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.29018465.asia', port=443): Max retries exceeded with url: /api/be/report/get-first-time-deposit-report (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 2215, in ftd_stdReport
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='v3-bo.29018465.asia', port=443): Max retries exceeded with url: /api/be/report/get-first-time-deposit-report (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 08:31:13,836 [ERROR] Error during SSBO A8T THAI MEMBER INFO (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=0&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 2801, in ssbo_member_info
+    response = requests.request("POST", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=0&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 08:43:07,141 [ERROR] Error during SSBO UM MY DL PID (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=1&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=uea&merchant=uea&merchantCode=uea&currencies=MYR&start=2025-12-04T16%3A00%3A00.000Z&startTime=2025-12-04T16%3A00%3A00.000Z&startCreatedTime=2025-12-04T16%3A00%3A00.000Z&end=2025-12-05T15%3A59%3A59.000Z&endTime=2025-12-05T15%3A59%3A59.000Z&endCreatedTime=2025-12-05T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764895379119 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 3263, in ssbo_deposit_list_PID
+    response = requests.get(full_url, headers=headers)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=1&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=uea&merchant=uea&merchantCode=uea&currencies=MYR&start=2025-12-04T16%3A00%3A00.000Z&startTime=2025-12-04T16%3A00%3A00.000Z&startCreatedTime=2025-12-04T16%3A00%3A00.000Z&end=2025-12-05T15%3A59%3A59.000Z&endTime=2025-12-05T15%3A59%3A59.000Z&endCreatedTime=2025-12-05T15%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764895379119 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:41:06,137 [ERROR] Error during SSBO A8T THAI MEMBER INFO (attempt 1/500)
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connection.py", line 565, in getresponse
+    httplib_response = super().getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+
+The above exception was the direct cause of the following exception:
+
+urllib3.exceptions.ProxyError: ('Unable to connect to proxy', BrokenPipeError(32, 'Broken pipe'))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=1&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by ProxyError('Unable to connect to proxy', BrokenPipeError(32, 'Broken pipe')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 2801, in ssbo_member_info
+    response = requests.request("POST", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 671, in send
+    raise ProxyError(e, request=request)
+requests.exceptions.ProxyError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=1&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by ProxyError('Unable to connect to proxy', BrokenPipeError(32, 'Broken pipe')))
+2025-12-05 16:43:14,006 [ERROR] Error during SSBO A8T THAI MEMBER INFO (attempt 2/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=aw8&merchant=aw8&merchantCode=aw8&memberIds=46121602&memberIds=46121255&memberIds=46121162&memberIds=46120949&memberIds=46120876&memberIds=46120696&memberIds=46119975&memberIds=46119974&memberIds=46119952&memberIds=46119474&memberIds=46119378&memberIds=46118975&memberIds=46118971&memberIds=46118897&memberIds=46118685&memberIds=46118378&memberIds=46118218&memberIds=46118181&memberIds=46117844&memberIds=46117718&memberIds=46117658&memberIds=46117347&memberIds=46117164&memberIds=46117147&memberIds=46117102&memberIds=46116807&memberIds=46116694&memberIds=46116396&memberIds=46116163&memberIds=46116056&memberIds=46115591&memberIds=46115484&memberIds=46115479&memberIds=46115471&memberIds=46115457&memberIds=46115353&memberIds=46115306&memberIds=46115242&memberIds=46115199&memberIds=46114971&memberIds=46114865&memberIds=46114773&memberIds=46114566&memberIds=46114440&memberIds=46114209&memberIds=46114043&memberIds=46113838&memberIds=46113797&memberIds=46113663&memberIds=46113623&memberIds=46113511&memberIds=46113476&memberIds=46113263&memberIds=46113165&memberIds=46113117&memberIds=46113017&memberIds=46112877&memberIds=46112741&memberIds=46112668&memberIds=46112564&memberIds=46112559&memberIds=46112522&memberIds=46112507&memberIds=46112493&memberIds=46112486&memberIds=46112476&memberIds=46112465&memberIds=46112428&memberIds=46112401&memberIds=46112387&memberIds=46112381&memberIds=46112368&memberIds=46112327&memberIds=46112320&memberIds=46112298&memberIds=46112281&memberIds=46112270&memberIds=46112250&memberIds=46112248&memberIds=46112221&memberIds=46112212&memberIds=46112055&memberIds=46111967&memberIds=46111840&memberIds=46111839&memberIds=46111832 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 2886, in ssbo_member_info
+    response = requests.request("GET", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=aw8&merchant=aw8&merchantCode=aw8&memberIds=46121602&memberIds=46121255&memberIds=46121162&memberIds=46120949&memberIds=46120876&memberIds=46120696&memberIds=46119975&memberIds=46119974&memberIds=46119952&memberIds=46119474&memberIds=46119378&memberIds=46118975&memberIds=46118971&memberIds=46118897&memberIds=46118685&memberIds=46118378&memberIds=46118218&memberIds=46118181&memberIds=46117844&memberIds=46117718&memberIds=46117658&memberIds=46117347&memberIds=46117164&memberIds=46117147&memberIds=46117102&memberIds=46116807&memberIds=46116694&memberIds=46116396&memberIds=46116163&memberIds=46116056&memberIds=46115591&memberIds=46115484&memberIds=46115479&memberIds=46115471&memberIds=46115457&memberIds=46115353&memberIds=46115306&memberIds=46115242&memberIds=46115199&memberIds=46114971&memberIds=46114865&memberIds=46114773&memberIds=46114566&memberIds=46114440&memberIds=46114209&memberIds=46114043&memberIds=46113838&memberIds=46113797&memberIds=46113663&memberIds=46113623&memberIds=46113511&memberIds=46113476&memberIds=46113263&memberIds=46113165&memberIds=46113117&memberIds=46113017&memberIds=46112877&memberIds=46112741&memberIds=46112668&memberIds=46112564&memberIds=46112559&memberIds=46112522&memberIds=46112507&memberIds=46112493&memberIds=46112486&memberIds=46112476&memberIds=46112465&memberIds=46112428&memberIds=46112401&memberIds=46112387&memberIds=46112381&memberIds=46112368&memberIds=46112327&memberIds=46112320&memberIds=46112298&memberIds=46112281&memberIds=46112270&memberIds=46112250&memberIds=46112248&memberIds=46112221&memberIds=46112212&memberIds=46112055&memberIds=46111967&memberIds=46111840&memberIds=46111839&memberIds=46111832 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:45:20,004 [ERROR] Error during SSBO UM MY FTD/STD (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 2498, in ssbo_ftd_stdReport
+    cls.upload_to_google_sheet_ssbo_FTD_STD(collection, g_sheet_ID, g_sheet_tab, extra_mongo_collections=extra_mongo_collections)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 951, in upload_to_google_sheet_ssbo_FTD_STD
+    documents = list(
+        collection_ref.find({}, {"_id": 0}).sort("register_info_date", 1)
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1289, in __next__
+    return self.next()
+           ~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1265, in next
+    if len(self._data) or self._refresh():
+                          ~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1213, in _refresh
+    self._send_message(q)
+    ~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1108, in _send_message
+    response = client._run_operation(
+        operation, self._unpack_response, address=self._address
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1938, in _run_operation
+    return self._retryable_read(
+           ~~~~~~~~~~~~~~~~~~~~^
+        _cmd,
+        ^^^^^
+    ...<4 lines>...
+        operation=operation.name,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2047, in _retryable_read
+    return self._retry_internal(
+           ~~~~~~~~~~~~~~~~~~~~^
+        func,
+        ^^^^^
+    ...<7 lines>...
+        operation_id=operation_id,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2014, in _retry_internal
+    ).run()
+      ~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2765, in run
+    return self._read() if self._is_read else self._write()
+           ~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2910, in _read
+    self._server = self._get_server()
+                   ~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2858, in _get_server
+    return self._client._select_server(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self._server_selector,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        operation_id=self._operation_id,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1833, in _select_server
+    server = topology.select_server(
+        server_selector,
+    ...<2 lines>...
+        operation_id=operation_id,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/topology.py", line 409, in select_server
+    server = self._select_server(
+        selector,
+    ...<4 lines>...
+        operation_id=operation_id,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/topology.py", line 387, in _select_server
+    servers = self.select_servers(
+        selector, operation, server_selection_timeout, address, operation_id
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/topology.py", line 294, in select_servers
+    server_descriptions = self._select_servers_loop(
+        selector, server_timeout, operation, operation_id, address
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/topology.py", line 344, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+        f"{self._error_message(selector)}, Timeout: {timeout}s, Topology Description: {self.description!r}"
+    )
+pymongo.errors.ServerSelectionTimeoutError: No replica set members match selector "Primary()", Timeout: 30s, Topology Description: <TopologyDescription id: 69329b8101de83881649c672, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-xfzdix9-shard-00-00.kqgprz4.mongodb.net', 27017) server_type: RSSecondary, rtt: 0.5727177671622485>, <ServerDescription ('ac-xfzdix9-shard-00-01.kqgprz4.mongodb.net', 27017) server_type: Unknown, rtt: None, error=NetworkTimeout('SSL handshake failed: ac-xfzdix9-shard-00-01.kqgprz4.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-xfzdix9-shard-00-02.kqgprz4.mongodb.net', 27017) server_type: RSSecondary, rtt: 0.6277902930323036>]>
+2025-12-05 16:45:46,870 [ERROR] Error during SSBO A8T THAI MEMBER INFO (attempt 3/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=1&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 2801, in ssbo_member_info
+    response = requests.request("POST", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=1&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:46:36,271 [ERROR] Error during SSBO UM MY FTD/STD (attempt 2/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/report-management/get-first-time-deposit-report?page=1&size=200&sort=eventTime%2CDESC&tenantId=35&merchants=uea&merchantCode=uea&currencies=MYR&start=2025-11-30T17%3A00%3A00.000Z&startTime=2025-11-30T17%3A00%3A00.000Z&startCreatedTime=2025-11-30T17%3A00%3A00.000Z&end=2025-12-05T16%3A59%3A59.000Z&endTime=2025-12-05T16%3A59%3A59.000Z&endCreatedTime=2025-12-05T16%3A59%3A59.000Z&timezone=8&cacheBuster=1764924391411 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 2418, in ssbo_ftd_stdReport
+    response = requests.get(url, headers=headers, params=params)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/report-management/get-first-time-deposit-report?page=1&size=200&sort=eventTime%2CDESC&tenantId=35&merchants=uea&merchantCode=uea&currencies=MYR&start=2025-11-30T17%3A00%3A00.000Z&startTime=2025-11-30T17%3A00%3A00.000Z&startCreatedTime=2025-11-30T17%3A00%3A00.000Z&end=2025-12-05T16%3A59%3A59.000Z&endTime=2025-12-05T16%3A59%3A59.000Z&endCreatedTime=2025-12-05T16%3A59%3A59.000Z&timezone=8&cacheBuster=1764924391411 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:47:02,117 [ERROR] Error during SSBO A8T THAI MEMBER INFO (attempt 4/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=aw8&merchant=aw8&merchantCode=aw8&memberIds=46121602&memberIds=46121255&memberIds=46121162&memberIds=46120949&memberIds=46120876&memberIds=46120696&memberIds=46119975&memberIds=46119974&memberIds=46119952&memberIds=46119474&memberIds=46119378&memberIds=46118975&memberIds=46118971&memberIds=46118897&memberIds=46118685&memberIds=46118378&memberIds=46118218&memberIds=46118181&memberIds=46117844&memberIds=46117718&memberIds=46117658&memberIds=46117347&memberIds=46117164&memberIds=46117147&memberIds=46117102&memberIds=46116807&memberIds=46116694&memberIds=46116396&memberIds=46116163&memberIds=46116056&memberIds=46115591&memberIds=46115484&memberIds=46115479&memberIds=46115471&memberIds=46115457&memberIds=46115353&memberIds=46115306&memberIds=46115242&memberIds=46115199&memberIds=46114971&memberIds=46114865&memberIds=46114773&memberIds=46114566&memberIds=46114440&memberIds=46114209&memberIds=46114043&memberIds=46113838&memberIds=46113797&memberIds=46113663&memberIds=46113623&memberIds=46113511&memberIds=46113476&memberIds=46113263&memberIds=46113165&memberIds=46113117&memberIds=46113017&memberIds=46112877&memberIds=46112741&memberIds=46112668&memberIds=46112564&memberIds=46112559&memberIds=46112522&memberIds=46112507&memberIds=46112493&memberIds=46112486&memberIds=46112476&memberIds=46112465&memberIds=46112428&memberIds=46112401&memberIds=46112387&memberIds=46112381&memberIds=46112368&memberIds=46112327&memberIds=46112320&memberIds=46112298&memberIds=46112281&memberIds=46112270&memberIds=46112250&memberIds=46112248&memberIds=46112221&memberIds=46112212&memberIds=46112055&memberIds=46111967&memberIds=46111840&memberIds=46111839&memberIds=46111832 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 2886, in ssbo_member_info
+    response = requests.request("GET", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=aw8&merchant=aw8&merchantCode=aw8&memberIds=46121602&memberIds=46121255&memberIds=46121162&memberIds=46120949&memberIds=46120876&memberIds=46120696&memberIds=46119975&memberIds=46119974&memberIds=46119952&memberIds=46119474&memberIds=46119378&memberIds=46118975&memberIds=46118971&memberIds=46118897&memberIds=46118685&memberIds=46118378&memberIds=46118218&memberIds=46118181&memberIds=46117844&memberIds=46117718&memberIds=46117658&memberIds=46117347&memberIds=46117164&memberIds=46117147&memberIds=46117102&memberIds=46116807&memberIds=46116694&memberIds=46116396&memberIds=46116163&memberIds=46116056&memberIds=46115591&memberIds=46115484&memberIds=46115479&memberIds=46115471&memberIds=46115457&memberIds=46115353&memberIds=46115306&memberIds=46115242&memberIds=46115199&memberIds=46114971&memberIds=46114865&memberIds=46114773&memberIds=46114566&memberIds=46114440&memberIds=46114209&memberIds=46114043&memberIds=46113838&memberIds=46113797&memberIds=46113663&memberIds=46113623&memberIds=46113511&memberIds=46113476&memberIds=46113263&memberIds=46113165&memberIds=46113117&memberIds=46113017&memberIds=46112877&memberIds=46112741&memberIds=46112668&memberIds=46112564&memberIds=46112559&memberIds=46112522&memberIds=46112507&memberIds=46112493&memberIds=46112486&memberIds=46112476&memberIds=46112465&memberIds=46112428&memberIds=46112401&memberIds=46112387&memberIds=46112381&memberIds=46112368&memberIds=46112327&memberIds=46112320&memberIds=46112298&memberIds=46112281&memberIds=46112270&memberIds=46112250&memberIds=46112248&memberIds=46112221&memberIds=46112212&memberIds=46112055&memberIds=46111967&memberIds=46111840&memberIds=46111839&memberIds=46111832 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:47:31,839 [ERROR] Error during SSBO UT THAI MEMBER INFO (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=uea&merchant=uea&merchantCode=uea&memberIds=46120890&memberIds=46120735&memberIds=46120520&memberIds=46120412&memberIds=46120354&memberIds=46120335&memberIds=46120081&memberIds=46120036&memberIds=46119783&memberIds=46119636&memberIds=46119408&memberIds=46118982&memberIds=46118709&memberIds=46118427&memberIds=46117693&memberIds=46117585&memberIds=46117195&memberIds=46117167&memberIds=46117146&memberIds=46116781&memberIds=46116531&memberIds=46116500&memberIds=46116448&memberIds=46116268&memberIds=46115636&memberIds=46115594&memberIds=46115516&memberIds=46115460&memberIds=46115307&memberIds=46115196&memberIds=46115156&memberIds=46114711&memberIds=46113758&memberIds=46113111&memberIds=46113049&memberIds=46112693&memberIds=46112359&memberIds=46112335&memberIds=46112226&memberIds=46111735 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UT.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UT.py", line 2888, in ssbo_member_info
+    response = requests.request("GET", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=uea&merchant=uea&merchantCode=uea&memberIds=46120890&memberIds=46120735&memberIds=46120520&memberIds=46120412&memberIds=46120354&memberIds=46120335&memberIds=46120081&memberIds=46120036&memberIds=46119783&memberIds=46119636&memberIds=46119408&memberIds=46118982&memberIds=46118709&memberIds=46118427&memberIds=46117693&memberIds=46117585&memberIds=46117195&memberIds=46117167&memberIds=46117146&memberIds=46116781&memberIds=46116531&memberIds=46116500&memberIds=46116448&memberIds=46116268&memberIds=46115636&memberIds=46115594&memberIds=46115516&memberIds=46115460&memberIds=46115307&memberIds=46115196&memberIds=46115156&memberIds=46114711&memberIds=46113758&memberIds=46113111&memberIds=46113049&memberIds=46112693&memberIds=46112359&memberIds=46112335&memberIds=46112226&memberIds=46111735 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:48:08,598 [ERROR] Error during SSBO US SG FTD/STD (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/report-management/get-first-time-deposit-report?page=0&size=200&sort=eventTime%2CDESC&tenantId=35&merchants=uea&merchantCode=uea&currencies=SGD&start=2025-11-30T17%3A00%3A00.000Z&startTime=2025-11-30T17%3A00%3A00.000Z&startCreatedTime=2025-11-30T17%3A00%3A00.000Z&end=2025-12-05T16%3A59%3A59.000Z&endTime=2025-12-05T16%3A59%3A59.000Z&endCreatedTime=2025-12-05T16%3A59%3A59.000Z&timezone=8&cacheBuster=1764924480122 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 2418, in ssbo_ftd_stdReport
+    response = requests.get(url, headers=headers, params=params)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/report-management/get-first-time-deposit-report?page=0&size=200&sort=eventTime%2CDESC&tenantId=35&merchants=uea&merchantCode=uea&currencies=SGD&start=2025-11-30T17%3A00%3A00.000Z&startTime=2025-11-30T17%3A00%3A00.000Z&startCreatedTime=2025-11-30T17%3A00%3A00.000Z&end=2025-12-05T16%3A59%3A59.000Z&endTime=2025-12-05T16%3A59%3A59.000Z&endCreatedTime=2025-12-05T16%3A59%3A59.000Z&timezone=8&cacheBuster=1764924480122 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:48:18,326 [ERROR] Error during SSBO A8T THAI MEMBER INFO (attempt 5/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=aw8&merchant=aw8&merchantCode=aw8&memberIds=46121602&memberIds=46121255&memberIds=46121162&memberIds=46120949&memberIds=46120876&memberIds=46120696&memberIds=46119975&memberIds=46119974&memberIds=46119952&memberIds=46119474&memberIds=46119378&memberIds=46118975&memberIds=46118971&memberIds=46118897&memberIds=46118685&memberIds=46118378&memberIds=46118218&memberIds=46118181&memberIds=46117844&memberIds=46117718&memberIds=46117658&memberIds=46117347&memberIds=46117164&memberIds=46117147&memberIds=46117102&memberIds=46116807&memberIds=46116694&memberIds=46116396&memberIds=46116163&memberIds=46116056&memberIds=46115591&memberIds=46115484&memberIds=46115479&memberIds=46115471&memberIds=46115457&memberIds=46115353&memberIds=46115306&memberIds=46115242&memberIds=46115199&memberIds=46114971&memberIds=46114865&memberIds=46114773&memberIds=46114566&memberIds=46114440&memberIds=46114209&memberIds=46114043&memberIds=46113838&memberIds=46113797&memberIds=46113663&memberIds=46113623&memberIds=46113511&memberIds=46113476&memberIds=46113263&memberIds=46113165&memberIds=46113117&memberIds=46113017&memberIds=46112877&memberIds=46112741&memberIds=46112668&memberIds=46112564&memberIds=46112559&memberIds=46112522&memberIds=46112507&memberIds=46112493&memberIds=46112486&memberIds=46112476&memberIds=46112465&memberIds=46112428&memberIds=46112401&memberIds=46112387&memberIds=46112381&memberIds=46112368&memberIds=46112327&memberIds=46112320&memberIds=46112298&memberIds=46112281&memberIds=46112270&memberIds=46112250&memberIds=46112248&memberIds=46112221&memberIds=46112212&memberIds=46112055&memberIds=46111967&memberIds=46111840&memberIds=46111839&memberIds=46111832 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 2886, in ssbo_member_info
+    response = requests.request("GET", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=aw8&merchant=aw8&merchantCode=aw8&memberIds=46121602&memberIds=46121255&memberIds=46121162&memberIds=46120949&memberIds=46120876&memberIds=46120696&memberIds=46119975&memberIds=46119974&memberIds=46119952&memberIds=46119474&memberIds=46119378&memberIds=46118975&memberIds=46118971&memberIds=46118897&memberIds=46118685&memberIds=46118378&memberIds=46118218&memberIds=46118181&memberIds=46117844&memberIds=46117718&memberIds=46117658&memberIds=46117347&memberIds=46117164&memberIds=46117147&memberIds=46117102&memberIds=46116807&memberIds=46116694&memberIds=46116396&memberIds=46116163&memberIds=46116056&memberIds=46115591&memberIds=46115484&memberIds=46115479&memberIds=46115471&memberIds=46115457&memberIds=46115353&memberIds=46115306&memberIds=46115242&memberIds=46115199&memberIds=46114971&memberIds=46114865&memberIds=46114773&memberIds=46114566&memberIds=46114440&memberIds=46114209&memberIds=46114043&memberIds=46113838&memberIds=46113797&memberIds=46113663&memberIds=46113623&memberIds=46113511&memberIds=46113476&memberIds=46113263&memberIds=46113165&memberIds=46113117&memberIds=46113017&memberIds=46112877&memberIds=46112741&memberIds=46112668&memberIds=46112564&memberIds=46112559&memberIds=46112522&memberIds=46112507&memberIds=46112493&memberIds=46112486&memberIds=46112476&memberIds=46112465&memberIds=46112428&memberIds=46112401&memberIds=46112387&memberIds=46112381&memberIds=46112368&memberIds=46112327&memberIds=46112320&memberIds=46112298&memberIds=46112281&memberIds=46112270&memberIds=46112250&memberIds=46112248&memberIds=46112221&memberIds=46112212&memberIds=46112055&memberIds=46111967&memberIds=46111840&memberIds=46111839&memberIds=46111832 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:48:39,285 [ERROR] Error during SSBO UT THAI MEMBER INFO (attempt 2/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=0&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UT.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UT.py", line 2803, in ssbo_member_info
+    response = requests.request("POST", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=0&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:49:17,463 [ERROR] Error during SSBO US SG FTD/STD (attempt 2/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/report-management/get-first-time-deposit-report?page=0&size=200&sort=eventTime%2CDESC&tenantId=35&merchants=uea&merchantCode=uea&currencies=SGD&start=2025-11-30T17%3A00%3A00.000Z&startTime=2025-11-30T17%3A00%3A00.000Z&startCreatedTime=2025-11-30T17%3A00%3A00.000Z&end=2025-12-05T16%3A59%3A59.000Z&endTime=2025-12-05T16%3A59%3A59.000Z&endCreatedTime=2025-12-05T16%3A59%3A59.000Z&timezone=8&cacheBuster=1764924549441 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 2418, in ssbo_ftd_stdReport
+    response = requests.get(url, headers=headers, params=params)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/report-management/get-first-time-deposit-report?page=0&size=200&sort=eventTime%2CDESC&tenantId=35&merchants=uea&merchantCode=uea&currencies=SGD&start=2025-11-30T17%3A00%3A00.000Z&startTime=2025-11-30T17%3A00%3A00.000Z&startCreatedTime=2025-11-30T17%3A00%3A00.000Z&end=2025-12-05T16%3A59%3A59.000Z&endTime=2025-12-05T16%3A59%3A59.000Z&endCreatedTime=2025-12-05T16%3A59%3A59.000Z&timezone=8&cacheBuster=1764924549441 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:49:30,528 [ERROR] Error during SSBO A8T THAI MEMBER INFO (attempt 6/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=aw8&merchant=aw8&merchantCode=aw8&memberIds=46121602&memberIds=46121255&memberIds=46121162&memberIds=46120949&memberIds=46120876&memberIds=46120696&memberIds=46119975&memberIds=46119974&memberIds=46119952&memberIds=46119474&memberIds=46119378&memberIds=46118975&memberIds=46118971&memberIds=46118897&memberIds=46118685&memberIds=46118378&memberIds=46118218&memberIds=46118181&memberIds=46117844&memberIds=46117718&memberIds=46117658&memberIds=46117347&memberIds=46117164&memberIds=46117147&memberIds=46117102&memberIds=46116807&memberIds=46116694&memberIds=46116396&memberIds=46116163&memberIds=46116056&memberIds=46115591&memberIds=46115484&memberIds=46115479&memberIds=46115471&memberIds=46115457&memberIds=46115353&memberIds=46115306&memberIds=46115242&memberIds=46115199&memberIds=46114971&memberIds=46114865&memberIds=46114773&memberIds=46114566&memberIds=46114440&memberIds=46114209&memberIds=46114043&memberIds=46113838&memberIds=46113797&memberIds=46113663&memberIds=46113623&memberIds=46113511&memberIds=46113476&memberIds=46113263&memberIds=46113165&memberIds=46113117&memberIds=46113017&memberIds=46112877&memberIds=46112741&memberIds=46112668&memberIds=46112564&memberIds=46112559&memberIds=46112522&memberIds=46112507&memberIds=46112493&memberIds=46112486&memberIds=46112476&memberIds=46112465&memberIds=46112428&memberIds=46112401&memberIds=46112387&memberIds=46112381&memberIds=46112368&memberIds=46112327&memberIds=46112320&memberIds=46112298&memberIds=46112281&memberIds=46112270&memberIds=46112250&memberIds=46112248&memberIds=46112221&memberIds=46112212&memberIds=46112055&memberIds=46111967&memberIds=46111840&memberIds=46111839&memberIds=46111832 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 2886, in ssbo_member_info
+    response = requests.request("GET", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=aw8&merchant=aw8&merchantCode=aw8&memberIds=46121602&memberIds=46121255&memberIds=46121162&memberIds=46120949&memberIds=46120876&memberIds=46120696&memberIds=46119975&memberIds=46119974&memberIds=46119952&memberIds=46119474&memberIds=46119378&memberIds=46118975&memberIds=46118971&memberIds=46118897&memberIds=46118685&memberIds=46118378&memberIds=46118218&memberIds=46118181&memberIds=46117844&memberIds=46117718&memberIds=46117658&memberIds=46117347&memberIds=46117164&memberIds=46117147&memberIds=46117102&memberIds=46116807&memberIds=46116694&memberIds=46116396&memberIds=46116163&memberIds=46116056&memberIds=46115591&memberIds=46115484&memberIds=46115479&memberIds=46115471&memberIds=46115457&memberIds=46115353&memberIds=46115306&memberIds=46115242&memberIds=46115199&memberIds=46114971&memberIds=46114865&memberIds=46114773&memberIds=46114566&memberIds=46114440&memberIds=46114209&memberIds=46114043&memberIds=46113838&memberIds=46113797&memberIds=46113663&memberIds=46113623&memberIds=46113511&memberIds=46113476&memberIds=46113263&memberIds=46113165&memberIds=46113117&memberIds=46113017&memberIds=46112877&memberIds=46112741&memberIds=46112668&memberIds=46112564&memberIds=46112559&memberIds=46112522&memberIds=46112507&memberIds=46112493&memberIds=46112486&memberIds=46112476&memberIds=46112465&memberIds=46112428&memberIds=46112401&memberIds=46112387&memberIds=46112381&memberIds=46112368&memberIds=46112327&memberIds=46112320&memberIds=46112298&memberIds=46112281&memberIds=46112270&memberIds=46112250&memberIds=46112248&memberIds=46112221&memberIds=46112212&memberIds=46112055&memberIds=46111967&memberIds=46111840&memberIds=46111839&memberIds=46111832 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:49:44,191 [ERROR] Error during SSBO UT THAI MEMBER INFO (attempt 3/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=0&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UT.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UT.py", line 2803, in ssbo_member_info
+    response = requests.request("POST", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=0&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:50:21,429 [ERROR] Error during SSBO A8T THAI MEMBER INFO (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=0&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 2801, in ssbo_member_info
+    response = requests.request("POST", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=0&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:52:38,568 [ERROR] Error during SSBO UT THAI MEMBER INFO (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=uea&merchant=uea&merchantCode=uea&memberIds=46120890&memberIds=46120735&memberIds=46120520&memberIds=46120412&memberIds=46120354&memberIds=46120335&memberIds=46120081&memberIds=46120036&memberIds=46119783&memberIds=46119636&memberIds=46119408&memberIds=46118982&memberIds=46118709&memberIds=46118427&memberIds=46117693&memberIds=46117585&memberIds=46117195&memberIds=46117167&memberIds=46117146&memberIds=46116781&memberIds=46116531&memberIds=46116500&memberIds=46116448&memberIds=46116268&memberIds=46115636&memberIds=46115594&memberIds=46115516&memberIds=46115460&memberIds=46115307&memberIds=46115196&memberIds=46115156&memberIds=46114711&memberIds=46113758&memberIds=46113111&memberIds=46113049&memberIds=46112693&memberIds=46112359&memberIds=46112335&memberIds=46112226&memberIds=46111735 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UT.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UT.py", line 2888, in ssbo_member_info
+    response = requests.request("GET", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=uea&merchant=uea&merchantCode=uea&memberIds=46120890&memberIds=46120735&memberIds=46120520&memberIds=46120412&memberIds=46120354&memberIds=46120335&memberIds=46120081&memberIds=46120036&memberIds=46119783&memberIds=46119636&memberIds=46119408&memberIds=46118982&memberIds=46118709&memberIds=46118427&memberIds=46117693&memberIds=46117585&memberIds=46117195&memberIds=46117167&memberIds=46117146&memberIds=46116781&memberIds=46116531&memberIds=46116500&memberIds=46116448&memberIds=46116268&memberIds=46115636&memberIds=46115594&memberIds=46115516&memberIds=46115460&memberIds=46115307&memberIds=46115196&memberIds=46115156&memberIds=46114711&memberIds=46113758&memberIds=46113111&memberIds=46113049&memberIds=46112693&memberIds=46112359&memberIds=46112335&memberIds=46112226&memberIds=46111735 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:52:43,072 [ERROR] Error during SSBO A8T THAI MEMBER INFO (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=aw8&merchant=aw8&merchantCode=aw8&memberIds=46121602&memberIds=46121255&memberIds=46121162&memberIds=46120949&memberIds=46120876&memberIds=46120696&memberIds=46119975&memberIds=46119974&memberIds=46119952&memberIds=46119474&memberIds=46119378&memberIds=46118975&memberIds=46118971&memberIds=46118897&memberIds=46118685&memberIds=46118378&memberIds=46118218&memberIds=46118181&memberIds=46117844&memberIds=46117718&memberIds=46117658&memberIds=46117347&memberIds=46117164&memberIds=46117147&memberIds=46117102&memberIds=46116807&memberIds=46116694&memberIds=46116396&memberIds=46116163&memberIds=46116056&memberIds=46115591&memberIds=46115484&memberIds=46115479&memberIds=46115471&memberIds=46115457&memberIds=46115353&memberIds=46115306&memberIds=46115242&memberIds=46115199&memberIds=46114971&memberIds=46114865&memberIds=46114773&memberIds=46114566&memberIds=46114440&memberIds=46114209&memberIds=46114043&memberIds=46113838&memberIds=46113797&memberIds=46113663&memberIds=46113623&memberIds=46113511&memberIds=46113476&memberIds=46113263&memberIds=46113165&memberIds=46113117&memberIds=46113017&memberIds=46112877&memberIds=46112741&memberIds=46112668&memberIds=46112564&memberIds=46112559&memberIds=46112522&memberIds=46112507&memberIds=46112493&memberIds=46112486&memberIds=46112476&memberIds=46112465&memberIds=46112428&memberIds=46112401&memberIds=46112387&memberIds=46112381&memberIds=46112368&memberIds=46112327&memberIds=46112320&memberIds=46112298&memberIds=46112281&memberIds=46112270&memberIds=46112250&memberIds=46112248&memberIds=46112221&memberIds=46112212&memberIds=46112055&memberIds=46111967&memberIds=46111840&memberIds=46111839&memberIds=46111832 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 2886, in ssbo_member_info
+    response = requests.request("GET", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-info-details-by-ids?page=0&size=200&sort=m.id%2CDESC&tenantId=35&currencies=THB&matchFullPhone=true&createdDateFrom=2025-12-04T17%3A00%3A00.000Z&createdDate=2025-12-05T16%3A59%3A59.000Z&complianceViewMemberSocialMediaDetails=true&enableShowTotalWallet=false&mask=false&merchants=aw8&merchant=aw8&merchantCode=aw8&memberIds=46121602&memberIds=46121255&memberIds=46121162&memberIds=46120949&memberIds=46120876&memberIds=46120696&memberIds=46119975&memberIds=46119974&memberIds=46119952&memberIds=46119474&memberIds=46119378&memberIds=46118975&memberIds=46118971&memberIds=46118897&memberIds=46118685&memberIds=46118378&memberIds=46118218&memberIds=46118181&memberIds=46117844&memberIds=46117718&memberIds=46117658&memberIds=46117347&memberIds=46117164&memberIds=46117147&memberIds=46117102&memberIds=46116807&memberIds=46116694&memberIds=46116396&memberIds=46116163&memberIds=46116056&memberIds=46115591&memberIds=46115484&memberIds=46115479&memberIds=46115471&memberIds=46115457&memberIds=46115353&memberIds=46115306&memberIds=46115242&memberIds=46115199&memberIds=46114971&memberIds=46114865&memberIds=46114773&memberIds=46114566&memberIds=46114440&memberIds=46114209&memberIds=46114043&memberIds=46113838&memberIds=46113797&memberIds=46113663&memberIds=46113623&memberIds=46113511&memberIds=46113476&memberIds=46113263&memberIds=46113165&memberIds=46113117&memberIds=46113017&memberIds=46112877&memberIds=46112741&memberIds=46112668&memberIds=46112564&memberIds=46112559&memberIds=46112522&memberIds=46112507&memberIds=46112493&memberIds=46112486&memberIds=46112476&memberIds=46112465&memberIds=46112428&memberIds=46112401&memberIds=46112387&memberIds=46112381&memberIds=46112368&memberIds=46112327&memberIds=46112320&memberIds=46112298&memberIds=46112281&memberIds=46112270&memberIds=46112250&memberIds=46112248&memberIds=46112221&memberIds=46112212&memberIds=46112055&memberIds=46111967&memberIds=46111840&memberIds=46111839&memberIds=46111832 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:54:15,709 [ERROR] Error during SSBO A8T THAI MEMBER INFO (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=1&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 2801, in ssbo_member_info
+    response = requests.request("POST", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=1&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:55:02,610 [ERROR] Error during SSBO UT THAI DL PID (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=uea&merchant=uea&merchantCode=uea&currencies=THB&start=2025-12-04T17%3A00%3A00.000Z&startTime=2025-12-04T17%3A00%3A00.000Z&startCreatedTime=2025-12-04T17%3A00%3A00.000Z&end=2025-12-05T16%3A59%3A59.000Z&endTime=2025-12-05T16%3A59%3A59.000Z&endCreatedTime=2025-12-05T16%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764924897658 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UT.py", line 63, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UT.py", line 3260, in ssbo_deposit_list_PID
+    response = requests.get(full_url, headers=headers)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/deposit-withdrawal-management/transactions-deposit?page=0&size=2000&sort=membershipLevel%2CDESC&sort=createdDate%2CDESC&tenantId=35&merchants=uea&merchant=uea&merchantCode=uea&currencies=THB&start=2025-12-04T17%3A00%3A00.000Z&startTime=2025-12-04T17%3A00%3A00.000Z&startCreatedTime=2025-12-04T17%3A00%3A00.000Z&end=2025-12-05T16%3A59%3A59.000Z&endTime=2025-12-05T16%3A59%3A59.000Z&endCreatedTime=2025-12-05T16%3A59%3A59.000Z&transType=D&approved=true&rejected=false&pending=false&inProgress=false&risk=false&kyc=false&isProcessingTime=false&hasDepositHideProcessingFees=false&isAllowViewAccountNumber=false&maskReloadAccountNumberCurrencyList=&firstDeposit=ALL&hiddenColumns=merchant&hiddenColumns=region&hiddenColumns=affiliateGroupCategory&hiddenColumns=affiliateLogin&hiddenColumns=processingFee&hiddenColumns=bankStatus&isSeamlessWalletMerchant=null&cacheBuster=1764924897658 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:55:14,109 [ERROR] Error during SSBO UM MY DL PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/response.py", line 779, in _error_catcher
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/response.py", line 1251, in read_chunked
+    chunk = self._handle_chunk(amt)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/response.py", line 1197, in _handle_chunk
+    returned_chunk = self._fp._safe_read(self.chunk_left)  # type: ignore[union-attr]
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 644, in _safe_read
+    raise IncompleteRead(data, amt-len(data))
+http.client.IncompleteRead: IncompleteRead(2732 bytes read, 2722 more expected)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/models.py", line 820, in generate
+    yield from self.raw.stream(chunk_size, decode_content=True)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/response.py", line 1088, in stream
+    yield from self.read_chunked(amt, decode_content=decode_content)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/response.py", line 1231, in read_chunked
+    with self._error_catcher():
+         ~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/response.py", line 806, in _error_catcher
+    raise ProtocolError(f"Connection broken: {e!r}", e) from e
+urllib3.exceptions.ProtocolError: ('Connection broken: IncompleteRead(2732 bytes read, 2722 more expected)', IncompleteRead(2732 bytes read, 2722 more expected))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 3366, in ssbo_deposit_list_PID
+    response = requests.get(url, headers=headers)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 746, in send
+    r.content
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/models.py", line 902, in content
+    self._content = b"".join(self.iter_content(CONTENT_CHUNK_SIZE)) or b""
+                    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/models.py", line 822, in generate
+    raise ChunkedEncodingError(e)
+requests.exceptions.ChunkedEncodingError: ('Connection broken: IncompleteRead(2732 bytes read, 2722 more expected)', IncompleteRead(2732 bytes read, 2722 more expected))
+2025-12-05 16:55:22,027 [ERROR] Error during SSBO A8T THAI MEMBER INFO (attempt 2/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=0&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/A8T.py", line 2801, in ssbo_member_info
+    response = requests.request("POST", url, headers=headers, data=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='aw8.premium-bo.com', port=443): Max retries exceeded with url: /cashmarket/api/sbo/member-management/get-member-list-by-filter?page=0&size=200&sort=m.id,DESC&cacheBuster=1762790852830 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:57:33,628 [ERROR] Error during IBS UM MY DL PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 3016, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column, rows=None, extra_mongo_collections=extra_mongo_collections)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 1707, in upload_to_google_sheet_DL_PID
+    cls._ensure_sheet_row_capacity(service, SPREADSHEET_ID, gs_tab, end_row)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/UM_US_2_fix.py", line 473, in _ensure_sheet_row_capacity
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 923, in execute
+    resp, content = _retry_request(
+                    ~~~~~~~~~~~~~~^
+        http,
+        ^^^^^
+    ...<7 lines>...
+        headers=self.headers,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 222, in _retry_request
+    raise exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 191, in _retry_request
+    resp, content = http.request(uri, method, *args, **kwargs)
+                    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google_auth_httplib2.py", line 218, in request
+    response, content = self.http.request(
+                        ~~~~~~~~~~~~~~~~~^
+        uri,
+        ^^^^
+    ...<5 lines>...
+        **kwargs
+        ^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1727, in request
+    (response, content) = self._request(
+                          ~~~~~~~~~~~~~^
+        conn, authority, uri, request_uri, method, body, headers, redirections, cachekey,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1447, in _request
+    (response, content) = self._conn_request(conn, request_uri, method, body, headers)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1399, in _conn_request
+    response = conn.getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+TimeoutError: The read operation timed out

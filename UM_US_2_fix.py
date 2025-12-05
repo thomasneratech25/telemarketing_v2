@@ -1002,8 +1002,7 @@ class mongodb_2_gs:
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SSBO & IBS MEMBER INFO =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # ====================================================================================
     
-    # -_-_-_-_-_-_-_- IBS -_-_-_-_-_-_-_-
-
+    # =-=-=--=-=-=-=-=-= IBS =-=-=-=-=-=-=-=-=-=-=-=-=
     # MongoDB Database (Member Info)
     def mongodbAPI_MI(rows, collection):
 
@@ -1015,7 +1014,7 @@ class mongodb_2_gs:
         db = client["UEA8"]
         collection = db[collection]
 
-        # Set and Ensure when upload data this 3 Field is Unique Data
+       # Set and Ensure when upload data this 3 Field is Unique Data
         collection.create_index(
             [("member_id", 1)],
             unique=True
@@ -1025,25 +1024,20 @@ class mongodb_2_gs:
         inserted = 0
         skipped = 0
         cleaned_docs = []
-
         # for each rows in a list of JSON objects return
         for row in rows:
-
             # Skip null or invalid rows
             if not isinstance(row, dict):
                 continue
-
             # Extract only the fields you want (Extract Data from json file)
             username = row.get("username")
             first_name = row.get("first_name")
             register_info_date = row.get("register_info_date")
             mobileno = row.get("mobileno")
             member_id = row.get("member_id")
-
             # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
             dt = datetime.fromisoformat(register_info_date)
             register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
-
             # Build the new cleaned document (Use for upload data to MongoDB)
             doc = {
                 "username": username,
@@ -1052,22 +1046,18 @@ class mongodb_2_gs:
                 "mobileno": mobileno,
                 "member_id": member_id,
             }
-
-            # Keep the version without _id for uploading later
+            # Upsert: overwrite if member_id exists
             cleaned_docs.append(doc.copy())
-
-            # Overwrite if member_id exists; otherwise insert new
-            result = collection.replace_one(
-                {"member_id": member_id},
-                doc,
-                upsert=True
-            )
-
-            if result.matched_count > 0:
-                inserted += 1  # overwrite counts as insert/update
-            else:
-                inserted += 1
-
+            try:
+                result = collection.update_one(
+                    {"member_id": member_id},
+                    {"$set": doc},
+                    upsert=True
+                )
+                if result.upserted_id is not None or result.modified_count > 0:
+                    inserted += 1
+            except Exception:
+                skipped += 1
         print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}\n")
         return cleaned_docs
 
@@ -1158,8 +1148,7 @@ class mongodb_2_gs:
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n")
 
-    # -_-_-_-_-_-_-_- SSBO -_-_-_-_-_-_-_-
-
+    # =-=-=--=-=-=-=-=-= SSBO =-=-=-=-=-=-=-=-=-=-=-=-=
     # MongoDB Database (Member Info)
     def mongodbAPI_ssbo_MI(rows, collection):
 
@@ -1171,61 +1160,62 @@ class mongodb_2_gs:
         db = client["UEA8"]
         collection = db[collection]
 
-        # Set and Ensure when upload data this 3 Field is Unique Data
+       # Set and Ensure when upload data this 3 Field is Unique Data
         collection.create_index(
-            [("id", 1)],
-            name="ssbo_member_id_unique",
+            [("member_id", 1)],
+            name="ssbo_member_unique",
             unique=True,
+            partialFilterExpression={
+                "member_id": {"$type": "string"}
+            },
         )
 
         # Count insert and skip
         inserted = 0
         skipped = 0
         cleaned_docs = []
-
         # for each rows in a list of JSON objects return
         for row in rows:
-
             # Skip null or invalid rows
             if not isinstance(row, dict):
                 continue
-
             # Extract only the fields you want (Extract Data from json file)
-            login = row.get("login")
-            name = row.get("name")
-            registerDate = row.get("registerDate")
-            phone = row.get("phone")
-            id = row.get("id")
-
+            username = row.get("username") or row.get("login")
+            first_name = row.get("first_name") or row.get("name")
+            register_info_date = row.get("register_info_date") or row.get("registerDate")
+            mobileno = row.get("mobileno") or row.get("phone")
+            member_id = row.get("member_id") or row.get("id")
+            if not register_info_date:
+                continue
             # Convert Date and Time to (YYYY-MM-DD HH:MM:SS) in GMT+8
             try:
-                dt = datetime.fromisoformat(str(registerDate).replace("Z", "+00:00"))
+                dt = datetime.fromisoformat(str(register_info_date).replace("Z", "+00:00"))
                 if dt.tzinfo is None:
                     dt = dt.replace(tzinfo=timezone.utc)
                 dt = dt.astimezone(timezone(timedelta(hours=8)))
                 register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
             except Exception:
-                register_info_date_fmt = str(registerDate)
-
+                register_info_date_fmt = str(register_info_date)
             # Build the new cleaned document (Use for upload data to MongoDB)
             doc = {
-                "login": login,
-                "name": name,
-                "registerDate": register_info_date_fmt,
-                "phone": phone,
-                "id": id,
+                "username": username,
+                "first_name": first_name,
+                "register_info_date": register_info_date_fmt,
+                "mobileno": mobileno,
+                "member_id": member_id,
             }
-
-            # Keep the version without _id for uploading later
+            # Upsert: overwrite if member_id exists
             cleaned_docs.append(doc.copy())
-
-            # Overwrite if member_id exists; otherwise insert new
             try:
-                collection.replace_one({"id": id}, doc, upsert=True)
-                inserted += 1
+                result = collection.update_one(
+                    {"member_id": member_id},
+                    {"$set": doc},
+                    upsert=True
+                )
+                if result.upserted_id is not None or result.modified_count > 0:
+                    inserted += 1
             except Exception:
                 skipped += 1
-
         print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}\n")
         return cleaned_docs
 
@@ -1248,32 +1238,37 @@ class mongodb_2_gs:
             sanitized = []
             for r in raw_rows:
                 if isinstance(r, dict):
-                    login = (
-                        r.get("login")
+                    username = (
+                        r.get("username")
+                        or r.get("login")
                         or ""
                     )
-                    name = (
-                        r.get("name")
+                    first_name = (
+                        r.get("first_name")
+                        or r.get("name")
                         or ""
                     )
-                    registerDate = (
-                        r.get("registerDate")
+                    register_date = (
+                        r.get("register_info_date")
+                        or r.get("registerDate")
                         or ""
                     )
                     phone = (
-                        r.get("phone")
+                        r.get("mobileno")
+                        or r.get("phone")
                         or ""
                     )
-                    id = (
-                        r.get("id")
+                    member_id = (
+                        r.get("member_id")
+                        or r.get("id")
                         or ""
                     )
                     sanitized.append([
-                        str(login),
-                        str(name),
-                        str(registerDate),
+                        str(username),
+                        str(first_name),
+                        str(register_date),
                         str(phone),
-                        str(id),
+                        str(member_id),
                     ])
                 else:
                     sanitized.append(["", "", "", "", ""])
@@ -1290,14 +1285,14 @@ class mongodb_2_gs:
         if not rows:
             collection_ref = db[collection]
             documents = list(
-                collection_ref.find({}, {"_id": 0}).sort("registerDate", 1)
+                collection_ref.find({}, {"_id": 0}).sort("register_info_date", 1)
             )
             rows = documents
         if extra_mongo_collections:
             for extra_col in extra_mongo_collections:
                 extra_ref = db[extra_col]
                 extra_docs = list(
-                    extra_ref.find({}, {"_id": 0}).sort("registerDate", 1)
+                    extra_ref.find({}, {"_id": 0}).sort("register_info_date", 1)
                 )
                 rows.extend(extra_docs)
         
@@ -1322,15 +1317,14 @@ class mongodb_2_gs:
         except Exception as exc:
             print(f"Failed to upload to Google Sheets: {exc}")
             raise
-        
-        # Sorting, the reason need this because combine ibs + ssbo
+
         if row_count > 1:
             cls._sort_range_by_column(
                 service,
                 SPREADSHEET_ID,
                 gs_tab,
                 "A",
-                "F",
+                "E",
                 3,
                 3 + row_count - 1,
                 sort_column_letter="C",
@@ -1339,7 +1333,7 @@ class mongodb_2_gs:
 
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n")
-    
+
     # ====================================================================================
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= SSBO DEPOSIT LIST (PLAYER ID) =-=-=-=-=-=-=-=-=-=-=-=-
     # ====================================================================================
@@ -2209,7 +2203,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "currency": [currency],
                 "timeZone": gmt_time,
                 "ftd": 1,
-                "start_date": today,
+                "start_date": "2025-12-01",
                 "end_date": today,
                 # "register_from": "2025-11-01",
                 # "register_to": today,
@@ -2393,9 +2387,9 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "merchants": merchants,
                 "merchantCode": merchants,
                 "currencies": currency,
-                "start": f"{yesterday}T17:00:00.000Z",
-                "startTime": f"{yesterday}T17:00:00.000Z",
-                "startCreatedTime": f"{yesterday}T17:00:00.000Z",
+                "start": f"2025-11-30T17:00:00.000Z",
+                "startTime": f"2025-11-30T17:00:00.000Z",
+                "startCreatedTime": f"2025-11-30T17:00:00.000Z",
                 "end": f"{today}T16:59:59.000Z",
                 "endTime": f"{today}T16:59:59.000Z",
                 "endCreatedTime": f"{today}T16:59:59.000Z",
@@ -2518,28 +2512,9 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             sys.stdout.flush()
             time.sleep(0.01)
 
-        # Get current time in GMT+8
-        gmt8 = pytz.timezone("Asia/Singapore")   # GMT+8
-        now_gmt8 = datetime.now(gmt8)
-
-        current_time = now_gmt8.time()
-        print(current_time, "GMT+8")
-
-        # Get today and yesterday date
-        today = now_gmt8.strftime("%Y-%m-%d")
-        yesterday = (now_gmt8 - timedelta(days=1)).strftime("%Y-%m-%d")
-
-        # Rule:
-        # 00:00 - 00:14 → yesterday
-        # 00:15 onward → today
-        cutoff_time = datetime.strptime("00:15", "%H:%M").time()
-
-        if current_time < cutoff_time:
-            start_date = yesterday
-            end_date = yesterday
-        else:
-            start_date = today
-            end_date = today
+        # Get today date and time
+        today = datetime.now()
+        today = today.strftime("%Y-%m-%d")
 
         # Cookie File
         cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
@@ -2563,8 +2538,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         "currency": [
             currency
         ],
-        "register_from": start_date,
-        "register_to": end_date,
+        "register_from": "2025-12-01",
+        "register_to": today,
         "merchant_id": 1,
         "admin_id": 581,
         "aid": 581
@@ -2731,7 +2706,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             "referrerLogin": None,
             "refCode": None,
             "fingerprint": None,
-            "created_date_from": f"{yesterday}T16:00:00.000Z",
+            "created_date_from": f"2025-11-30T16:00:00.000Z",
             "created_date": f"{today}T15:59:59.000Z",
             "registerDate": None,
             "last_login_date_from": None,
@@ -2828,7 +2803,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "tenantId": 35,
                 "currencies": currency_list,
                 "matchFullPhone": "true",
-                "createdDateFrom": f"{yesterday}T16:00:00.000Z",
+                "createdDateFrom": f"2025-11-30T16:00:00.000Z",
                 "createdDate": f"{today}T15:59:59.000Z",
                 "complianceViewMemberSocialMediaDetails": "true",
                 "enableShowTotalWallet": "false",
@@ -3437,65 +3412,55 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 
 
 while True:
-
     try:
+
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # ============================================================== UM US FTD/STD WEINEI ====================================================================================
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        # IBS UM MY
+        safe_call(Fetch.ftd_stdReport, "29018465.asia", "uea8", "MYR", "+08:00", "UM_FTD_STD", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "UM", upload_to_sheet=False, description="IBS UM MY FTD/STD")
+        # SSBO UM MY
+        safe_call(Fetch.ssbo_ftd_stdReport, "uea", "MYR", "SSBO_UM_FTD_STD_2", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "UM", extra_mongo_collections=["UM_FTD_STD"], description="SSBO UM MY FTD/STD")
+
+        # SSBO US SG
+        safe_call(Fetch.ssbo_ftd_stdReport, "uea", "SGD", "SSBO_US_FTD_STD", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "US", description="SSBO US SG FTD/STD")
+
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # ============================================================== UM US USERNAME WEINI ================================================================================
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        # SSBO UM MY
+        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["MYR"], "SSBO_UM_DL", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "DEPOSIT LIST", "A", "C", upload_to_sheet=False, description="SSBO UM MY DL PID")
+        # IBS UM MY 
+        safe_call(Fetch.deposit_list_PID, "29018465.asia", "uea8", "MYR", "+08:00", "UM_DL", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "DEPOSIT LIST", "A", "C", extra_mongo_collections=["SSBO_UM_DL"], description="IBS UM MY DL PID")
+        
+        # SSBO US SG
+        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["SGD"], "SSBO_US_DL", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "DEPOSIT LIST", "E", "G", description="SSBO US SG DL PID")
+
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         # ============================================================== UM US MEMBER INFO KAY =============================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         
         # IBS UM MY
-        safe_call(Fetch.member_info, "29018465.asia", "uea8", "MYR", "+08:00", "UM_MI_FIX", "1E7YaLmoKGUDsb2pXylhQI9CFwBxI2L_wcwl_Fx5400A", "UM", upload_to_sheet=False, description="IBS UM MY MEMBER INFO")
+        safe_call(Fetch.member_info, "29018465.asia", "uea8", "MYR", "+08:00", "UM_MI", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "UM", upload_to_sheet=False, description="IBS UM MY MEMBER INFO")
         # SSBO UM MY
-        safe_call(Fetch.ssbo_member_info, "uea", "MYR", "SSBO_UM_MI_FIX", "1E7YaLmoKGUDsb2pXylhQI9CFwBxI2L_wcwl_Fx5400A", "UM", extra_mongo_collections=["UM_MI_FIX"], description="SSBO UM MY MEMBER INFO")
+        safe_call(Fetch.ssbo_member_info, "uea", "MYR", "SSBO_UM_MI", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "UM", extra_mongo_collections=["UM_MI"], description="SSBO UM MY MEMBER INFO")
 
+        # SSBO US SG
+        safe_call(Fetch.ssbo_member_info, "uea", "SGD", "SSBO_US_MI", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "US", description="SSBO US SG MEMBER INFO")
 
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # # ============================================================== UM US FTD/STD WEINEI ====================================================================================
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # ============================================================== UM US PLAYER ID KAY ===============================================================================
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        # # IBS UM MY
-        # safe_call(Fetch.ftd_stdReport, "29018465.asia", "uea8", "MYR", "+08:00", "UM_FTD_STD", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "UM", upload_to_sheet=False, description="IBS UM MY FTD/STD")
-        # # SSBO UM MY
-        # safe_call(Fetch.ssbo_ftd_stdReport, "uea", "MYR", "SSBO_UM_FTD_STD_2", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "UM", extra_mongo_collections=["UM_FTD_STD"], description="SSBO UM MY FTD/STD")
-
-        # # SSBO US SG
-        # safe_call(Fetch.ssbo_ftd_stdReport, "uea", "SGD", "SSBO_US_FTD_STD", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "US", description="SSBO US SG FTD/STD")
-
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # # ============================================================== UM US USERNAME WEINI ================================================================================
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        # # SSBO UM MY
-        # safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["MYR"], "SSBO_UM_DL", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "DEPOSIT LIST", "A", "C", upload_to_sheet=False, description="SSBO UM MY DL PID")
-        # # IBS UM MY 
-        # safe_call(Fetch.deposit_list_PID, "29018465.asia", "uea8", "MYR", "+08:00", "UM_DL", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "DEPOSIT LIST", "A", "C", extra_mongo_collections=["SSBO_UM_DL"], description="IBS UM MY DL PID")
+        # SSBO UM MY
+        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["MYR"], "SSBO_UM_DL", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "DEPOSIT LIST", "A", "C", upload_to_sheet=False, description="SSBO UM MY DL PID")
+        # IBS UM MY 
+        safe_call(Fetch.deposit_list_PID, "29018465.asia", "uea8", "MYR", "+08:00", "UM_DL", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "DEPOSIT LIST", "A", "C", extra_mongo_collections=["SSBO_UM_DL"], description="IBS UM MY DL PID")
         
-        # # SSBO US SG
-        # safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["SGD"], "SSBO_US_DL", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "DEPOSIT LIST", "E", "G", description="SSBO US SG DL PID")
-
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # # ============================================================== UM US MEMBER INFO KAY =============================================================================
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        
-        # # IBS UM MY
-        # safe_call(Fetch.member_info, "29018465.asia", "uea8", "MYR", "+08:00", "UM_MI", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "UM", upload_to_sheet=False, description="IBS UM MY MEMBER INFO")
-        # # SSBO UM MY
-        # safe_call(Fetch.ssbo_member_info, "uea", "MYR", "SSBO_UM_MI", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "UM", extra_mongo_collections=["UM_MI"], description="SSBO UM MY MEMBER INFO")
-
-        # # SSBO US SG
-        # safe_call(Fetch.ssbo_member_info, "uea", "SGD", "SSBO_US_MI", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "US", description="SSBO US SG MEMBER INFO")
-
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # # ============================================================== UM US PLAYER ID KAY ===============================================================================
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        # # SSBO UM MY
-        # safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["MYR"], "SSBO_UM_DL", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "DEPOSIT LIST", "A", "C", upload_to_sheet=False, description="SSBO UM MY DL PID")
-        # # IBS UM MY 
-        # safe_call(Fetch.deposit_list_PID, "29018465.asia", "uea8", "MYR", "+08:00", "UM_DL", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "DEPOSIT LIST", "A", "C", extra_mongo_collections=["SSBO_UM_DL"], description="IBS UM MY DL PID")
-        
-        # # SSBO US SG
-        # safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["SGD"], "SSBO_US_DL", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "DEPOSIT LIST", "E", "G", description="SSBO US SG DL PID")
+        # SSBO US SG
+        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["SGD"], "SSBO_US_DL", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "DEPOSIT LIST", "E", "G", description="SSBO US SG DL PID")
 
         # Delay 10 minutes
         time.sleep(600)

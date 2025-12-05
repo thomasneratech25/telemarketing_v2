@@ -545,8 +545,7 @@ class mongodb_2_gs:
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SSBO & IBS MEMBER INFO =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # ====================================================================================
     
-    # -_-_-_-_-_-_-_- IBS -_-_-_-_-_-_-_-
-
+    # =-=-=--=-=-=-=-=-= IBS =-=-=-=-=-=-=-=-=-=-=-=-=
     # MongoDB Database (Member Info)
     def mongodbAPI_MI(rows, collection):
 
@@ -558,7 +557,7 @@ class mongodb_2_gs:
         db = client["UEA8"]
         collection = db[collection]
 
-        # Set and Ensure when upload data this 3 Field is Unique Data
+       # Set and Ensure when upload data this 3 Field is Unique Data
         collection.create_index(
             [("member_id", 1)],
             unique=True
@@ -568,25 +567,20 @@ class mongodb_2_gs:
         inserted = 0
         skipped = 0
         cleaned_docs = []
-
         # for each rows in a list of JSON objects return
         for row in rows:
-
             # Skip null or invalid rows
             if not isinstance(row, dict):
                 continue
-
             # Extract only the fields you want (Extract Data from json file)
             username = row.get("username")
             first_name = row.get("first_name")
             register_info_date = row.get("register_info_date")
             mobileno = row.get("mobileno")
             member_id = row.get("member_id")
-
             # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
             dt = datetime.fromisoformat(register_info_date)
             register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
-
             # Build the new cleaned document (Use for upload data to MongoDB)
             doc = {
                 "username": username,
@@ -595,22 +589,18 @@ class mongodb_2_gs:
                 "mobileno": mobileno,
                 "member_id": member_id,
             }
-
-            # Keep the version without _id for uploading later
+            # Upsert: overwrite if member_id exists
             cleaned_docs.append(doc.copy())
-
-            # Overwrite if member_id exists; otherwise insert new
-            result = collection.replace_one(
-                {"member_id": member_id},
-                doc,
-                upsert=True
-            )
-
-            if result.matched_count > 0:
-                inserted += 1  # overwrite counts as insert/update
-            else:
-                inserted += 1
-
+            try:
+                result = collection.update_one(
+                    {"member_id": member_id},
+                    {"$set": doc},
+                    upsert=True
+                )
+                if result.upserted_id is not None or result.modified_count > 0:
+                    inserted += 1
+            except Exception:
+                skipped += 1
         print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}\n")
         return cleaned_docs
 
@@ -701,8 +691,7 @@ class mongodb_2_gs:
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n")
 
-    # -_-_-_-_-_-_-_- SSBO -_-_-_-_-_-_-_-
-
+    # =-=-=--=-=-=-=-=-= SSBO =-=-=-=-=-=-=-=-=-=-=-=-=
     # MongoDB Database (Member Info)
     def mongodbAPI_ssbo_MI(rows, collection):
 
@@ -714,61 +703,62 @@ class mongodb_2_gs:
         db = client["UEA8"]
         collection = db[collection]
 
-        # Set and Ensure when upload data this 3 Field is Unique Data
+       # Set and Ensure when upload data this 3 Field is Unique Data
         collection.create_index(
-            [("id", 1)],
-            name="ssbo_member_id_unique",
+            [("member_id", 1)],
+            name="ssbo_member_unique",
             unique=True,
+            partialFilterExpression={
+                "member_id": {"$type": "string"}
+            },
         )
 
         # Count insert and skip
         inserted = 0
         skipped = 0
         cleaned_docs = []
-
         # for each rows in a list of JSON objects return
         for row in rows:
-
             # Skip null or invalid rows
             if not isinstance(row, dict):
                 continue
-
             # Extract only the fields you want (Extract Data from json file)
-            login = row.get("login")
-            name = row.get("name")
-            registerDate = row.get("registerDate")
-            phone = row.get("phone")
-            id = row.get("id")
-
+            username = row.get("username") or row.get("login")
+            first_name = row.get("first_name") or row.get("name")
+            register_info_date = row.get("register_info_date") or row.get("registerDate")
+            mobileno = row.get("mobileno") or row.get("phone")
+            member_id = row.get("member_id") or row.get("id")
+            if not register_info_date:
+                continue
             # Convert Date and Time to (YYYY-MM-DD HH:MM:SS) in GMT+8
             try:
-                dt = datetime.fromisoformat(str(registerDate).replace("Z", "+00:00"))
+                dt = datetime.fromisoformat(str(register_info_date).replace("Z", "+00:00"))
                 if dt.tzinfo is None:
                     dt = dt.replace(tzinfo=timezone.utc)
                 dt = dt.astimezone(timezone(timedelta(hours=8)))
                 register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
             except Exception:
-                register_info_date_fmt = str(registerDate)
-
+                register_info_date_fmt = str(register_info_date)
             # Build the new cleaned document (Use for upload data to MongoDB)
             doc = {
-                "login": login,
-                "name": name,
-                "registerDate": register_info_date_fmt,
-                "phone": phone,
-                "id": id,
+                "username": username,
+                "first_name": first_name,
+                "register_info_date": register_info_date_fmt,
+                "mobileno": mobileno,
+                "member_id": member_id,
             }
-
-            # Keep the version without _id for uploading later
+            # Upsert: overwrite if member_id exists
             cleaned_docs.append(doc.copy())
-
-            # Overwrite if member_id exists; otherwise insert new
             try:
-                collection.replace_one({"id": id}, doc, upsert=True)
-                inserted += 1
+                result = collection.update_one(
+                    {"member_id": member_id},
+                    {"$set": doc},
+                    upsert=True
+                )
+                if result.upserted_id is not None or result.modified_count > 0:
+                    inserted += 1
             except Exception:
                 skipped += 1
-
         print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}\n")
         return cleaned_docs
 
@@ -791,32 +781,37 @@ class mongodb_2_gs:
             sanitized = []
             for r in raw_rows:
                 if isinstance(r, dict):
-                    login = (
-                        r.get("login")
+                    username = (
+                        r.get("username")
+                        or r.get("login")
                         or ""
                     )
-                    name = (
-                        r.get("name")
+                    first_name = (
+                        r.get("first_name")
+                        or r.get("name")
                         or ""
                     )
-                    registerDate = (
-                        r.get("registerDate")
+                    register_date = (
+                        r.get("register_info_date")
+                        or r.get("registerDate")
                         or ""
                     )
                     phone = (
-                        r.get("phone")
+                        r.get("mobileno")
+                        or r.get("phone")
                         or ""
                     )
-                    id = (
-                        r.get("id")
+                    member_id = (
+                        r.get("member_id")
+                        or r.get("id")
                         or ""
                     )
                     sanitized.append([
-                        str(login),
-                        str(name),
-                        str(registerDate),
+                        str(username),
+                        str(first_name),
+                        str(register_date),
                         str(phone),
-                        str(id),
+                        str(member_id),
                     ])
                 else:
                     sanitized.append(["", "", "", "", ""])
@@ -833,14 +828,14 @@ class mongodb_2_gs:
         if not rows:
             collection_ref = db[collection]
             documents = list(
-                collection_ref.find({}, {"_id": 0}).sort("registerDate", 1)
+                collection_ref.find({}, {"_id": 0}).sort("register_info_date", 1)
             )
             rows = documents
         if extra_mongo_collections:
             for extra_col in extra_mongo_collections:
                 extra_ref = db[extra_col]
                 extra_docs = list(
-                    extra_ref.find({}, {"_id": 0}).sort("registerDate", 1)
+                    extra_ref.find({}, {"_id": 0}).sort("register_info_date", 1)
                 )
                 rows.extend(extra_docs)
         
@@ -865,15 +860,14 @@ class mongodb_2_gs:
         except Exception as exc:
             print(f"Failed to upload to Google Sheets: {exc}")
             raise
-        
-        # Sorting, the reason need this because combine ibs + ssbo
+
         if row_count > 1:
             cls._sort_range_by_column(
                 service,
                 SPREADSHEET_ID,
                 gs_tab,
                 "A",
-                "F",
+                "E",
                 3,
                 3 + row_count - 1,
                 sort_column_letter="C",
@@ -882,7 +876,7 @@ class mongodb_2_gs:
 
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n")
-    
+
     # ====================================================================================
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= SSBO DEPOSIT LIST (PLAYER ID) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     # ====================================================================================
@@ -1677,7 +1671,6 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             # Browser Quit
             browser.close()
             Automation.cleanup()
-
 
     # ====================================================================================
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SSBO & IBS MEMBER INFO =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

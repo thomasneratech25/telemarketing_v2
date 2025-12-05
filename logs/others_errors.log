@@ -29714,3 +29714,909 @@ Traceback (most recent call last):
   File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 671, in send
     raise ProxyError(e, request=request)
 requests.exceptions.ProxyError: HTTPSConnectionPool(host='v3-bo.nex8bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))
+2025-12-04 23:23:53,866 [ERROR] Error during S345T deposit list (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.57249022.asia', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1723, in deposit_list_PID
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='v3-bo.57249022.asia', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 00:31:56,155 [ERROR] Error during J8T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 773, in urlopen
+    self._prepare_proxy(conn)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 1042, in _prepare_proxy
+    conn.connect()
+    ~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connection.py", line 753, in connect
+    self.sock = sock = self._new_conn()
+                       ~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connection.py", line 213, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPSConnection object at 0x10613ed50>: Failed to establish a new connection: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+urllib3.exceptions.ProxyError: ('Unable to connect to proxy', NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x10613ed50>: Failed to establish a new connection: [Errno 61] Connection refused'))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.jw8bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by ProxyError('Unable to connect to proxy', NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x10613ed50>: Failed to establish a new connection: [Errno 61] Connection refused')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1723, in deposit_list_PID
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 671, in send
+    raise ProxyError(e, request=request)
+requests.exceptions.ProxyError: HTTPSConnectionPool(host='v3-bo.jw8bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by ProxyError('Unable to connect to proxy', NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x10613ed50>: Failed to establish a new connection: [Errno 61] Connection refused')))
+2025-12-05 00:33:13,712 [ERROR] Error during J8T deposit list (attempt 2/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1705, in deposit_list_PID
+    cls._get_cookies(
+    ~~~~~~~~~~~~~~~~^
+        bo_link,
+        ^^^^^^^^
+    ...<3 lines>...
+        f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1573, in _get_cookies
+    page.wait_for_selector("//span[normalize-space()='Dashboard']", state="visible", timeout=300000)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_generated.py", line 8182, in wait_for_selector
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.wait_for_selector(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            selector=selector, timeout=timeout, state=state, strict=strict
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_page.py", line 423, in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_frame.py", line 369, in wait_for_selector
+    await self._channel.send(
+        "waitForSelector", self._timeout, locals_to_params(locals())
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 558, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TargetClosedError: Page.wait_for_selector: Target page, context or browser has been closed
+Call log:
+  - waiting for locator("//span[normalize-space()='Dashboard']") to be visible
+
+2025-12-05 00:41:15,414 [ERROR] Error during 2FT deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connection.py", line 565, in getresponse
+    httplib_response = super().getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 300, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+                             " response")
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+The above exception was the direct cause of the following exception:
+
+urllib3.exceptions.ProxyError: ('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response'))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.22funbo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1723, in deposit_list_PID
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 671, in send
+    raise ProxyError(e, request=request)
+requests.exceptions.ProxyError: HTTPSConnectionPool(host='v3-bo.22funbo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))
+2025-12-05 00:46:17,878 [ERROR] Error during Jolibet Kristian deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connection.py", line 565, in getresponse
+    httplib_response = super().getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+
+The above exception was the direct cause of the following exception:
+
+urllib3.exceptions.ProxyError: ('Unable to connect to proxy', BrokenPipeError(32, 'Broken pipe'))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.jolibetbo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by ProxyError('Unable to connect to proxy', BrokenPipeError(32, 'Broken pipe')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1723, in deposit_list_PID
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 671, in send
+    raise ProxyError(e, request=request)
+requests.exceptions.ProxyError: HTTPSConnectionPool(host='v3-bo.jolibetbo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by ProxyError('Unable to connect to proxy', BrokenPipeError(32, 'Broken pipe')))
+2025-12-05 01:05:38,577 [ERROR] Error during J8T deposit list (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.jw8bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1723, in deposit_list_PID
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='v3-bo.jw8bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 07:05:54,967 [ERROR] Error during S369T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1749, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 895, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 409 when requesting https://sheets.googleapis.com/v4/spreadsheets/1O3cnGleSipLATH_c00GmGFe152qFgAPCBYS_CWM8mHk/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "The operation was aborted.". Details: "The operation was aborted.">
+2025-12-05 08:30:28,247 [ERROR] Error during A8T deposit list (attempt 1/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.aw8bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1695, in deposit_list_PID
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='v3-bo.aw8bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 11:30:00,038 [ERROR] Error during N8Y deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1749, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 895, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 500 when requesting https://sheets.googleapis.com/v4/spreadsheets/1wu2CuhTZyddAq0Xj5xENzMDFxvVr8Zykw5gVKBR1PVI/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Internal error encountered.". Details: "Internal error encountered.">
+2025-12-05 12:03:34,200 [ERROR] Error during S369T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/models.py", line 976, in json
+    return complexjson.loads(self.text, **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/simplejson/__init__.py", line 514, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/simplejson/decoder.py", line 386, in decode
+    obj, end = self.raw_decode(s)
+               ~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/simplejson/decoder.py", line 416, in raw_decode
+    return self.scan_once(s, idx=_w(s, idx).end())
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+simplejson.errors.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1698, in deposit_list_PID
+    if response.json().get("statusCode") == 401:
+       ~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/models.py", line 980, in json
+    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-12-05 13:41:41,848 [ERROR] Error during N8Y deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pool_shared.py", line 496, in _configured_socket_interface
+    ssl_sock = ssl_context.wrap_socket(sock, server_hostname=host)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pyopenssl_context.py", line 412, in wrap_socket
+    ssl_conn.do_handshake()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pyopenssl_context.py", line 149, in do_handshake
+    return self._call(super().do_handshake, *args, **kwargs)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pyopenssl_context.py", line 145, in _call
+    raise _socket.timeout("timed out") from None
+TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1744, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 765, in mongodbAPI_DL_PID
+    collection.create_index(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        [("player_id", 1), ("amount", 1), ("completed_at", 1)],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        unique=True
+        ^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/collection.py", line 2387, in create_index
+    return (self._create_indexes([index], session, **cmd_options))[0]
+            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/collection.py", line 2240, in _create_indexes
+    with self._conn_for_writes(session, operation=_Op.CREATE_INDEXES) as conn:
+         ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1777, in _checkout
+    with server.checkout(handler=err_handler) as conn:
+         ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 1118, in checkout
+    conn = self._get_conn(checkout_started_time, handler=handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 1280, in _get_conn
+    conn = self.connect(handler=handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 1032, in connect
+    networking_interface = _configured_socket_interface(self.address, self.opts)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pool_shared.py", line 510, in _configured_socket_interface
+    _raise_connection_failure(address, exc, "SSL handshake failed: ", timeout_details=details)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pool_shared.py", line 142, in _raise_connection_failure
+    raise NetworkTimeout(msg) from error
+pymongo.errors.NetworkTimeout: SSL handshake failed: ac-xfzdix9-shard-00-01.kqgprz4.mongodb.net:27017: timed out (configured timeouts: connectTimeoutMS: 20000.0ms)
+2025-12-05 14:52:32,990 [ERROR] Error during 2FT deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+TypeError: Fetch.deposit_list_PID() missing 1 required positional argument: 'end_column'
+2025-12-05 15:09:10,732 [ERROR] Error during 2FT deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1749, in deposit_list_PID
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 868, in upload_to_google_sheet_DL_PID
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/dotenv/main.py", line 374, in load_dotenv
+    dotenv_path = find_dotenv()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/dotenv/main.py", line 322, in find_dotenv
+    assert frame.f_back is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2025-12-05 15:10:59,160 [ERROR] Error during 2FT deposit list (attempt 2/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1749, in deposit_list_PID
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 868, in upload_to_google_sheet_DL_PID
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/dotenv/main.py", line 374, in load_dotenv
+    dotenv_path = find_dotenv()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/dotenv/main.py", line 322, in find_dotenv
+    assert frame.f_back is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2025-12-05 15:12:43,938 [ERROR] Error during 2FT deposit list (attempt 3/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 61, in safe_call
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 1749, in deposit_list_PID
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2.py", line 868, in upload_to_google_sheet_DL_PID
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/dotenv/main.py", line 374, in load_dotenv
+    dotenv_path = find_dotenv()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/dotenv/main.py", line 322, in find_dotenv
+    assert frame.f_back is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2025-12-05 16:43:46,873 [ERROR] Error during S8T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connection.py", line 565, in getresponse
+    httplib_response = super().getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+
+The above exception was the direct cause of the following exception:
+
+urllib3.exceptions.ProxyError: ('Unable to connect to proxy', BrokenPipeError(32, 'Broken pipe'))
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.siam855bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by ProxyError('Unable to connect to proxy', BrokenPipeError(32, 'Broken pipe')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1722, in deposit_list_PID
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 671, in send
+    raise ProxyError(e, request=request)
+requests.exceptions.ProxyError: HTTPSConnectionPool(host='v3-bo.siam855bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by ProxyError('Unable to connect to proxy', BrokenPipeError(32, 'Broken pipe')))
+2025-12-05 16:45:14,377 [ERROR] Error during S8T deposit list (attempt 2/500)
+urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='v3-bo.siam855bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1722, in deposit_list_PID
+    response = requests.post(url, headers=headers, json=payload)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/requests/adapters.py", line 675, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='v3-bo.siam855bo.com', port=443): Max retries exceeded with url: /api/be/finance/get-deposit (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1035)')))
+2025-12-05 16:58:36,161 [ERROR] Error during S6T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 16:59:40,519 [ERROR] Error during S6T deposit list (attempt 2/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 17:00:44,664 [ERROR] Error during S6T deposit list (attempt 3/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 17:01:48,511 [ERROR] Error during S6T deposit list (attempt 4/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 17:02:52,904 [ERROR] Error during S6T deposit list (attempt 5/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 17:03:57,313 [ERROR] Error during S6T deposit list (attempt 6/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 17:05:01,050 [ERROR] Error during S6T deposit list (attempt 7/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 17:05:43,285 [ERROR] Error during S6T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 17:06:47,299 [ERROR] Error during S6T deposit list (attempt 2/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 17:06:58,939 [ERROR] Error during S6T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 17:07:34,303 [ERROR] Error during S6T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 17:08:38,269 [ERROR] Error during S6T deposit list (attempt 2/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 17:09:42,498 [ERROR] Error during S6T deposit list (attempt 3/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 17:10:19,967 [ERROR] Error during S6T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1765, in deposit_list_PID
+    cls.mongodbAPI_DL_PID(data["data"], collection)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 780, in mongodbAPI_DL_PID
+    player_id = row.get("player_id")
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+2025-12-05 17:11:24,277 [ERROR] Error during S6T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1705, in deposit_list_PID
+    cls._get_cookies(
+    ~~~~~~~~~~~~~~~~^
+        bo_link,
+        ^^^^^^^^
+    ...<3 lines>...
+        f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1573, in _get_cookies
+    page.wait_for_selector("//span[normalize-space()='Dashboard']", state="visible", timeout=300000)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_generated.py", line 8182, in wait_for_selector
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.wait_for_selector(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            selector=selector, timeout=timeout, state=state, strict=strict
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_page.py", line 423, in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_frame.py", line 369, in wait_for_selector
+    await self._channel.send(
+        "waitForSelector", self._timeout, locals_to_params(locals())
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 558, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TargetClosedError: Page.wait_for_selector: Target page, context or browser has been closed
+Call log:
+  - waiting for locator("//span[normalize-space()='Dashboard']") to be visible
+    - waiting for" https://v3-bo.siam66bo.com/en-us" navigation to finish...
+    - navigated to "https://v3-bo.siam66bo.com/en-us"
+
+2025-12-05 17:14:09,279 [ERROR] Error during S6T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1715, in deposit_list_PID
+    return cls.deposit_list_PID(bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1706, in deposit_list_PID
+    cls._get_cookies(
+    ~~~~~~~~~~~~~~~~^
+        bo_link,
+        ^^^^^^^^
+    ...<3 lines>...
+        f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1546, in _get_cookies
+    page.goto(f"https://v3-bo.{bo_link}", wait_until="load", timeout=0)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/sync_api/_generated.py", line 9019, in goto
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.goto(
+        ^^^^^^^^^^^^^^^^^^^^
+            url=url, timeout=timeout, waitUntil=wait_until, referer=referer
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_page.py", line 556, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_frame.py", line 153, in goto
+    await self._channel.send(
+        "goto", self._navigation_timeout, locals_to_params(locals())
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 558, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.Error: Page.goto: net::ERR_ABORTED at https://v3-bo.siam66bo.com/
+Call log:
+  - navigating to "https://v3-bo.siam66bo.com/", waiting until "load"
+

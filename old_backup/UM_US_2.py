@@ -1014,15 +1014,9 @@ class mongodb_2_gs:
         db = client["UEA8"]
         collection = db[collection]
 
-        # Ensure deposit-specific unique index does not block member inserts
-        try:
-            collection.drop_index("player_id_1_amount_1_completed_at_1")
-        except Exception:
-            pass
-
        # Set and Ensure when upload data this 3 Field is Unique Data
         collection.create_index(
-            [("username", 1), ("register_info_date", 1), ("mobileno", 1)],
+            [("member_id", 1)],
             unique=True
         )
 
@@ -1190,31 +1184,13 @@ class mongodb_2_gs:
         db = client["UEA8"]
         collection = db[collection]
 
-        # Ensure deposit-specific unique index does not block member inserts
-        try:
-            collection.drop_index("player_id_1_amount_1_completed_at_1")
-        except Exception:
-            pass
-        # Remove any legacy member indexes before recreating ours
-        for idx_name in (
-            "login_1_name_1_registerDate_1",
-            "ssbo_member_unique",
-            "username_1_first_name_1_register_info_date_1",
-        ):
-            try:
-                collection.drop_index(idx_name)
-            except Exception:
-                pass
-
        # Set and Ensure when upload data this 3 Field is Unique Data
         collection.create_index(
-            [("username", 1), ("first_name", 1), ("register_info_date", 1)],
+            [("member_id", 1)],
             name="ssbo_member_unique",
             unique=True,
             partialFilterExpression={
-                "username": {"$type": "string"},
-                "first_name": {"$type": "string"},
-                "register_info_date": {"$type": "string"},
+                "member_id": {"$type": "string"}
             },
         )
 
@@ -2276,7 +2252,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "currency": [currency],
                 "timeZone": gmt_time,
                 "ftd": 1,
-                "start_date": today,
+                "start_date": "2025-12-04",
                 "end_date": today,
                 # "register_from": "2025-11-01",
                 # "register_to": today,
@@ -2460,9 +2436,9 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "merchants": merchants,
                 "merchantCode": merchants,
                 "currencies": currency,
-                "start": f"{yesterday}T17:00:00.000Z",
-                "startTime": f"{yesterday}T17:00:00.000Z",
-                "startCreatedTime": f"{yesterday}T17:00:00.000Z",
+                "start": f"2025-12-03T17:00:00.000Z",
+                "startTime": f"2025-12-03T17:00:00.000Z",
+                "startCreatedTime": f"2025-12-03T17:00:00.000Z",
                 "end": f"{today}T16:59:59.000Z",
                 "endTime": f"{today}T16:59:59.000Z",
                 "endCreatedTime": f"{today}T16:59:59.000Z",

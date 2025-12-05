@@ -1583,10 +1583,10 @@ while True:
         # ==========================================================================
 
         # I8T (MEMBER INFO)
-        safe_call(Fetch.member_info, "i828.asia", "i88", "I8T", "THB", "+07:00", "I88_I8T_MI", "1lelEpA64CynKqfnpcZEpQhGu7w_7bwzDUHpoozVWmwo", "New Register", description="I8T member info")
+        safe_call(Fetch.member_info, "i828.asia", "i88", "I8T", "THB", "+07:00", "I828_I8T_MI", "1lelEpA64CynKqfnpcZEpQhGu7w_7bwzDUHpoozVWmwo", "New Register", description="I8T member info")
         
         # # I8T (DEPOSIT LIST)
-        # safe_call(Fetch.deposit_list_PID, "i828.asia", "i88", "I8T", "THB", "+07:00", "I88_I8T_DL", "1lelEpA64CynKqfnpcZEpQhGu7w_7bwzDUHpoozVWmwo", "DEPOSIT LIST", "A", "C", description="I8T deposit list")
+        # safe_call(Fetch.deposit_list_PID, "i828.asia", "i88", "I8T", "THB", "+07:00", "I828_I8T_DL", "1lelEpA64CynKqfnpcZEpQhGu7w_7bwzDUHpoozVWmwo", "DEPOSIT LIST", "A", "C", description="I8T deposit list")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= G855T MEMBER INFO & DEPOSIT LIST (MEME) =-=-=-=-==-=-=-=-=-=-= 
