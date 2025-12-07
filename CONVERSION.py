@@ -1191,7 +1191,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         # Rule:
         # 00:00 - 00:14 → use yesterday
         # 00:15 onward → use today
-        if current_time < datetime.strptime("00:15", "%H:%M").time():
+        if current_time < datetime.strptime("01:00", "%H:%M").time():
             start_date = yesterday
             end_date = yesterday
         else:
@@ -1339,7 +1339,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         # Rule:
         # 00:00 - 00:14 → use yesterday
         # 00:15 onward → use today
-        if current_time < datetime.strptime("00:15", "%H:%M").time():
+        if current_time < datetime.strptime("01:00", "%H:%M").time():
             start_date = yesterday
             end_date = yesterday
         else:

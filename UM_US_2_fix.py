@@ -2512,9 +2512,28 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             sys.stdout.flush()
             time.sleep(0.01)
 
-        # Get today date and time
-        today = datetime.now()
-        today = today.strftime("%Y-%m-%d")
+        # Get current time in GMT+8
+        gmt8 = pytz.timezone("Asia/Singapore")   # GMT+8
+        now_gmt8 = datetime.now(gmt8)
+
+        current_time = now_gmt8.time()
+        print(current_time, "GMT+8")
+
+        # Get today and yesterday date
+        today = now_gmt8.strftime("%Y-%m-%d")
+        yesterday = (now_gmt8 - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Rule:
+        # 00:00 - 00:14 → yesterday
+        # 00:15 onward → today
+        cutoff_time = datetime.strptime("01:00", "%H:%M").time()
+
+        if current_time < cutoff_time:
+            start_date = yesterday
+            end_date = yesterday
+        else:
+            start_date = today
+            end_date = today
 
         # Cookie File
         cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
@@ -2538,8 +2557,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         "currency": [
             currency
         ],
-        "register_from": "2025-12-01",
-        "register_to": today,
+        "register_from": start_date,
+        "register_to": end_date,
         "merchant_id": 1,
         "admin_id": 581,
         "aid": 581
@@ -2706,7 +2725,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             "referrerLogin": None,
             "refCode": None,
             "fingerprint": None,
-            "created_date_from": f"2025-11-30T16:00:00.000Z",
+            "created_date_from": f"{yesterday}T16:00:00.000Z",
             "created_date": f"{today}T15:59:59.000Z",
             "registerDate": None,
             "last_login_date_from": None,
@@ -2803,7 +2822,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "tenantId": 35,
                 "currencies": currency_list,
                 "matchFullPhone": "true",
-                "createdDateFrom": f"2025-11-30T16:00:00.000Z",
+                "createdDateFrom": f"{yesterday}T16:00:00.000Z",
                 "createdDate": f"{today}T15:59:59.000Z",
                 "complianceViewMemberSocialMediaDetails": "true",
                 "enableShowTotalWallet": "false",
@@ -2896,7 +2915,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         # Rule:
         # 00:00 - 00:14 → yesterday
         # 00:15 onward → today
-        cutoff_time = datetime.strptime("00:15", "%H:%M").time()
+        cutoff_time = datetime.strptime("01:00", "%H:%M").time()
 
         if current_time < cutoff_time:
             start_date = yesterday
@@ -3040,7 +3059,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         # Rule:
         # 00:00 - 00:14 → yesterday
         # 00:15 onward → today
-        cutoff_time = datetime.strptime("00:15", "%H:%M").time()
+        cutoff_time = datetime.strptime("01:00", "%H:%M").time()
 
         if current_time < cutoff_time:
             start_date = yesterday

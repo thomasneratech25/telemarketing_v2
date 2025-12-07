@@ -3164,7 +3164,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             sys.stdout.write(ch)
             sys.stdout.flush()
             time.sleep(0.01)
-
+        
         # Get today and yesterday date
         today = datetime.now().strftime("%Y-%m-%d")
         yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
@@ -3396,7 +3396,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 
         if upload_to_sheet:
             cls.upload_to_google_sheet_ssbo_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
-        
+     
 
 ###############=================================== CODE RUN HERE =======================================############
 

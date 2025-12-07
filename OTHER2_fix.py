@@ -1631,7 +1631,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         # Rule:
         # 00:00 - 00:14 → use yesterday
         # 00:15 onward → use today
-        if current_time < datetime.strptime("00:15", "%H:%M").time():
+        if current_time < datetime.strptime("01:00", "%H:%M").time():
             start_date = yesterday
             end_date = yesterday
         else:
@@ -2702,16 +2702,6 @@ while True:
         # S6T (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S66_S6T_DL", "1bHKEfVvunQ4OfU_weF-6CTuMAkcQXqwnSehSZyhMClo", "DEPOSIT LIST", "A", "C", description="S6T deposit list")
 
-
-        # # ==========================================================================
-        # # =-=-=-=-==-=-=-=-= A8T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # # ==========================================================================
-
-        # # A8T  (MEMBER INFO)
-        # safe_call(Fetch.member_info, "aw8bo.com", "aw8", "A8T", "THB", "+07:00", "AW8_A8T_MI", "1fL_qVhAKC8BmbPYrUlxSv4iT8CuFJk3zn4jv_xe8rjM", "New Register", description="A8T member info")
-        
-        # A8T  (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "aw8bo.com", "aw8", "A8T", "THB", "+07:00", "AW8_A8T_DL", "1fL_qVhAKC8BmbPYrUlxSv4iT8CuFJk3zn4jv_xe8rjM", "DEPOSIT LIST", "A", "C", description="A8T deposit list")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= J8T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 

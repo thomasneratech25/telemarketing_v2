@@ -2051,7 +2051,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         # Rule:
         # 00:00 - 00:14 → yesterday
         # 00:15 onward → today
-        cutoff_time = datetime.strptime("00:15", "%H:%M").time()
+        cutoff_time = datetime.strptime("01:00", "%H:%M").time()
 
         if current_time < cutoff_time:
             start_date = yesterday
