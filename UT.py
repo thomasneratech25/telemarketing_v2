@@ -282,8 +282,8 @@ class mongodb_2_gs:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google2/token.json"
-    CREDS_PATH = "./api/google2/credentials.json"
+    TOKEN_PATH = "./api/google3/token.json"
+    CREDS_PATH = "./api/google3/credentials.json"
 
     # Google API Authentication
     @classmethod
@@ -1161,19 +1161,6 @@ class mongodb_2_gs:
             print(f"Failed to upload to Google Sheets: {exc}")
             raise
 
-        if row_count > 1:
-            cls._sort_range_by_column(
-                service,
-                SPREADSHEET_ID,
-                gs_tab,
-                "A",
-                "E",
-                3,
-                3 + row_count - 1,
-                sort_column_letter="C",
-                descending=False
-            )
-
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n")
 
@@ -1390,19 +1377,6 @@ class mongodb_2_gs:
         except Exception as exc:
             print(f"Failed to upload to Google Sheets: {exc}")
             raise
-
-        if row_count > 1:
-            cls._sort_range_by_column(
-                service,
-                SPREADSHEET_ID,
-                gs_tab,
-                "A",
-                "E",
-                3,
-                3 + row_count - 1,
-                sort_column_letter="C",
-                descending=False
-            )
 
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n")

@@ -1,4 +1,4 @@
-import os 
+import os
 import time
 from dotenv import load_dotenv
 from pymongo import MongoClient
@@ -6,62 +6,26 @@ from pymongo import MongoClient
 load_dotenv("/Users/nera_thomas/Desktop/Telemarketing/api/mongodb/.env")
 MONGODB_URI = os.getenv("MONGODB_API_KEY")
 
-def Telemarketing():
+def print_db_collections(db_name):
     if not MONGODB_URI:
         raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
+
     client = MongoClient(MONGODB_URI)
-    db = client["Telemarketing"]
+    db = client[db_name]
 
-    collections = db.list_collection_names()
+    # SORT collections by ASC
+    collections = sorted(db.list_collection_names())
 
+    print(f"\n{db_name}")
     for c in collections:
         count = db[c].estimated_document_count()
         print(f"{c}: {count}")
 
-def Conversion():
-    if not MONGODB_URI:
-        raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
-    client = MongoClient(MONGODB_URI)
-    db = client["CONVERSION"]
-
-    collections = db.list_collection_names()
-
-    for c in collections:
-        count = db[c].estimated_document_count()
-        print(f"{c}: {count}")
-
-def J8MS_A8MS():
-    if not MONGODB_URI:
-        raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
-    client = MongoClient(MONGODB_URI)
-    db = client["J8MS_A8MS"]
-
-    collections = db.list_collection_names()
-
-    for c in collections:
-        count = db[c].estimated_document_count()
-        print(f"{c}: {count}")
-
-def UEA8():
-    if not MONGODB_URI:
-        raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
-    client = MongoClient(MONGODB_URI)
-    db = client["UEA8"]
-
-    collections = db.list_collection_names()
-
-    for c in collections:
-        count = db[c].estimated_document_count()
-        print(f"{c}: {count}")
 
 while True:
-    print("Telemarketing")
-    Telemarketing()
-    print("\nConversion")
-    Conversion()
-    print("\nJ8MS_A8MS")
-    J8MS_A8MS()
-    print("\nUEA8")
-    UEA8()
+    print_db_collections("Telemarketing")
+    print_db_collections("CONVERSION")
+    print_db_collections("J8MS_A8MS")
+    print_db_collections("UEA8")
 
-    time.sleep(5)
+    time.sleep(10)

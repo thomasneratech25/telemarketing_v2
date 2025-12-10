@@ -617,7 +617,6 @@ class mongodb_2_gs:
         inserted = 0
         skipped = 0
         cleaned_docs = []
-        batch = []
 
         ordered_fields = [
             "none",
@@ -682,30 +681,34 @@ class mongodb_2_gs:
                 doc["member_id"] = str(member_id)
 
             cleaned_docs.append(doc.copy())
-            batch.append(doc)
 
-            if len(batch) == 500:
+            # === Upsert by member_id (replace existing document when member_id matches) ===
+            key_value = doc.get("member_id")
+
+            # If we have a member_id, use it as the unique key and replace existing doc
+            if key_value:
                 try:
-                    collection.insert_many(batch, ordered=False)
-                    inserted += len(batch)
-                except Exception as exc:
-                    if hasattr(exc, "details"):
-                        skipped += len(exc.details.get("writeErrors", []))
-                        inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                    result = collection.replace_one(
+                        {"member_id": key_value},
+                        doc,
+                        upsert=True
+                    )
+                    # New insert vs update existing
+                    if result.upserted_id:
+                        inserted += 1
                     else:
-                        skipped += 0
-                batch = []
-
-        if batch:
-            try:
-                collection.insert_many(batch, ordered=False)
-                inserted += len(batch)
-            except Exception as exc:
-                if hasattr(exc, "details"):
-                    skipped += len(exc.details.get("writeErrors", []))
-                    inserted += len(batch) - len(exc.details.get("writeErrors", []))
-                else:
-                    skipped += 0
+                        # treated as "skipped" in the sense of "updated existing"
+                        skipped += 1
+                except Exception:
+                    # any failure to write is treated as skipped
+                    skipped += 1
+            else:
+                # fallback: no member_id, behave like a simple insert
+                try:
+                    collection.insert_one(doc)
+                    inserted += 1
+                except Exception:
+                    skipped += 1
 
         return cleaned_docs, inserted, skipped
 
@@ -838,7 +841,6 @@ class mongodb_2_gs:
         ).execute()
 
         print(f"✅ Uploaded {len(df)} data rows to '{g_sheet_tab}' starting from row 2.")
-
 
     # ====================================================================================
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= DEPOSIT LIST (USERNAME) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -1621,101 +1623,110 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             page = context.pages[0] if context.pages else context.new_page()
             page.goto("https://aw8.premium-bo.com/", wait_until="load", timeout=0)
 
-            # if announment appear, then click close
             try:
-                # Wait for "Member" appear
-                expect(page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[4]/div[1]/div[1]/a[1]/ul[1]/li[2]")).to_be_visible(timeout=30000)
-                # Check whether "Merchant credit balance is low" appear, else pass
-                expect(page.locator("//div[normalize-space()='Merchant credit balance is low.']")).to_be_visible(timeout=1500)
-                # Click checkbox
-                page.locator("//div[@class='disable-low-merchant-credit-balance']//input[@type='checkbox']").click()
-                time.sleep(1)
-                # Click Close
-                page.locator("//button[normalize-space()='Close']").click()
-            except:
-                pass
-            
-            # if is in Login Page, then Login, else Skip
-            try:
-                # Check whether "Sign In" appear, else pass
-                expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=2000)
-                # Fill in Username
-                page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan"]["acc_ID"])
-                # Fill in Password
-                page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan"]["acc_PASS"])
-                # Login 
-                page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
-                # Delay 2 second
-                page.wait_for_timeout(2000)
-                # 
-            except:
-                pass
-            
-            # Click Report
-            page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[7]/div[1]/div[1]/a[1]/ul[1]/li[2]").click()
-            # Click All Member Report
-            page.locator("//a[@ng-reflect-router-link='/report/all-member-report']//li[@class='parent-nav-item'][normalize-space()='10.2. All Member Report']").click() 
-            # Delay 5 seconds
-            page.wait_for_timeout(5000)
-            
-            # if is in Login Page, then Login, else Skip
-            try:
-                # Check whether "Sign In" appear, else pass
-                expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=5000)
-                # Fill in Username
-                page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan"]["acc_ID"])
-                # Fill in Password
-                page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan"]["acc_PASS"])
-                # Login 
-                page.click("//button[normalize-space()='Login']", force=True)
-                # Delay 2 second
-                page.wait_for_timeout(2000)
+                # if announment appear, then click close
+                try:
+                    # Wait for "Member" appear
+                    expect(page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[4]/div[1]/div[1]/a[1]/ul[1]/li[2]")).to_be_visible(timeout=30000)
+                    # Check whether "Merchant credit balance is low" appear, else pass
+                    expect(page.locator("//div[normalize-space()='Merchant credit balance is low.']")).to_be_visible(timeout=1500)
+                    # Click checkbox
+                    page.locator("//div[@class='disable-low-merchant-credit-balance']//input[@type='checkbox']").click()
+                    time.sleep(1)
+                    # Click Close
+                    page.locator("//button[normalize-space()='Close']").click()
+                except:
+                    pass
+                
+                # if is in Login Page, then Login, else Skip
+                try:
+                    # Check whether "Sign In" appear, else pass
+                    expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=2000)
+                    # Fill in Username
+                    page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan"]["acc_ID"])
+                    # Fill in Password
+                    page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan"]["acc_PASS"])
+                    # Login 
+                    page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
+                    # Delay 2 second
+                    page.wait_for_timeout(2000)
+                    # 
+                except:
+                    pass
+                
                 # Click Report
                 page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[7]/div[1]/div[1]/a[1]/ul[1]/li[2]").click()
                 # Click All Member Report
-                page.locator("//a[@ng-reflect-router-link='/report/all-member-report']//li[@class='parent-nav-item'][normalize-space()='10.2. All Member Report']").click()    
-            except:
-                pass
-            
-            # Click Region dropdown
-            page.locator("ng-select .ng-select-container").nth(0).click()
-            page.locator(".ng-dropdown-panel .ng-option").filter(has_text=merchant).click()
-            # Delay 1 second
-            page.wait_for_timeout(1000)
-            # Click Region dropdown
-            page.locator("ng-select .ng-select-container").nth(1).click()
-            page.locator(".ng-dropdown-panel .ng-option").filter(has_text=currency).click()
-            # Delay 1 second
-            page.wait_for_timeout(1000)
-            # Button Click "This Month"
-            page.locator("//button[normalize-space()='This Month']").click()
-            # Delay 1 second
-            page.wait_for_timeout(1000)
-            # Button Click "Search"
-            page.locator("//button[normalize-space()='Search']").click()
-            # wait for the first row data appear 
-            page.locator("tbody tr").first.wait_for(state="visible", timeout=10000)
-            # Delay 3 seconds
-            page.wait_for_timeout(3000)
+                page.locator("//a[@ng-reflect-router-link='/report/all-member-report']//li[@class='parent-nav-item'][normalize-space()='10.2. All Member Report']").click() 
+                # Delay 5 seconds
+                page.wait_for_timeout(5000)
+                
+                # if is in Login Page, then Login, else Skip
+                try:
+                    # Check whether "Sign In" appear, else pass
+                    expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=5000)
+                    # Fill in Username
+                    page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan"]["acc_ID"])
+                    # Fill in Password
+                    page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan"]["acc_PASS"])
+                    # Login 
+                    page.click("//button[normalize-space()='Login']", force=True)
+                    # Delay 2 second
+                    page.wait_for_timeout(2000)
+                    # Click Report
+                    page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[7]/div[1]/div[1]/a[1]/ul[1]/li[2]").click()
+                    # Click All Member Report
+                    page.locator("//a[@ng-reflect-router-link='/report/all-member-report']//li[@class='parent-nav-item'][normalize-space()='10.2. All Member Report']").click()    
+                except:
+                    pass
+                
+                # Click Region dropdown
+                page.locator("ng-select .ng-select-container").nth(0).click()
+                page.locator(".ng-dropdown-panel .ng-option").filter(has_text=merchant).click()
+                # Delay 1 second
+                page.wait_for_timeout(1000)
+                # Click Region dropdown
+                page.locator("ng-select .ng-select-container").nth(1).click()
+                page.locator(".ng-dropdown-panel .ng-option").filter(has_text=currency).click()
+                # Delay 1 second
+                page.wait_for_timeout(1000)
+                # Button Click "This Month"
+                page.locator("//button[normalize-space()='This Month']").click()
+                # Delay 1 second
+                page.wait_for_timeout(1000)
+                # Button Click "Search"
+                page.locator("//button[normalize-space()='Search']").click()
+                # wait for the first row data appear 
+                page.locator("tbody tr").first.wait_for(state="visible", timeout=10000)
+                # Delay 3 seconds
+                page.wait_for_timeout(3000)
 
-            # Download .CSV Report File
-            with page.expect_download(timeout=600000) as download_info:
-                page.locator("//button[normalize-space()='Export']").click(timeout=10000)   # ---> button click downnload csv file
-            download = download_info.value
+                # Download .CSV Report File
+                with page.expect_download(timeout=600000) as download_info:
+                    page.locator("//button[normalize-space()='Export']").click(timeout=10000)   # ---> button click downnload csv file
+                download = download_info.value
 
-            # Save the file manually
-            base_dir = "/Users/nera_thomas/Desktop/Telemarketing/excel_file"
-            os.makedirs(base_dir, exist_ok=True)
-            download_path = os.path.join(base_dir, f"{file_name}.zip")
-            download.save_as(download_path)
+                # Save the file manually
+                base_dir = "/Users/nera_thomas/Desktop/Telemarketing/excel_file"
+                os.makedirs(base_dir, exist_ok=True)
+                download_path = os.path.join(base_dir, f"{file_name}.zip")
+                download.save_as(download_path)
 
-            # Unzip file
-            cls.unzip(file_name)
-            # Delay 1 second
-            page.wait_for_timeout(1000)
-            # Upload to Google Sheet
-            cls.upload_to_google_sheet_SSBO_AMR(file_name, g_sheet_tab, g_sheet_ID)
-    
+                # Unzip file
+                cls.unzip(file_name)
+                # Delay 1 second
+                page.wait_for_timeout(1000)
+                # Upload to Google Sheet
+                cls.upload_to_google_sheet_SSBO_AMR(file_name, g_sheet_tab, g_sheet_ID)
+            finally:
+                try:
+                    browser.close()
+                except:
+                    pass  # Browser already closed or failed to close
+                Automation.cleanup()
+                # Run Chrome Browser
+                Automation.chrome_CDP()
+                
     # =========================== DEPOSIT LIST USERNAME ===========================
 
     # Deposit List (Username)

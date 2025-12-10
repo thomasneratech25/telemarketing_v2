@@ -554,10 +554,10 @@ class mongodb_2_gs:
 
         # Call MongoDB database and collection
         client = MongoClient(MONGODB_URI)
-        db = client["UEA8"]
+        db = client["J8MS_A8MS"]
         collection = db[collection]
 
-       # Set and Ensure when upload data this 3 Field is Unique Data
+        # Set and Ensure when upload data this 3 Field is Unique Data
         collection.create_index(
             [("member_id", 1)],
             unique=True
@@ -567,20 +567,28 @@ class mongodb_2_gs:
         inserted = 0
         skipped = 0
         cleaned_docs = []
+
+        batch = []
+
         # for each rows in a list of JSON objects return
         for row in rows:
+
             # Skip null or invalid rows
             if not isinstance(row, dict):
                 continue
+
             # Extract only the fields you want (Extract Data from json file)
-            username = row.get("username")
+            username= row.get("username")
             first_name = row.get("first_name")
             register_info_date = row.get("register_info_date")
             mobileno = row.get("mobileno")
             member_id = row.get("member_id")
+            email = row.get("email")
+
             # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
             dt = datetime.fromisoformat(register_info_date)
             register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
+
             # Build the new cleaned document (Use for upload data to MongoDB)
             doc = {
                 "username": username,
@@ -588,25 +596,43 @@ class mongodb_2_gs:
                 "register_info_date": register_info_date_fmt,
                 "mobileno": mobileno,
                 "member_id": member_id,
+                "email": email,
             }
-            # Upsert: overwrite if member_id exists
+
+            # Keep the version without _id for uploading later
             cleaned_docs.append(doc.copy())
+            batch.append(doc)
+
+            if len(batch) == 500:
+                try:
+                    collection.insert_many(batch, ordered=False)
+                    inserted += len(batch)
+                except Exception as exc:
+                    if hasattr(exc, "details"):
+                        skipped += len(exc.details.get("writeErrors", []))
+                        inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                    else:
+                        skipped += 0
+                batch = []
+
+        # Insert any remaining documents in batch
+        if batch:
             try:
-                result = collection.update_one(
-                    {"member_id": member_id},
-                    {"$set": doc},
-                    upsert=True
-                )
-                if result.upserted_id is not None or result.modified_count > 0:
-                    inserted += 1
-            except Exception:
-                skipped += 1
-        print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}\n")
+                collection.insert_many(batch, ordered=False)
+                inserted += len(batch)
+            except Exception as exc:
+                if hasattr(exc, "details"):
+                    skipped += len(exc.details.get("writeErrors", []))
+                    inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                else:
+                    skipped += 0
+
+        print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}")
         return cleaned_docs
 
     # Update Data to Google Sheet from MongoDB (MemberInfo)
     @classmethod
-    def upload_to_google_sheet_MI(cls, collection, gs_id, gs_tab, rows=None, extra_mongo_collections=None):
+    def upload_to_google_sheet_MI(cls, collection, gs_id, gs_tab, rows=None):
         
         # Authenticate with OAuth2
         creds = cls.googleAPI()
@@ -615,7 +641,7 @@ class mongodb_2_gs:
 
         # Google Sheet ID and Sheet Tab Name (range name)
         SPREADSHEET_ID = gs_id
-        RANGE_NAME = cls._build_a1_range(gs_tab, "A", 3, "E")
+        RANGE_NAME = f"{gs_tab}!A3:F"
 
         # Convert from MongoDB (dics) to Google Sheet API (list), because Google Sheets API only accept "list".
         def sanitize_rows(raw_rows):
@@ -629,32 +655,24 @@ class mongodb_2_gs:
                         str(r.get("register_info_date", "")),
                         str(r.get("mobileno", "")),
                         str(r.get("member_id", "")),
+                        str(r.get("email", "")),
                     ])
                 else:
-                    sanitized.append(["", "", "", "", ""])
+                    sanitized.append(["", "", "", "", "", ""])
             return sanitized
-
-        load_dotenv()
-        MONGODB_URI = os.getenv("MONGODB_API_KEY")
-        if not MONGODB_URI:
-            raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
-        client = MongoClient(MONGODB_URI)
-        db = client["UEA8"]
 
         # If no data upload to MongoDB, it auto upload data to google sheet
         if not rows:
-            collection_ref = db[collection]
-            documents = list(collection_ref.find({}, {"_id": 0}).sort("register_info_date", 1))
-            rows = documents
-        
-        if extra_mongo_collections:
-            for extra_col in extra_mongo_collections:
-                extra_ref = db[extra_col]
-                extra_docs = list(extra_ref.find({}, {"_id": 0}).sort("register_info_date", 1))
-                rows.extend(extra_docs)
+            load_dotenv()
+            MONGODB_URI = os.getenv("MONGODB_API_KEY")
+            client = MongoClient(MONGODB_URI)
 
+            db = client["J8MS_A8MS"]
+            collection = db[collection]
+            documents = list(collection.find({}, {"_id": 0}).sort("register_info_date", 1))
+            rows = documents
+            
         rows = sanitize_rows(rows)
-        row_count = len(rows)
 
         if not rows:
             print("No rows found to upload to Google Sheet.")
@@ -675,21 +693,9 @@ class mongodb_2_gs:
             print(f"Failed to upload to Google Sheets: {exc}")
             raise
 
-        if row_count > 1:
-            cls._sort_range_by_column(
-                service,
-                SPREADSHEET_ID,
-                gs_tab,
-                "A",
-                "E",
-                3,
-                3 + row_count - 1,
-                sort_column_letter="C",
-                descending=False
-            )
-
         # print("Rows to upload:", rows)
-        print("Uploaded MongoDB data to Google Sheet.\n")
+        print("Uploaded MongoDB data to Google Sheet.")
+
 
     # =-=-=--=-=-=-=-=-= SSBO =-=-=-=-=-=-=-=-=-=-=-=-=
     # MongoDB Database (Member Info)
@@ -700,7 +706,7 @@ class mongodb_2_gs:
 
         # Call MongoDB database and collection
         client = MongoClient(MONGODB_URI)
-        db = client["UEA8"]
+        db = client["J8MS_A8MS"]
         collection = db[collection]
 
        # Set and Ensure when upload data this 3 Field is Unique Data
@@ -822,7 +828,7 @@ class mongodb_2_gs:
         if not MONGODB_URI:
             raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
         client = MongoClient(MONGODB_URI)
-        db = client["UEA8"]
+        db = client["J8MS_A8MS"]
 
         # If no data upload to MongoDB, it auto upload data to google sheet
         if not rows:
@@ -840,7 +846,6 @@ class mongodb_2_gs:
                 rows.extend(extra_docs)
         
         rows = sanitize_rows(rows)
-        row_count = len(rows)
 
         if not rows:
             print("No rows found to upload to Google Sheet.")
@@ -860,19 +865,6 @@ class mongodb_2_gs:
         except Exception as exc:
             print(f"Failed to upload to Google Sheets: {exc}")
             raise
-
-        if row_count > 1:
-            cls._sort_range_by_column(
-                service,
-                SPREADSHEET_ID,
-                gs_tab,
-                "A",
-                "E",
-                3,
-                3 + row_count - 1,
-                sort_column_letter="C",
-                descending=False
-            )
 
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n")
@@ -1700,13 +1692,13 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         url = f"https://v3-bo.{bo_link}/api/be/member/get-list"
 
         payload = {
-        "paginate": 100,
+        "paginate": 10000,
         "page": 1,
         "gmt": gmt_time,
         "currency": [
             currency
         ],
-        "register_from": today,
+        "register_from": "2025-12-01",
         "register_to": today,
         "merchant_id": 1,
         "admin_id": 581,
@@ -2553,9 +2545,9 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 while True:
     try:
 
-        # Get today time
-        current_time = datetime.now().time()
-        if current_time < datetime.strptime("09:59", "%H:%M").time():
+        # # Get today time
+        # current_time = datetime.now().time()
+        # if current_time < datetime.strptime("09:59", "%H:%M").time():
             
             # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
             # ============================================================== J8MS A8MS EMILLIA =============================================================================
@@ -2569,74 +2561,28 @@ while True:
 
             # IBS J8M MY
             print("\n>>== IBS J8M ==<<")
-            safe_call(Fetch.member_info, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "J8M", description="IBS J8M MY MEMBER INFO")
+            safe_call(Fetch.member_info, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "J8M IBS", description="IBS J8M MY MEMBER INFO")
         
-            # IBS J8S SG
-            print("\n>>== IBS J8S ==<<")
-            safe_call(Fetch.member_info, "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "J8S", description="IBS J8S SG MEMBER INFO")
+            # # IBS J8S SG
+            # print("\n>>== IBS J8S ==<<")
+            # safe_call(Fetch.member_info, "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "J8S IBS", description="IBS J8S SG MEMBER INFO")
             
-            # IBS A8M MY
-            print("\n>>== IBS A8M ==<<")
-            safe_call(Fetch.member_info, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8M", upload_to_sheet=False, description="IBS A8M MY MEMBER INFO")
-            print("\n>>== SSBO A8M MY ==<<")
-            safe_call(Fetch.ssbo_member_info, "aw8", ["MYR"], "SSBO_A8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8M", extra_mongo_collections=["A8M_MI"], description="SSBO A8M MY MEMBER INFO")
+            # # IBS A8M MY
+            # print("\n>>== IBS A8M ==<<")
+            # safe_call(Fetch.member_info, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8M IBS", description="IBS A8M MY MEMBER INFO")
 
-            # SSBO A8S SG
-            print("\n>>== IBS A8S ==<<")
-            safe_call(Fetch.member_info, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8S", upload_to_sheet=False, description="IBS A8S SG MEMBER INFO")
-            print("\n>>== SSBO A8S SG ==<<")
-            safe_call(Fetch.ssbo_member_info, "aw8", ["SGD"], "SSBO_A8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8S", extra_mongo_collections=["A8S_MI"], description="SSBO A8S SG MEMBER INFO")
-            
+            # # SSBO A8M MY
+            # print("\n>>== SSBO A8M MY ==<<")
+            # safe_call(Fetch.ssbo_member_info, "aw8", ["MYR"], "SSBO_A8M_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8M SS", description="SSBO A8M MY MEMBER INFO")
 
-            # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-            # ============================================================== J8MS A8MS KAYREEN =============================================================================
-            # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+            # # IBS A8S SG
+            # print("\n>>== IBS A8S ==<<")
+            # safe_call(Fetch.member_info, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8S IBS", description="IBS A8S SG MEMBER INFO")
 
-
-            msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[KAYREEN] {Fore.YELLOW} MEMBER INFO Data ... {Style.RESET_ALL}\n"
-            for ch in msg:
-                sys.stdout.write(ch)
-                sys.stdout.flush()
-                time.sleep(0.01)
-
-            print("\n>>== IBS J8M MY ==<<")
-            safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "J8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "J8M")
-            print("\n>>== IBS J8S SGD ==<<")
-            safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "J8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "J8S")
-
-            print("\n>>== SSBO A8M MY ==<<")
-            safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "A8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8M", upload_to_sheet=False)
-            safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_MI, "SSBO_A8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8M", rows=None, extra_mongo_collections=["A8M_MI"])
-            
-            print("\n>>== SSBO A8S SG ==<<")
-            safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "A8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8S", upload_to_sheet=False)
-            safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_MI, "SSBO_A8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8S", rows=None, extra_mongo_collections=["A8S_MI"])
-
-
-            # # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-            # # # ============================================================== J8MS A8MS YVONNE =============================================================================
-            # # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-
-            msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[YVONNE] {Fore.YELLOW} MEMBER INFO Data ... {Style.RESET_ALL}\n"
-            for ch in msg:
-                sys.stdout.write(ch)
-                sys.stdout.flush()
-                time.sleep(0.01)
-
-            print("\n>>== IBS J8M MY ==<<")
-            safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "J8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "J8M")
-            print("\n>>== IBS J8S SGD ==<<")
-            safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "J8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "J8S")
-
-            print("\n>>== SSBO A8M MY ==<<")
-            safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "A8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8M", upload_to_sheet=False)
-            safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_MI, "SSBO_A8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8M", rows=None, extra_mongo_collections=["A8M_MI"])
-            
-            print("\n>>== SSBO A8S SG ==<<")
-            safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "A8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8S", upload_to_sheet=False)
-            safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_MI, "SSBO_A8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8S", rows=None, extra_mongo_collections=["A8S_MI"])
-
+            # # SSBO A8S SG
+            # print("\n>>== SSBO A8S SG ==<<")
+            # safe_call(Fetch.ssbo_member_info, "aw8", ["SGD"], "SSBO_A8S_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8S SS", description="SSBO A8S SG MEMBER INFO")
+        
             # Delay 10 minutes
             time.sleep(600)
 
