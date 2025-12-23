@@ -3400,12 +3400,6 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 
 ###############=================================== CODE RUN HERE =======================================############
 
-### ==== README YO!!!! ==== ####
-# member_info format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name)
-# member_info_2 format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name)
-# deposit_list format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name, google sheet start column, google sheet end column)
-
-
 while True:
     try:
 

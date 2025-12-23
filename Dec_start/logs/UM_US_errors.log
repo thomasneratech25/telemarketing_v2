@@ -1,0 +1,15 @@
+2025-12-23 20:14:14,582 [ERROR] Error during SSBO A8T THAI MEMBER INFO (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/Dec_start/SSBO_CONVERSION_GMT7.py", line 62, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/Dec_start/SSBO_CONVERSION_GMT7.py", line 2924, in ssbo_member_info
+    cls.upload_to_google_sheet_ssbo_MI(collection, gs_id, gs_tab, extra_mongo_collections=extra_mongo_collections)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/Dec_start/SSBO_CONVERSION_GMT7.py", line 1390, in upload_to_google_sheet_ssbo_MI
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 404 when requesting https://sheets.googleapis.com/v4/spreadsheets/1fL_qVhAKC8BmbPYrUlxSv4iT8CuFJk34323zn4jv_xe8rjM/values/%27New%20Register%27%21A3%3AE?valueInputOption=USER_ENTERED&alt=json returned "Requested entity was not found.". Details: "Requested entity was not found.">

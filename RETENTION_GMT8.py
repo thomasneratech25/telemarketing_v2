@@ -91,7 +91,7 @@ class Automation:
             "--no-first-run",
             "--no-default-browser-check",
             f"--user-data-dir={USER_DATA_DIR}",  # User Profile
-            # "--headless=new",                    # ------> if want to use headless mode, use --windows-size together, due to headless mode small screen size
+            "--headless=new",                    # ------> if want to use headless mode, use --windows-size together, due to headless mode small screen size
             "--window-size=1920,1080",           # ✅ simulate full HD
             "--force-device-scale-factor=1",     # ✅ ensure no zoom scalin
         ],
@@ -2133,16 +2133,12 @@ while True:
     try:
 
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== IBS BO ======================================================================================
+        # ================================== IBS BO J8MS A8MS ALL MEMBER REPORT & DEPOSIT LIST ========================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         
-        
-        #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J8M ALL MEMBER REPORT -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        #
 
         print(">>== IBS J8M MY (AVA) ==<<")
-        safe_call(Fetch.allmemberReport, "IBS J8M", "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_AMR", "12G0kDXi2fnB5EhA3RT4bDDtQ4Tq-g88Rg6VQL89U0aY", "TM - All Member Report")
+        safe_call(Fetch.allmemberReport, "IBS J8M", "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_AMR", "1FoD7rHmGBWkTx0QIGT_yw06-fG-mk7QyzJ84Ep1txVU", "TM - All Member Report")
         print("======================================================\n")
 
         print(">>== IBS J8M MY (PEI) ==<<")
@@ -2153,12 +2149,8 @@ while True:
         safe_call(mongodb_2_gs.upload_to_google_sheet_AMR,"J8M_AMR", "1vOikI71wExfzh5luDpX8KQKoINnsKVKYxBMqi-Js0a8", "TM - All Member Report")
         print("======================================================\n")
 
-        #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J8M DEPOSIT LIST (USERNAME) -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        #
-
         print("\n>>== IBS J8M MY (AVA) ==<<")
-        safe_call(Fetch.deposit_list_USERNAME, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL_USERNAME", "12G0kDXi2fnB5EhA3RT4bDDtQ4Tq-g88Rg6VQL89U0aY", "Deposit List", "A", "C")
+        safe_call(Fetch.deposit_list_USERNAME, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL_USERNAME", "1FoD7rHmGBWkTx0QIGT_yw06-fG-mk7QyzJ84Ep1txVU", "Deposit List", "A", "C")
         print("======================================================\n")
 
         print("\n>>== IBS J8M MY (PEI) ==<<")
@@ -2168,32 +2160,18 @@ while True:
         print("\n>>== IBS J8M MY (XY) ==<<")
         safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "J8M_DL_USERNAME", "1vOikI71wExfzh5luDpX8KQKoINnsKVKYxBMqi-Js0a8", "Deposit List", "A", "C")
         print("======================================================\n")
-
-
-
-
-        #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J8S ALL MEMBER REPORT -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        #
         
         print(">>== IBS J8S SG (CINDY) ==<<")
         safe_call(Fetch.allmemberReport, "IBS J8S", "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_AMR", "1nCKZWdO2qaNy-4-9Zl86wGkZtd3C7x_HjsrjYF81YKo", "TM - All Member Report")
         print("======================================================\n")
 
-        #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J8S DEPOSIT LIST (USERNAME) -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        #
-
         print(">>== IBS J8S SG (CINDY) ==<<")
         safe_call(Fetch.deposit_list_USERNAME, "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_DL_USERNAME", "1nCKZWdO2qaNy-4-9Zl86wGkZtd3C7x_HjsrjYF81YKo", "Deposit List", "A", "C")
         print("======================================================\n")
 
-
-
-
-        #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS A8M ALL MEMBER REPORT  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        #
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS A8M ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
         
         print(">>== IBS A8M MY (ANGIE) ==<<")
         safe_call(Fetch.allmemberReport, "IBS A8M", "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_AMR", "1xy2C52zKX0o6Odcc3TysmPHXuXXhdYIJJyi1NoRrDBw", "TM - All Member Report (IBS)")
@@ -2207,35 +2185,24 @@ while True:
         safe_call(mongodb_2_gs.upload_to_google_sheet_AMR, "A8M_AMR", "1bzFhQ6ji5Ch2sk-V1Cc3y2PNWk4CrSBllXhTN2deZX4", "TM - All Member Report (IBS)")
         print("======================================================\n")
 
-        #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS & SSBO A8M DEPOSIT LIST (USERNAME)  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        #
-
-        ###### ANGIE #####
         print("\n>>== SSBO A8M MY (ANGIE) ==<<")
         safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8M_DL", "1xy2C52zKX0o6Odcc3TysmPHXuXXhdYIJJyi1NoRrDBw", "Deposit List", "A", "C")
         safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_DL_USERNAME", "1xy2C52zKX0o6Odcc3TysmPHXuXXhdYIJJyi1NoRrDBw", "Deposit List", "E", "G")
         print("======================================================\n")
 
-        ###### ANGIE2 #####
         print(">>== IBS A8M MY (ANGIE 2) ==<<")
         safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8M_DL", "1OtitCR8PXD9WXrOoXrluUdfMPZvzzzN__u4sulB9bio", "Deposit List", "A", "C")
         safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "A8M_DL_USERNAME", "1OtitCR8PXD9WXrOoXrluUdfMPZvzzzN__u4sulB9bio", "Deposit List", "E", "G")
         print("======================================================\n")
 
-        ###### AVA #####
         print("\n>>== SSBO A8M MY (AVA) ==<<")
         safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8M_DL", "1bzFhQ6ji5Ch2sk-V1Cc3y2PNWk4CrSBllXhTN2deZX4", "Deposit List", "A", "C")
         safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "A8M_DL_USERNAME", "1bzFhQ6ji5Ch2sk-V1Cc3y2PNWk4CrSBllXhTN2deZX4", "Deposit List", "E", "G")
         print("======================================================\n")
 
-
-
-
-
-        # #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS A8S ALL MEMBER REPORT  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        #
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS A8S ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
 
         print(">>== IBS A8S SG (AVA) ==<<")
         safe_call(Fetch.allmemberReport, "IBS A8S", "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_AMR", "1V_qWbLfSJloA6KtEW7QdXz9qkox53WYRP46yRePgD90", "TM - All Member Report (IBS)")
@@ -2245,36 +2212,64 @@ while True:
         safe_call(mongodb_2_gs.upload_to_google_sheet_AMR, "A8S_AMR", "1JmVXGT67naNtM_9GiqPgDKqZXYdarKD-4nfy4zKTeMU", "TM - All Member Report (IBS)")
         print("======================================================\n")
 
-        #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS A8S DEPOSIT LIST  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        #
-
-        ###### AVA #####
         print(">>== IBS A8S SG (AVA) ==<<")
         safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8S_DL", "1V_qWbLfSJloA6KtEW7QdXz9qkox53WYRP46yRePgD90", "Deposit List", "A", "C")
         safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_DL_USERNAME", "1V_qWbLfSJloA6KtEW7QdXz9qkox53WYRP46yRePgD90", "Deposit List", "E", "G")
         print("======================================================\n")
 
-
-        ###### CINDY #####
         print(">>== IBS A8S SG (AVA) ==<<")
         safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8S_DL", "1JmVXGT67naNtM_9GiqPgDKqZXYdarKD-4nfy4zKTeMU", "Deposit List", "A", "C")
         safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_DL_USERNAME", "1JmVXGT67naNtM_9GiqPgDKqZXYdarKD-4nfy4zKTeMU", "Deposit List", "E", "G")
         print("======================================================\n")
 
+        
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J1B ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
 
+        print(">>== J1B (TOP 1000 RABBIT FILE) ==<<")
+        safe_call(Fetch.allmemberReport, "IBS J1B", "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_AMR", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "AMR")
+        print("======================================================\n")
 
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-
-        # ============================================== SSBO UEAT IP9 ACEWIN8  =======================================================================
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-
+        print(">>== J1B (TOP 1000 RABBIT FILE) ==<<")
+        safe_call(Fetch.deposit_list_USERNAME, "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_DL_USERNAME", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "Deposit List", "A", "C")
+        print("======================================================\n")
+
+        
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS D8M ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        print(">>== D8M RETENTION LIST ==<<")
+        safe_call(Fetch.allmemberReport, "IBS D8M", "dis88bo.com", "dis88", "MYR", "+08:00", "D8M_AMR", "1BV_FRD3T4LquzhZjYZPlidRsNJBComs73UXzTvaqlko", "TM - All Member Report")
+        print("======================================================\n")
+
+        print(">>== D8M VIP LIST ==<<")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_AMR, "D8M_AMR", "1VqKTphZ7CsFMHzASskQoN6yhjsWxtwQ0RbIduc1Q9rc", "TM - All Member Report")
+        print("======================================================\n")
+
+        print(">>== D8M RETENTION LIST ==<<")
+        safe_call(Fetch.deposit_list_USERNAME, "dis88bo.com", "dis88", "MYR", "+08:00",  "D8M_DL_USERNAME", "1BV_FRD3T4LquzhZjYZPlidRsNJBComs73UXzTvaqlko", "DEPOSIT LIST", "A", "C")
+        print("======================================================\n")
+
+        print(">>== D8M VIP LIST ==<<")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "D8M_DL_USERNAME", "1VqKTphZ7CsFMHzASskQoN6yhjsWxtwQ0RbIduc1Q9rc", "DEPOSIT LIST", "A", "C")
+        print("======================================================\n")
+
+        
+        
+        
+        
+        
+        
+        
+        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-
+        # # ============================================== SSBO A8MS USING EXPORT METHOD ====================================================================================
+        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-
         
         
         # Run Chrome Browser
         Automation.chrome_CDP()
-
-        #
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  SSBO A8M  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        #
 
         print(">>== SSBO A8M MY (ANGIE) ==<<")
         safe_call(Fetch.ssbo_allmemberReport, "Acewin8", "Malaysia", "SSBO_A8M_AMR", "TM - All Member Report (SS)", "1xy2C52zKX0o6Odcc3TysmPHXuXXhdYIJJyi1NoRrDBw")
@@ -2285,10 +2280,6 @@ while True:
         print(">>== SSBO A8M MY (AVA) ==<<")
         safe_call(mongodb_2_gs.upload_to_google_sheet_SSBO_AMR, "SSBO_A8M_AMR", "TM - All Member Report (SS)", "1bzFhQ6ji5Ch2sk-V1Cc3y2PNWk4CrSBllXhTN2deZX4")
 
-        
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  SSBO A8S  -_-_-_-_-_-_-_-_-_-_-_-_-_-_  
-        
-
         print(">>== SSBO A8S SG (AVA) ==<<")
         safe_call(Fetch.ssbo_allmemberReport, "Acewin8", "Singapore", "SSBO_A8S_AMR", "TM - All Member Report (SS)", "1V_qWbLfSJloA6KtEW7QdXz9qkox53WYRP46yRePgD90")
 
@@ -2298,8 +2289,8 @@ while True:
         # Close Browser
         Automation.cleanup()
 
-        # Delay 10 minutes
-        time.sleep(600)
+        # Delay 5 minutes
+        time.sleep(300)
 
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")

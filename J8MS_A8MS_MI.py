@@ -641,7 +641,7 @@ class mongodb_2_gs:
 
         # Google Sheet ID and Sheet Tab Name (range name)
         SPREADSHEET_ID = gs_id
-        RANGE_NAME = f"{gs_tab}!A3:F"
+        RANGE_NAME = f"{gs_tab}!B6:F"
 
         # Convert from MongoDB (dics) to Google Sheet API (list), because Google Sheets API only accept "list".
         def sanitize_rows(raw_rows):
@@ -655,10 +655,9 @@ class mongodb_2_gs:
                         str(r.get("register_info_date", "")),
                         str(r.get("mobileno", "")),
                         str(r.get("member_id", "")),
-                        str(r.get("email", "")),
                     ])
                 else:
-                    sanitized.append(["", "", "", "", "", ""])
+                    sanitized.append(["", "", "", "", ""])
             return sanitized
 
         # If no data upload to MongoDB, it auto upload data to google sheet
@@ -779,7 +778,7 @@ class mongodb_2_gs:
 
         # Google Sheet ID and Sheet Tab Name (range name)
         SPREADSHEET_ID = gs_id
-        RANGE_NAME = cls._build_a1_range(gs_tab, "A", 3, "E")
+        RANGE_NAME = cls._build_a1_range(gs_tab, "B", 6, "F")
 
         # Convert from MongoDB (dics) to Google Sheet API (list), because Google Sheets API only accept "list".
         def sanitize_rows(raw_rows):
@@ -1698,7 +1697,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         "currency": [
             currency
         ],
-        "register_from": "2025-12-01",
+        "register_from": today,
         "register_to": today,
         "merchant_id": 1,
         "admin_id": 581,
@@ -2536,24 +2535,22 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         
 ###############=================================== CODE RUN HERE =======================================############
 
-### ==== README YO!!!! ==== ####
-# member_info format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name)
-# member_info_2 format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name)
-# deposit_list format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name, google sheet start column, google sheet end column)
 
+already_dropped = False
 
 while True:
     try:
-
-        # # Get today time
-        # current_time = datetime.now().time()
-        # if current_time < datetime.strptime("09:59", "%H:%M").time():
+        
+        # Get today time
+        current_time = datetime.now().time()
+        print(current_time)
+        if current_time < datetime.strptime("09:59", "%H:%M").time():
             
             # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
             # ============================================================== J8MS A8MS EMILLIA =============================================================================
             # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-            msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[EMILLIA] {Fore.YELLOW} MEMBER INFO Data ... {Style.RESET_ALL}\n"
+            msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} J8MS A8MS {Fore.YELLOW} MEMBER INFO Data ... {Style.RESET_ALL}\n"
             for ch in msg:
                 sys.stdout.write(ch)
                 sys.stdout.flush()
@@ -2563,28 +2560,28 @@ while True:
             print("\n>>== IBS J8M ==<<")
             safe_call(Fetch.member_info, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "J8M IBS", description="IBS J8M MY MEMBER INFO")
         
-            # # IBS J8S SG
-            # print("\n>>== IBS J8S ==<<")
-            # safe_call(Fetch.member_info, "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "J8S IBS", description="IBS J8S SG MEMBER INFO")
+            # IBS J8S SG
+            print("\n>>== IBS J8S ==<<")
+            safe_call(Fetch.member_info, "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "J8S IBS", description="IBS J8S SG MEMBER INFO")
             
-            # # IBS A8M MY
-            # print("\n>>== IBS A8M ==<<")
-            # safe_call(Fetch.member_info, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8M IBS", description="IBS A8M MY MEMBER INFO")
+            # IBS A8M MY
+            print("\n>>== IBS A8M ==<<")
+            safe_call(Fetch.member_info, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8M IBS", description="IBS A8M MY MEMBER INFO")
 
-            # # SSBO A8M MY
-            # print("\n>>== SSBO A8M MY ==<<")
-            # safe_call(Fetch.ssbo_member_info, "aw8", ["MYR"], "SSBO_A8M_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8M SS", description="SSBO A8M MY MEMBER INFO")
+            # SSBO A8M MY
+            print("\n>>== SSBO A8M MY ==<<")
+            safe_call(Fetch.ssbo_member_info, "aw8", ["MYR"], "SSBO_A8M_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8M SS", description="SSBO A8M MY MEMBER INFO")
 
-            # # IBS A8S SG
-            # print("\n>>== IBS A8S ==<<")
-            # safe_call(Fetch.member_info, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8S IBS", description="IBS A8S SG MEMBER INFO")
+            # IBS A8S SG
+            print("\n>>== IBS A8S ==<<")
+            safe_call(Fetch.member_info, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8S IBS", description="IBS A8S SG MEMBER INFO")
 
-            # # SSBO A8S SG
-            # print("\n>>== SSBO A8S SG ==<<")
-            # safe_call(Fetch.ssbo_member_info, "aw8", ["SGD"], "SSBO_A8S_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8S SS", description="SSBO A8S SG MEMBER INFO")
-        
-            # Delay 10 minutes
-            time.sleep(600)
+            # SSBO A8S SG
+            print("\n>>== SSBO A8S SG ==<<")
+            safe_call(Fetch.ssbo_member_info, "aw8", ["SGD"], "SSBO_A8S_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8S SS", description="SSBO A8S SG MEMBER INFO")
+            
+        # Delay 10 minutes
+        time.sleep(600)
 
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")

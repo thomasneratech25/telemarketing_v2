@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from colorama import Fore, Style
 from urllib.parse import urlencode
+from datetime import date, timedelta
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
@@ -2151,6 +2152,9 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         today = datetime.now()
         today = today.strftime("%Y-%m-%d")
 
+        # this month of first day
+        first_day = today.replace(day=1)
+
         # Cookie File
         cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
 
@@ -2203,7 +2207,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "currency": [currency],
                 "timeZone": gmt_time,
                 "ftd": 1,
-                "start_date": "2025-12-01",
+                "start_date": first_day,
                 "end_date": today,
                 # "register_from": "2025-11-01",
                 # "register_to": today,
@@ -2343,9 +2347,12 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             sys.stdout.flush()
             time.sleep(0.01)
 
-        # Get today and yesterday date
+        # Get today date
         today = datetime.now().strftime("%Y-%m-%d")
-        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Get this/last year, last month, last month of day
+        today2 = date.today()
+        last_month_date = today2.replace(day=1) - timedelta(days=1)
 
         # Normalize currency input to list form for API payloads
         if isinstance(currency, (list, tuple, set)):
@@ -2387,9 +2394,9 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "merchants": merchants,
                 "merchantCode": merchants,
                 "currencies": currency,
-                "start": f"2025-11-30T17:00:00.000Z",
-                "startTime": f"2025-11-30T17:00:00.000Z",
-                "startCreatedTime": f"2025-11-30T17:00:00.000Z",
+                "start": f"{last_month_date}T17:00:00.000Z",
+                "startTime": f"{last_month_date}17:00:00.000Z",
+                "startCreatedTime": f"{last_month_date}T17:00:00.000Z",
                 "end": f"{today}T16:59:59.000Z",
                 "endTime": f"{today}T16:59:59.000Z",
                 "endCreatedTime": f"{today}T16:59:59.000Z",
@@ -3421,7 +3428,6 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         if upload_to_sheet:
             cls.upload_to_google_sheet_ssbo_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
         
-
 ###############=================================== CODE RUN HERE =======================================############
 
 ### ==== README YO!!!! ==== ####
@@ -3446,7 +3452,7 @@ while True:
         safe_call(Fetch.ssbo_ftd_stdReport, "uea", "SGD", "SSBO_US_FTD_STD", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "US", description="SSBO US SG FTD/STD")
 
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== UM US USERNAME WEINI ================================================================================
+        # ============================================================== UM US PID WEINI ================================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         # SSBO UM MY

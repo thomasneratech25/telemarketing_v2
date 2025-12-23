@@ -2049,8 +2049,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         yesterday = (now_gmt8 - timedelta(days=1)).strftime("%Y-%m-%d")
 
         # Rule:
-        # 00:00 - 00:14 → yesterday
-        # 00:15 onward → today
+        # 00:00 - 01:00 → use yesterday
+        # 01:01 onward → use today
         cutoff_time = datetime.strptime("01:00", "%H:%M").time()
 
         if current_time < cutoff_time:
@@ -2186,9 +2186,9 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         yesterday = (now_gmt8 - timedelta(days=1)).strftime("%Y-%m-%d")
 
         # Rule:
-        # 00:00 - 00:14 → yesterday
-        # 00:15 onward → today
-        cutoff_time = datetime.strptime("00:15", "%H:%M").time()
+        # 00:00 - 01:00 → use yesterday
+        # 01:01 onward → use today
+        cutoff_time = datetime.strptime("01:00", "%H:%M").time()
 
         if current_time < cutoff_time:
             start_date = yesterday
@@ -2310,10 +2310,36 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     @classmethod
     def ssbo_deposit_list_PID(cls, merchants, currency, collection, gs_id, gs_tab, start_column, end_column, upload_to_sheet=True):
         
-       # Get today and yesterday date
+        # Get today and yesterday date
+        # Get current time in GMT+8
+        gmt8 = pytz.timezone("Asia/Singapore")   # GMT+8
+        now_gmt8 = datetime.now(gmt8)
+
+        current_time = now_gmt8.time()
+        print(current_time, "GMT+8")
+
+        # Get today and yesterday date
         today = datetime.now().strftime("%Y-%m-%d")
         yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
+        # Get today and yesterday date
+        today_minus1 = (now_gmt8 - timedelta(days=1)).strftime("%Y-%m-%d")
+        yesterday_minus2 = (now_gmt8 - timedelta(days=2)).strftime("%Y-%m-%d")
+
+        # Rule:
+        # 00:00 - 01:00 → use yesterday
+        # 01:01 onward → use today
+        cutoff_time = datetime.strptime("01:00", "%H:%M").time()
+
+        if current_time < cutoff_time:
+            start_date = yesterday_minus2
+            end_date = today_minus1
+        else:
+            start_date = yesterday
+            end_date = today
+
+        print(f"Start Date: {start_date}, End Date: {end_date}")
+        
         # Cookie File
         cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/superswan.json"
 
@@ -2347,12 +2373,12 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "merchant": merchants,
                 "merchantCode": merchants,
                 "currencies": currency,
-                "start": f"{yesterday}T16:00:00.000Z",
-                "startTime": f"{yesterday}T16:00:00.000Z",
-                "startCreatedTime": f"{yesterday}T16:00:00.000Z",
-                "end": f"{today}T15:59:59.000Z",
-                "endTime": f"{today}T15:59:59.000Z",
-                "endCreatedTime": f"{today}T15:59:59.000Z",
+                "start": f"{start_date}T16:00:00.000Z",
+                "startTime": f"{start_date}T16:00:00.000Z",
+                "startCreatedTime": f"{start_date}T16:00:00.000Z",
+                "end": f"{end_date}T15:59:59.000Z",
+                "endTime": f"{end_date}T15:59:59.000Z",
+                "endCreatedTime": f"{end_date}T15:59:59.000Z",
                 "transType": "D",
                 "approved": "true",
                 "rejected": "false",
@@ -2451,12 +2477,12 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "merchant": merchants,
                 "merchantCode": merchants,
                 "currencies": currency,
-                "start": f"{yesterday}T16:00:00.000Z",
-                "startTime": f"{yesterday}T16:00:00.000Z",
-                "startCreatedTime": f"{yesterday}T16:00:00.000Z",
-                "end": f"{today}T15:59:59.000Z",
-                "endTime": f"{today}T15:59:59.000Z",
-                "endCreatedTime": f"{today}T15:59:59.000Z",
+                "start": f"{start_date}T16:00:00.000Z",
+                "startTime": f"{start_date}T16:00:00.000Z",
+                "startCreatedTime": f"{start_date}T16:00:00.000Z",
+                "end": f"{end_date}T15:59:59.000Z",
+                "endTime": f"{end_date}T15:59:59.000Z",
+                "endCreatedTime": f"{end_date}T15:59:59.000Z",
                 "transType": "D",
                 "approved": "true",
                 "rejected": "false",
@@ -2556,34 +2582,7 @@ while True:
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         # ============================================================== J8MS A8MS EMILLIA =============================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        # msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[EMILLIA] {Fore.YELLOW} MEMBER INFO Data ... {Style.RESET_ALL}\n"
-        # for ch in msg:
-        #     sys.stdout.write(ch)
-        #     sys.stdout.flush()
-        #     time.sleep(0.01)
-
-        # # IBS J8M MY
-        # print("\n>>== IBS J8M ==<<")
-        # safe_call(Fetch.member_info, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "J8M", description="IBS J8M MY MEMBER INFO")
-    
-        # # IBS J8S SG
-        # print("\n>>== IBS J8S ==<<")
-        # safe_call(Fetch.member_info, "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "J8S", description="IBS J8S SG MEMBER INFO")
         
-        # # IBS A8M MY
-        # print("\n>>== IBS A8M ==<<")
-        # safe_call(Fetch.member_info, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8M", upload_to_sheet=False, description="IBS A8M MY MEMBER INFO")
-        # print("\n>>== SSBO A8M MY ==<<")
-        # safe_call(Fetch.ssbo_member_info, "aw8", ["MYR"], "SSBO_A8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8M", extra_mongo_collections=["A8M_MI"], description="SSBO A8M MY MEMBER INFO")
-
-        # # SSBO A8S SG
-        # print("\n>>== IBS A8S ==<<")
-        # safe_call(Fetch.member_info, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8S", upload_to_sheet=False, description="IBS A8S SG MEMBER INFO")
-        # print("\n>>== SSBO A8S SG ==<<")
-        # safe_call(Fetch.ssbo_member_info, "aw8", ["SGD"], "SSBO_A8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8S", extra_mongo_collections=["A8S_MI"], description="SSBO A8S SG MEMBER INFO")
-
-
         msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[EMILLIA] {Fore.YELLOW} DEPOSIT LIST Data... (Player ID){Style.RESET_ALL}\n"
         for ch in msg:
             sys.stdout.write(ch)
@@ -2615,28 +2614,6 @@ while True:
         # ============================================================== J8MS A8MS KAYREEN =============================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-
-        # msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[KAYREEN] {Fore.YELLOW} MEMBER INFO Data ... {Style.RESET_ALL}\n"
-        # for ch in msg:
-        #     sys.stdout.write(ch)
-        #     sys.stdout.flush()
-        #     time.sleep(0.01)
-
-        # print("\n>>== IBS J8M MY ==<<")
-        # safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "J8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "J8M")
-        # print("\n>>== IBS J8S SGD ==<<")
-        # safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "J8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "J8S")
-
-        # print("\n>>== SSBO A8M MY ==<<")
-        # safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "A8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8M", upload_to_sheet=False)
-        # safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_MI, "SSBO_A8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8M", rows=None, extra_mongo_collections=["A8M_MI"])
-        
-        # print("\n>>== SSBO A8S SG ==<<")
-        # safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "A8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8S", upload_to_sheet=False)
-        # safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_MI, "SSBO_A8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8S", rows=None, extra_mongo_collections=["A8S_MI"])
-
-
-
         msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[KAYREEN] {Fore.YELLOW} DEPOSIT LIST Data... (Player ID){Style.RESET_ALL}\n"
         for ch in msg:
             sys.stdout.write(ch)
@@ -2665,27 +2642,6 @@ while True:
         # # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         # # # ============================================================== J8MS A8MS YVONNE =============================================================================
         # # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-
-        # msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[YVONNE] {Fore.YELLOW} MEMBER INFO Data ... {Style.RESET_ALL}\n"
-        # for ch in msg:
-        #     sys.stdout.write(ch)
-        #     sys.stdout.flush()
-        #     time.sleep(0.01)
-
-        # print("\n>>== IBS J8M MY ==<<")
-        # safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "J8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "J8M")
-        # print("\n>>== IBS J8S SGD ==<<")
-        # safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "J8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "J8S")
-
-        # print("\n>>== SSBO A8M MY ==<<")
-        # safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "A8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8M", upload_to_sheet=False)
-        # safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_MI, "SSBO_A8M_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8M", rows=None, extra_mongo_collections=["A8M_MI"])
-        
-        # print("\n>>== SSBO A8S SG ==<<")
-        # safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "A8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8S", upload_to_sheet=False)
-        # safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_MI, "SSBO_A8S_MI", "1UVMhE2ciVawmBhi3yFDW12TiLz4BK1mbX9b1YTZdlYY", "A8S", rows=None, extra_mongo_collections=["A8S_MI"])
-
 
 
         msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[YVONNE] {Fore.YELLOW} DEPOSIT LIST Data... (Player ID){Style.RESET_ALL}\n"

@@ -275,6 +275,11 @@ class BO_Account:
             "acc_ID": os.getenv("ACC_ID_NEX8"),
             "acc_PASS": os.getenv("ACC_PASS_NEX8")
         },
+        "dis88": {
+            "merchant_code": os.getenv("MERCHANT_CODE_DIS88"),
+            "acc_ID": os.getenv("ACC_ID_DIS88"),
+            "acc_PASS": os.getenv("ACC_PASS_DIS88")
+        },
     }
 
 # MongoDB <-> Google Sheet
@@ -729,19 +734,6 @@ class mongodb_2_gs:
         except Exception as exc:
             print(f"Failed to upload to Google Sheets: {exc}")
             raise
-
-        if (start_column, end_column) in {("I", "K"), ("M", "O")}:
-            cls._sort_range_by_column(
-                service,
-                SPREADSHEET_ID,
-                gs_tab,
-                start_column,
-                end_column,
-                start_row=first_empty_row,
-                end_row=end_row,
-                sort_column_letter=end_column,
-                descending=False
-            )
 
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n")
@@ -1800,7 +1792,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             currency
         ],
         "status": "approved",
-        "start_date": today,
+        "start_date": "2025-12-01",
         "end_date": today,
         "gmt": gmt_time,
         "merchant_id": 1,
@@ -2783,6 +2775,61 @@ while True:
         # S8T (DEPOSIT LIST)
         safe_call(Fetch.deposit_list_PID, "siam855bo.com", "s855", "S8T", "THB", "+07:00", "S855_S8T_DL", "1zlB2V3yi9HyVJLKBomkGX0wKkgKfrSV2G8jQa-dzhgI", "DEPOSIT LIST", "A", "C", description="S8T deposit list")
 
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= A8N MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # # A8N (MEMBER INFO)
+        # safe_call(Fetch.member_info, "siam855bo.com", "s855", "S8T", "THB", "+07:00", "S855_S8T_MI", "1zlB2V3yi9HyVJLKBomkGX0wKkgKfrSV2G8jQa-dzhgI", "New Register", description="S8T member info")
+        
+        # A8N  (DEPOSIT LIST)
+        safe_call(Fetch.deposit_list_PID, "aw8bo.com", "aw8", "A8N", "NPR", "+07:00", "AW8_A8N_DL", "1XH9TYpgF0LYqs9QEnOxxvdv8QW18JdivSV_hudSifUs", "DEPOSIT LIST", "A", "C", description="A8N deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= J8N MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # J8N (MEMBER INFO)
+        # safe_call(Fetch.member_info, "jw8bo.com", "jw8", "NPR", "+07:00", "J8N_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "J8N IBS", description="IBS J8N MEMBER INFO")
+            
+        # J8N (DEPOSIT LIST) (LOKENDRA)
+        safe_call(Fetch.deposit_list_PID, "jw8bo.com", "jw8", "J8N", "NPR", "+07:00", "J8N_DL", "1HD8-yQ1whVvEUkJFVRAPJgWj4wNlEp88LpsHielS7VA", "DEPOSIT LIST", "A", "C", description="J8N deposit list")
+
+        # J8N (DEPOSIT LIST) (LAXMI)
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J8N_DL", "1eIoVnWjmhjmZTZ9SLHE8ifEuLdOtQicGVdI_s3WQoEw", "DEPOSIT LIST", "A", "C", description="J8N deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= J1B MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # J1B (MEMBER INFO)
+        # safe_call(Fetch.member_info, "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "J1B IBS", description="IBS J1B MEMBER INFO")
+            
+        # J1B (DEPOSIT LIST) (HAFIZUR)
+        safe_call(Fetch.deposit_list_PID, "batsman88.com", "jaya11", "J1B", "BDT", "+07:00", "J1B_DL", "1ZOv7AniBdas5rwvnmqvrm6y0a2-czdVSd2xMzLgAhjY", "DEPOSIT LIST", "A", "C", description="J1B deposit list")
+
+        # J1B (DEPOSIT LIST) (ALAMGIR)
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J1B_DL", "1y8_EFXrMohv4ApBZXuvq9pMEz2288pcRZtj1MSE3E7o", "DEPOSIT LIST", "A", "C", description="J1B deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= J1N MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # J1N (MEMBER INFO)
+        # safe_call(Fetch.member_info, "batsman88.com", "jaya11", "NPR", "+07:00", "J1N_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "J1N IBS", description="IBS J1N MEMBER INFO")
+            
+        # J1N (DEPOSIT LIST) (BADAL)
+        safe_call(Fetch.deposit_list_PID, "batsman88.com", "jaya11", "J1N", "NPR", "+07:00", "J1N_DL", "1jek1Aztz1jgvbOmHUX5SLCVl24NY1ZLDAJhS00InJUw", "DEPOSIT LIST", "A", "C", description="J1N deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= D8M MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # D8M (MEMBER INFO)
+        # safe_call(Fetch.member_info, "batsman88.com", "dis88", "MYR", "+08:00", "D8M_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "D8M IBS", description="IBS D8M MEMBER INFO")
+            
+        # D8M (DEPOSIT LIST) (BADAL)
+        safe_call(Fetch.deposit_list_PID, "dis88bo.com", "dis88", "D8M", "MYR", "+08:00", "D8M_DL", "1iw0jWV7UHUhQ6bTrcBiFYsvCGN02e8kDtBnhKD6agu4", "DEPOSIT LIST", "A", "C", description="D8M deposit list")
 
         time.sleep(180)
 

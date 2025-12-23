@@ -1041,9 +1041,9 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         yesterday = (now_gmt7 - timedelta(days=1)).strftime("%Y-%m-%d")
 
         # Rule:
-        # 00:00 - 00:14 → use yesterday
-        # 00:15 onward → use today
-        if current_time < datetime.strptime("00:15", "%H:%M").time():
+        # 00:00 - 01:00 → use yesterday
+        # 01:01 onward → use today
+        if current_time < datetime.strptime("01:00", "%H:%M").time():
             start_date = yesterday
             end_date = yesterday
         else:
@@ -1189,8 +1189,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         yesterday = (now_gmt7 - timedelta(days=1)).strftime("%Y-%m-%d")
 
         # Rule:
-        # 00:00 - 00:14 → use yesterday
-        # 00:15 onward → use today
+        # 00:00 - 01:00 → use yesterday
+        # 01:01 onward → use today
         if current_time < datetime.strptime("01:00", "%H:%M").time():
             start_date = yesterday
             end_date = yesterday
@@ -1337,8 +1337,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         yesterday = (now_gmt7 - timedelta(days=1)).strftime("%Y-%m-%d")
 
         # Rule:
-        # 00:00 - 00:14 → use yesterday
-        # 00:15 onward → use today
+        # 00:00 - 01:00 → use yesterday
+        # 01:01 onward → use today
         if current_time < datetime.strptime("01:00", "%H:%M").time():
             start_date = yesterday
             end_date = yesterday
@@ -1547,17 +1547,6 @@ while True:
         # # S6T (DEPOSIT LIST)
         # safe_call(Fetch.deposit_list_PID, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S66_S6T_DL", "1bHKEfVvunQ4OfU_weF-6CTuMAkcQXqwnSehSZyhMClo", "DEPOSIT LIST", "A", "C", description="S6T deposit list")
 
-
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= A8T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
-
-        # # A8T  (MEMBER INFO)
-        # safe_call(Fetch.member_info, "aw8bo.com", "aw8", "A8T", "THB", "+07:00", "AW8_A8T_MI", "1fL_qVhAKC8BmbPYrUlxSv4iT8CuFJk3zn4jv_xe8rjM", "New Register", description="A8T member info")
-        
-        # # A8T  (DEPOSIT LIST)
-        # safe_call(Fetch.deposit_list_PID, "aw8bo.com", "aw8", "A8T", "THB", "+07:00", "AW8_A8T_DL", "1fL_qVhAKC8BmbPYrUlxSv4iT8CuFJk3zn4jv_xe8rjM", "DEPOSIT LIST", "A", "C", description="A8T deposit list")
-
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= J8T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
         # ==========================================================================
@@ -1637,6 +1626,48 @@ while True:
         
         # # S8T (DEPOSIT LIST)
         # safe_call(Fetch.deposit_list_PID, "siam855bo.com", "s855", "S8T", "THB", "+07:00", "S855_S8T_DL", "1zlB2V3yi9HyVJLKBomkGX0wKkgKfrSV2G8jQa-dzhgI", "DEPOSIT LIST", "A", "C", description="S8T deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= A8N MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # A8N  (MEMBER INFO)
+        safe_call(Fetch.member_info, "aw8bo.com", "aw8", "A8N", "NPR", "+07:00", "AW8_A8N_MI", "1XH9TYpgF0LYqs9QEnOxxvdv8QW18JdivSV_hudSifUs", "New Register", description="A8N member info")
+        
+        # # # A8N (DEPOSIT LIST)
+        # # safe_call(Fetch.deposit_list_PID, "siam855bo.com", "s855", "S8T", "THB", "+07:00", "S855_S8T_DL", "1zlB2V3yi9HyVJLKBomkGX0wKkgKfrSV2G8jQa-dzhgI", "DEPOSIT LIST", "A", "C", description="S8T deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= J1B MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # J1B (MEMBER INFO) (HAFIZUR)
+        safe_call(Fetch.member_info, "batsman88.com", "jaya11", "J1B", "BDT", "+07:00", "J1B_MI", "1ZOv7AniBdas5rwvnmqvrm6y0a2-czdVSd2xMzLgAhjY", "New Register", description="IBS J1B MEMBER INFO")
+            
+        # J1B (DEPOSIT LIST) (HAFIZUR)
+        # safe_call(Fetch.deposit_list_PID, "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_DL", "1ZOv7AniBdas5rwvnmqvrm6y0a2-czdVSd2xMzLgAhjY", "DEPOSIT LIST", "A", "C", description="J1B deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= J8N MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # J8N (MEMBER INFO) (LOKENDRA)
+        safe_call(Fetch.member_info, "jw8bo.com", "jw8", "J8N", "NPR", "+07:00", "J8N_MI", "1HD8-yQ1whVvEUkJFVRAPJgWj4wNlEp88LpsHielS7VA", "New Register", description="IBS J8N MEMBER INFO")
+            
+        # # J8N (DEPOSIT LIST) (LOKENDRA)
+        # safe_call(Fetch.deposit_list_PID, "jw8bo.com", "jw8", "NPR", "+07:00", "J8N_DL", "1HD8-yQ1whVvEUkJFVRAPJgWj4wNlEp88LpsHielS7VA", "DEPOSIT LIST", "A", "C", description="J8N deposit list")
+
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= D8M MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # D8M (MEMBER INFO) (BADAL)
+        safe_call(Fetch.member_info, "dis88bo.com", "dis88", "D8N", "MYR", "+08:00", "D8M_MI", "1iw0jWV7UHUhQ6bTrcBiFYsvCGN02e8kDtBnhKD6agu4", "New Register", description="IBS D8M MEMBER INFO")
+            
+        # # D8M (DEPOSIT LIST) (BADAL)
+        # safe_call(Fetch.deposit_list_PID, "dis88bo.com", "dis88", "MYR", "+08:00", "D8M_DL", "1iw0jWV7UHUhQ6bTrcBiFYsvCGN02e8kDtBnhKD6agu4", "DEPOSIT LIST", "A", "C", description="D8M deposit list")
+
 
 
         time.sleep(300)

@@ -4,8 +4,6 @@ import sys
 import time
 import json
 import atexit
-import shutil
-import zipfile
 import logging
 import requests
 import subprocess
