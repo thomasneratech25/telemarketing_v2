@@ -1667,8 +1667,7 @@ while True:
             
         # # D8M (DEPOSIT LIST) (BADAL)
         # safe_call(Fetch.deposit_list_PID, "dis88bo.com", "dis88", "MYR", "+08:00", "D8M_DL", "1iw0jWV7UHUhQ6bTrcBiFYsvCGN02e8kDtBnhKD6agu4", "DEPOSIT LIST", "A", "C", description="D8M deposit list")
-
-
+        
 
         time.sleep(300)
 

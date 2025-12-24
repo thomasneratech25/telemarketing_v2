@@ -1,16 +1,9 @@
 import os
-import re
 import sys
 import time
 import pytz
 import json
-import atexit
-import shutil
-import zipfile
-import logging
 import requests
-import subprocess
-from pathlib import Path
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from colorama import Fore, Style
@@ -20,111 +13,7 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from datetime import datetime, timedelta, timezone
 from google_auth_oauthlib.flow import InstalledAppFlow
-from playwright.sync_api import sync_playwright, expect
-
-# Load MongoDB API Key 
-load_dotenv("/Users/nera_thomas/Desktop/Telemarketing/api/mongodb/.env")
-MONGODB_URI = os.getenv("MONGODB_API_KEY")
-
-# Logging configuration
-LOG_DIR = Path(__file__).resolve().parent / "logs"
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-
-logger = logging.getLogger("log_files")
-if not logger.handlers:
-    logger.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
-
-    file_handler = logging.FileHandler(LOG_DIR / "RETENTION_errors.log", encoding="utf-8")
-    file_handler.setLevel(logging.ERROR)
-    file_handler.setFormatter(formatter)
-
-    stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(logging.INFO)
-    stream_handler.setFormatter(formatter)
-
-    logger.addHandler(file_handler)
-    logger.addHandler(stream_handler)
-
-def safe_call(func, *args, description=None, retries=500, delay=60, **kwargs):
-    """
-    Call a function safely with retries.
-
-    Parameters:
-        func: callable to execute.
-        description: Optional string used in logs for readability.
-        retries: Number of attempts before giving up.
-        delay: Seconds to wait between retries.
-    """
-    attempt = 1
-    label = description or getattr(func, "__name__", "callable")
-    while True:
-        try:
-            return func(*args, **kwargs)
-        except KeyboardInterrupt:
-            raise
-        except Exception:
-            logger.exception("Error during %s (attempt %s/%s)", label, attempt, retries)
-            if attempt >= retries:
-                logger.error("Giving up on %s after %s attempts.", label, retries)
-                return None
-            attempt += 1
-            time.sleep(delay)
-
-# Chrome Settings
-class Automation:
-
-    # Chrome CDP 
-    chrome_proc = None
-    @classmethod
-    def chrome_CDP(cls):
-
-        # User Profile
-        USER_DATA_DIR = f"/Users/nera_thomas/Library/Application Support/Google/Chrome/Profile 9"
-        
-        # Start Chrome normally
-        cls.chrome_proc = subprocess.Popen([
-            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-            "--remote-debugging-port=9222",
-            "--disable-session-crashed-bubble",
-            "--hide-crash-restore-bubble",
-            "--no-first-run",
-            "--no-default-browser-check",
-            f"--user-data-dir={USER_DATA_DIR}",  # User Profile
-            "--headless=new",                    # ------> if want to use headless mode, use --windows-size together, due to headless mode small screen size
-            "--window-size=1920,1080",           # ✅ simulate full HD
-            "--force-device-scale-factor=1",     # ✅ ensure no zoom scalin
-        ],
-        stdout=subprocess.DEVNULL,  # ✅ hide chrome cdp logs
-        stderr=subprocess.DEVNULL   # ✅ hide chrome cdp logs
-        )
-    
-        # wait for Chrome CDP launch...
-        cls.wait_for_cdp_ready()
-
-        atexit.register(cls.cleanup)
-
-    # Close Chrome CDP
-    @classmethod
-    def cleanup(cls):
-        try:
-            cls.chrome_proc.terminate()
-        except Exception as e:
-            print(f"Error terminating Chrome: {e}")
-    
-    # Wait for Chrome CDP to be ready
-    @staticmethod
-    def wait_for_cdp_ready(timeout=10):
-        """Wait until Chrome CDP is ready at http://localhost:9222/json"""
-        for _ in range(timeout):
-            try:
-                res = requests.get("http://localhost:9222/json")
-                if res.status_code == 200:
-                    return True
-            except:
-                pass
-            time.sleep(1)
-        raise RuntimeError("Chrome CDP is not ready after waiting.")
+from Dec_start.runtime import logger, safe_call, MONGODB_URI
 
 # BO Account
 class BO_Account:
@@ -527,10 +416,6 @@ class mongodb_2_gs:
         """Load and normalize PID docs from extra Mongo collections."""
         if not collection_names:
             return []
-        load_dotenv()
-        MONGODB_URI = os.getenv("MONGODB_API_KEY")
-        if not MONGODB_URI:
-            raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
         client = MongoClient(MONGODB_URI)
         db = client["Telemarketing"]
         combined = []
@@ -541,44 +426,8 @@ class mongodb_2_gs:
         return combined
 
     # ====================================================================================
-    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SSBO & IBS AMR =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- IBS AMR =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # ====================================================================================
-
-    # Unzip File (ssbo)
-    @classmethod
-    def unzip(cls, file_name):
-        base_dir = "/Users/nera_thomas/Desktop/Telemarketing/excel_file"
-        zip_path = os.path.join(base_dir, f"{file_name}.zip")
-
-        if not os.path.exists(zip_path):
-            print(f"❌ Zip file not found: {zip_path}")
-            return
-
-        # ✅ Use dedicated temp folder
-        extract_to = os.path.join(base_dir, f"{file_name}_temp")
-        os.makedirs(extract_to, exist_ok=True)
-
-        new_csv_path = os.path.join(base_dir, f"{file_name}.csv")
-        if os.path.exists(new_csv_path):
-            os.remove(new_csv_path)
-
-        with zipfile.ZipFile(zip_path, "r") as zip_ref:
-            zip_ref.extractall(extract_to)
-        print(f"✅ Unzipped into folder: {extract_to}")
-
-        csv_files = []
-        for root, _, files in os.walk(extract_to):
-            for file in files:
-                if file.endswith(".csv"):
-                    csv_files.append(os.path.join(root, file))
-
-        if not csv_files:
-            print("❌ No CSV found inside ZIP.")
-            shutil.rmtree(extract_to, ignore_errors=True)
-            return
-
-        shutil.move(csv_files[0], new_csv_path)
-        shutil.rmtree(extract_to, ignore_errors=True)
 
     # MongoDB Database (All Member Report)
     def mongodbAPI_AMR(rows, collection):
@@ -777,11 +626,7 @@ class mongodb_2_gs:
                 else:
                     sanitized.append([""] * len(ordered_fields))
             return sanitized
-
-        load_dotenv()
-        MONGODB_URI = os.getenv("MONGODB_API_KEY")
-        if not MONGODB_URI:
-            raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
+        
         client = MongoClient(MONGODB_URI)
         db = client["Telemarketing"]
 
@@ -815,35 +660,8 @@ class mongodb_2_gs:
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n")
 
-    # Upload to Google Sheet (From JSON List) (All Member Report) SSBO
-    @classmethod
-    def upload_to_google_sheet_SSBO_AMR(cls, file_name, g_sheet_tab, g_sheet_ID):
-        """Upload CSV data to Google Sheet starting from row 2 (overwrite existing cells)."""
-        import os, pandas as pd
-        from googleapiclient.discovery import build
-
-        creds = cls.googleAPI()
-        sheet = build("sheets", "v4", credentials=creds).spreadsheets()
-
-        csv_path = f"/Users/nera_thomas/Desktop/Telemarketing/excel_file/{file_name}.csv"
-        if not os.path.exists(csv_path):
-            print(f"❌ File not found: {csv_path}")
-            return
-
-        df = pd.read_csv(csv_path, encoding="utf-8-sig").fillna("")
-        values = df.values.tolist()   # skip header row on sheet
-
-        sheet.values().update(
-            spreadsheetId=g_sheet_ID,
-            range=f"'{g_sheet_tab}'!A2",
-            valueInputOption="USER_ENTERED",
-            body={"values": values}
-        ).execute()
-
-        print(f"✅ Uploaded {len(df)} data rows to '{g_sheet_tab}' starting from row 2.")
-
     # ====================================================================================
-    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= DEPOSIT LIST (USERNAME) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= IBS DEPOSIT LIST (USERNAME) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # ====================================================================================
     
     # MongoDB Database 
@@ -984,12 +802,7 @@ class mongodb_2_gs:
             return
 
         if not rows:
-            load_dotenv()
-            MONGODB_URI = os.getenv("MONGODB_API_KEY")
-            if not MONGODB_URI:
-                raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
             client = MongoClient(MONGODB_URI)
-
             db = client["Telemarketing"]
             collection = db[collection]
             documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
@@ -1065,14 +878,14 @@ class mongodb_2_gs:
             confirmedAmount = row.get("confirmedAmount")
             lastModifiedDate = row.get("lastModifiedDate")
 
-            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS) in GMT+8
+            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS) in GMT+7
             if lastModifiedDate:
                 try:
                     # Convert Z → UTC datetime
                     dt = datetime.fromisoformat(lastModifiedDate.replace("Z", "+00:00"))
 
-                    # Convert UTC → GMT+8 (Malaysia Time)
-                    myt = dt.astimezone(timezone(timedelta(hours=8)))
+                    # Convert UTC → GMT+7 (Malaysia Time)
+                    myt = dt.astimezone(timezone(timedelta(hours=7)))
 
                     # Format output
                     lastModifiedDate_fmt = myt.strftime("%Y-%m-%d %H:%M:%S")
@@ -1172,12 +985,7 @@ class mongodb_2_gs:
 
         # If no data upload to MongoDB, it auto upload data to google sheet
         if not rows:
-            load_dotenv()
-            MONGODB_URI = os.getenv("MONGODB_API_KEY")
-            if not MONGODB_URI:
-                raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
             client = MongoClient(MONGODB_URI)
-
             db = client["J8MS_A8MS"]
             collection = db[collection]
             documents = list(collection.find({}, {"_id": 0}).sort("lastModifiedDate", 1))
@@ -1227,215 +1035,131 @@ class mongodb_2_gs:
         print("Uploaded MongoDB data to Google Sheet.\n\n")
 
 # Fetch Data
-class Fetch(Automation, BO_Account, mongodb_2_gs):
+class Fetch(BO_Account, mongodb_2_gs):
     
     # =========================== GET Cookies ===========================
 
     # Get IBS Cookies incase Cookies expired
     @classmethod
     def _get_cookies(cls, bo_link, merchant_code, acc_id, acc_pass, cookies_path):
-        with sync_playwright() as p:
-            # Wait for Chrome CDP to be ready
-            cls.wait_for_cdp_ready()
+        
+        session = requests.Session()
 
-            # Connect to running Chrome
-            browser = p.chromium.connect_over_cdp("http://localhost:9222")
-            context = browser.contexts[0] if browser.contexts else browser.new_context()
-            # Clean Cookies
-            context.clear_cookies()
+        url = f"https://v3-bo.{bo_link}/api/be/auth/loginV2"
 
-            # Open a new browser page
-            page = context.pages[0] if context.pages else context.new_page()
-            page.goto(f"https://v3-bo.{bo_link}", wait_until="load", timeout=0)
+        payload = json.dumps({
+        "mer_code": merchant_code,
+        "username": acc_id,
+        "password": acc_pass,
+        })
+        
+        headers = {
+        'accept': 'application/json',
+        'accept-language': 'en-US,en;q=0.9',
+        'cache-control': 'no-cache',
+        'content-type': 'application/json',
+        'domain': f'v3-bo.{bo_link}',
+        'gmt': '+08:00',
+        'lang': 'en-US',
+        'loggedin': 'false',
+        'origin': f'https://v3-bo.{bo_link}',
+        'page': '/en-us',
+        'pragma': 'no-cache',
+        'priority': 'u=1, i',
+        'referer': f'https://v3-bo.{bo_link}/en-us',
+        'sec-ch-ua': '"Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24"',
+        'sec-ch-ua-arch': '"arm"',
+        'sec-ch-ua-bitness': '"64"',
+        'sec-ch-ua-full-version': '"143.0.7499.147"',
+        'sec-ch-ua-full-version-list': '"Google Chrome";v="143.0.7499.147", "Chromium";v="143.0.7499.147", "Not A(Brand";v="24.0.0.0"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-model': '""',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-ch-ua-platform-version': '"15.5.0"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
+        'type': 'CUSTOM',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36',
+        }
 
-            # Delay 2 seconds
-            page.wait_for_timeout(2000)
+        # Get session
+        session.get(f"https://v3-bo.{bo_link}/en-us", headers=headers)
 
-            # if is in Login Page, then Login, else Skip
-            try:
-                # Check whether "Back Office Login" appear, else pass
-                expect(page.locator("//div[@class='lg:mb-10 mb-6 text-lg lg:text-2xl text-center text-primary']")).to_be_visible(timeout=2000)
-                # Wait for captcha to appear
-                page.locator(".text-2xl > span:first-child").wait_for(state="visible", timeout=0)
-                # Get Captcha Code
-                captcha_code = page.locator("//div[@class='font-normal cursor-pointer tracking-normal space-x-3 text-2xl']").inner_text()
-                # Fill in Merchant Code
-                page.locator("//input[@placeholder='Merchant Code']").fill(merchant_code)
-                # Fill in Username
-                page.locator("//input[@placeholder='Username']").fill(acc_id)
-                # Fill in Password
-                page.locator("//input[@placeholder='Password']").fill(acc_pass)
-                # Fill in Captcha Code
-                page.locator("//input[@placeholder='Captcha Code']").fill(captcha_code)
-                # Button click "Login"
-                page.click("//button[normalize-space()='Login']", force=True)
-            except (TimeoutError, Exception):
-                pass
+        # Return Response
+        response = session.post(url, headers=headers, data=payload)
 
-            # Wait for "Dashboard" appear
-            page.wait_for_selector("//span[normalize-space()='Dashboard']", state="visible", timeout=300000)
+        # to get Authentication Cookies
+        user_cookie = session.cookies.get("user")
 
-            time.sleep(1)
+        # Save cookies to "get_cookies" path
+        file_path = cookies_path
 
-            # Extract all cookies from the current context
-            cookies = context.cookies()
+        # data format
+        data = {
+            "user_cookie": user_cookie
+        }
 
-            # Convert to Json Format
-            cookies_json = json.dumps(cookies, indent=4, ensure_ascii=False)
+        # write to json file
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4)
 
-            # Using regex to get cookies
-            get_cookies = re.search(r'"name"\s*:\s*"user".*?"value"\s*:\s*"([^"]+)"', cookies_json, re.S)
-
-            # Save to JSON file
-            data = {"user_cookie": get_cookies.group(1) if get_cookies else ""}
-            with open(cookies_path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
-
-            # Print dynamic message based on merchant_code or output_path
-            merchant_name = None
-            for k, v in cls.accounts.items():
-                if isinstance(v, dict) and v.get("merchant_code") == merchant_code:
-                    merchant_name = k
-                    break
-            if merchant_name:
-                print(f"✅ Get {merchant_name} Cookies Successful ...")
-            else:
-                print(f"✅ Get BO Cookies Successful ...")
-
-            # Browser Quit
-            browser.close()
-            Automation.cleanup()
+        print("Saved user cookie to:", file_path)
 
     # Get SSBO Cookies incase Cookies expired
     @classmethod
-    def _ssbo_get_cookies(cls):
-        with sync_playwright() as p:  
-            
-            # Load Env
-            load_dotenv("/Users/nera_thomas/Desktop/Telemarketing/.env")
+    def _ssbo_get_cookies(cls, acc_id, acc_pass):
 
-            # Wait for Chrome CDP to be ready
-            cls.wait_for_cdp_ready()
+        session = requests.Session()
 
-            # Connect to running Chrome
-            browser = p.chromium.connect_over_cdp("http://localhost:9222")
-            context = browser.contexts[0] if browser.contexts else browser.new_context()    
+        url = "https://aw8.premium-bo.com/api/authenticate?noBlockUI=true"
 
-            # Open a new browser page
-            page = context.pages[0] if context.pages else context.new_page()
-            page.goto("https://aw8.premium-bo.com/#/member/member-info", wait_until="load", timeout=0)
+        payload = json.dumps({
+        "tenantCode": None,
+        "login": acc_id,
+        "password": acc_pass,
+        "rememberMe": True,
+        "authenticatorAppEncoded": None,
+        "authenticatorAppCode": None
+        })
 
-            # if announment appear, then click close
-            try:
-                # Wait for "Member" appear
-                expect(page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[4]/div[1]/div[1]/a[1]/ul[1]/li[2]")).to_be_visible(timeout=30000)
-                # Check whether "Merchant credit balance is low" appear, else pass
-                expect(page.locator("//div[normalize-space()='Merchant credit balance is low.']")).to_be_visible(timeout=1500)
-                # Click checkbox
-                page.locator("//div[@class='disable-low-merchant-credit-balance']//input[@type='checkbox']").click()
-                time.sleep(1)
-                # Click Close
-                page.locator("//button[normalize-space()='Close']").click()
-            except:
-                pass
+        headers = {
+        'accept': 'application/json, text/plain, */*',
+        'accept-language': 'en-US,en;q=0.9',
+        'cache-control': 'no-cache',
+        'content-type': 'application/json',
+        'origin': 'https://aw8.premium-bo.com',
+        'pragma': 'no-cache',
+        'priority': 'u=1, i',
+        'referer': 'https://aw8.premium-bo.com/',
+        'sec-ch-ua': '"Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36',
+        }
 
-            # if is in Login Page, then Login, else Skip
-            try:
-                # Check whether "Sign In" appear, else pass
-                expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=2000)
-                # Fill in Username
-                page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan"]["acc_ID"])
-                # Fill in Password
-                page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan"]["acc_PASS"])
-                # Login 
-                page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
-                # Delay 2 second
-                page.wait_for_timeout(2000)
-                # 
-            except:
-                pass
+        # Session
+        session.get("https://aw8.premium-bo.com/", headers=headers)
 
-            # if is in Login Page, then Login, else Skip
-            try:
-                # Check whether "Sign In" appear, else pass
-                expect(page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[1]/h5[1]")).to_be_visible(timeout=4000)
-                # Fill in Username
-                page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[2]/div[2]/jhi-text-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_ID"])
-                # Fill in Password
-                page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[3]/div[2]/jhi-password-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_PASS"])
-                # Login 
-                page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
-                # Delay 2 second
-                page.wait_for_timeout(2000)
-                # Click Member
-                page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[4]/div[1]/div[1]/a[1]/ul[1]/li[2]").click()
-                # Click Member Info
-                page.locator("//a[@ng-reflect-router-link='/member/member-info']//li[@class='parent-nav-item'][normalize-space()='1.3. Member Info']").click()
-            except:
-                pass
-            
-            # Click All
-            page.locator("//button[normalize-space()='All']").click()
-            # Delay 1 second
-            page.wait_for_timeout(1000)
+        # Response
+        response = session.post(url, headers=headers, data=payload)
+        data = response.json()
+        jwt_token = data.get("jwt")
 
-            # Extract all cookies
-            cookies = context.cookies()
+        # Save cookies to "get_cookies" path
+        file_path = "/Users/nera_thomas/Desktop/Telemarketing/get_cookies/demo_cookies.json"
 
-            # # Convert to Json Format
-            # cookies_json = json.dumps(cookies, indent=4, ensure_ascii=False)
-            # print(cookies_json)
+        # data format you want
+        data = {"jwt_token": jwt_token}
 
-            # Extract all cookies starting with "_ga"
-            ga_cookies = [c for c in cookies if c.get("name", "").startswith("_ga")]
+        # write to json file
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4)
 
-            # Initialize parts list
-            parts = []
-
-            # ============== Get GA1 Cookies ===============
-
-            for c in ga_cookies:
-                name = c.get("name")
-                value = c.get("value")
-                if name == "_ga":  # main GA cookie
-                    parts.append(value)
-                else:
-                    parts.append(f"{name}={value}")
-
-            # Join everything with "; "
-            combined_ga = "; ".join(parts)
-            # print(f"✅ Combined GA cookies: {combined_ga}")
-
-            # =============== Get Bearer Token =================
-
-            bearer_token = ""
-            try:
-                keys = page.evaluate("() => Object.keys(localStorage)")
-                for key in keys:
-                    value = page.evaluate(f"() => window.localStorage.getItem('{key}')")
-                    # Find "jwt":"xxxxx" inside JSON text
-                    match = re.search(r'"jwt"\s*:\s*"([^"]+)"', value or "")
-                    if match:
-                        bearer_token = match.group(1)
-                        # print(f"✅ Found Bearer Token:\nBearer {bearer_token}")
-                        break
-            except Exception as e:
-                print(f"⚠️ Error extracting bearer token: {e}")
-
-            # Save cookie and bearer token to JSON file
-            data = {
-                "user_cookie": combined_ga,
-                "bearer_token": bearer_token
-            }
-            output_path = "/Users/nera_thomas/Desktop/Telemarketing/get_cookies/superswan.json"
-            with open(output_path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
-
-            print(f"✅ Get Super Swan Cookies + Bearer Token Successful ...")
-
-            # Browser Quit
-            browser.close()
-            Automation.cleanup()
+        print("Saved user cookie to:", file_path)
 
     # =========================== ALL MEMBER REPORT ===========================
 
@@ -1530,7 +1254,6 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 
             if data.get("statusCode") == 401:
                 print("⚠️ Received 401 Unauthorized. Attempting to refresh cookies...")
-                Automation.chrome_CDP()
                 cls._get_cookies(
                     bo_link,
                     cls.accounts[f"{bo_name}"]["merchant_code"],
@@ -1597,152 +1320,31 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             print(f"Finished. Last page = {last_page_with_data}")
 
         cls.upload_to_google_sheet_AMR(collection, g_sheet_ID, g_sheet_tab)
-
-    # BO All Member Report (Extract Data like Postman/API and save as json file)
-    # (merchants name = Acewin8, Ivip9, UEABET)
-    @classmethod
-    def ssbo_allmemberReport(cls, merchant, currency, file_name, g_sheet_tab, g_sheet_ID):
-        with sync_playwright() as p:  
-
- 
-            # Get Deposit List Data (effect for fun only)
-            msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN}[{file_name}] {Fore.YELLOW}All Member Report...{Style.RESET_ALL}\n"
-            for ch in msg:
-                sys.stdout.write(ch)
-                sys.stdout.flush()
-                time.sleep(0.02)
-
-            # Wait for Chrome CDP to be ready
-            cls.wait_for_cdp_ready()
-
-            # Connect to running Chrome
-            browser = p.chromium.connect_over_cdp("http://localhost:9222")
-            context = browser.contexts[0] if browser.contexts else browser.new_context()    
-
-            # Open a new browser page
-            page = context.pages[0] if context.pages else context.new_page()
-            page.goto("https://aw8.premium-bo.com/", wait_until="load", timeout=0)
-
-            try:
-                # if announment appear, then click close
-                try:
-                    # Wait for "Member" appear
-                    expect(page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[4]/div[1]/div[1]/a[1]/ul[1]/li[2]")).to_be_visible(timeout=30000)
-                    # Check whether "Merchant credit balance is low" appear, else pass
-                    expect(page.locator("//div[normalize-space()='Merchant credit balance is low.']")).to_be_visible(timeout=1500)
-                    # Click checkbox
-                    page.locator("//div[@class='disable-low-merchant-credit-balance']//input[@type='checkbox']").click()
-                    time.sleep(1)
-                    # Click Close
-                    page.locator("//button[normalize-space()='Close']").click()
-                except:
-                    pass
-                
-                # if is in Login Page, then Login, else Skip
-                try:
-                    # Check whether "Sign In" appear, else pass
-                    expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=2000)
-                    # Fill in Username
-                    page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan"]["acc_ID"])
-                    # Fill in Password
-                    page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan"]["acc_PASS"])
-                    # Login 
-                    page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
-                    # Delay 2 second
-                    page.wait_for_timeout(2000)
-                    # 
-                except:
-                    pass
-                
-                # Click Report
-                page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[7]/div[1]/div[1]/a[1]/ul[1]/li[2]").click()
-                # Click All Member Report
-                page.locator("//a[@ng-reflect-router-link='/report/all-member-report']//li[@class='parent-nav-item'][normalize-space()='10.2. All Member Report']").click() 
-                # Delay 5 seconds
-                page.wait_for_timeout(5000)
-                
-                # if is in Login Page, then Login, else Skip
-                try:
-                    # Check whether "Sign In" appear, else pass
-                    expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=5000)
-                    # Fill in Username
-                    page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan"]["acc_ID"])
-                    # Fill in Password
-                    page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan"]["acc_PASS"])
-                    # Login 
-                    page.click("//button[normalize-space()='Login']", force=True)
-                    # Delay 2 second
-                    page.wait_for_timeout(2000)
-                    # Click Report
-                    page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[7]/div[1]/div[1]/a[1]/ul[1]/li[2]").click()
-                    # Click All Member Report
-                    page.locator("//a[@ng-reflect-router-link='/report/all-member-report']//li[@class='parent-nav-item'][normalize-space()='10.2. All Member Report']").click()    
-                except:
-                    pass
-                
-                # Click Region dropdown
-                page.locator("ng-select .ng-select-container").nth(0).click()
-                page.locator(".ng-dropdown-panel .ng-option").filter(has_text=merchant).click()
-                # Delay 1 second
-                page.wait_for_timeout(1000)
-                # Click Region dropdown
-                page.locator("ng-select .ng-select-container").nth(1).click()
-                page.locator(".ng-dropdown-panel .ng-option").filter(has_text=currency).click()
-                # Delay 1 second
-                page.wait_for_timeout(1000)
-                # Button Click "This Month"
-                page.locator("//button[normalize-space()='This Month']").click()
-                # Delay 1 second
-                page.wait_for_timeout(1000)
-                # Button Click "Search"
-                page.locator("//button[normalize-space()='Search']").click()
-                # wait for the first row data appear 
-                page.locator("tbody tr").first.wait_for(state="visible", timeout=10000)
-                # Delay 3 seconds
-                page.wait_for_timeout(3000)
-
-                # Download .CSV Report File
-                with page.expect_download(timeout=600000) as download_info:
-                    page.locator("//button[normalize-space()='Export']").click(timeout=10000)   # ---> button click downnload csv file
-                download = download_info.value
-
-                # Save the file manually
-                base_dir = "/Users/nera_thomas/Desktop/Telemarketing/excel_file"
-                os.makedirs(base_dir, exist_ok=True)
-                download_path = os.path.join(base_dir, f"{file_name}.zip")
-                download.save_as(download_path)
-
-                # Unzip file
-                cls.unzip(file_name)
-                # Delay 1 second
-                page.wait_for_timeout(1000)
-                # Upload to Google Sheet
-                cls.upload_to_google_sheet_SSBO_AMR(file_name, g_sheet_tab, g_sheet_ID)
-            finally:
-                try:
-                    browser.close()
-                except:
-                    pass  # Browser already closed or failed to close
-                Automation.cleanup()
-                # Run Chrome Browser
-                Automation.chrome_CDP()
-                
+   
     # =========================== DEPOSIT LIST USERNAME ===========================
 
     # Deposit List (Username)
     @classmethod
-    def deposit_list_USERNAME(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=None):
+    def deposit_list_USERNAME(cls, team, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=None):
+        
+        # Print Color Messages
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {team} {Fore.YELLOW} All MEMBER REPORT Data...{Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
 
-        # Get current time in GMT+8
-        gmt8 = pytz.timezone("Asia/Singapore")   # GMT+8
-        now_gmt8 = datetime.now(gmt8)
 
-        current_time = now_gmt8.time()
-        print(current_time, "GMT+8")
+        # Get current time in GMT+7
+        gmt7 = pytz.timezone("Asia/Bangkok")   # GMT+7
+        now_gmt7 = datetime.now(gmt7)
+
+        current_time = now_gmt7.time()
+        print(current_time, "GMT+7")
 
         # Get today and yesterday date
-        today = now_gmt8.strftime("%Y-%m-%d")
-        yesterday = (now_gmt8 - timedelta(days=1)).strftime("%Y-%m-%d")
+        today = now_gmt7.strftime("%Y-%m-%d")
+        yesterday = (now_gmt7 - timedelta(days=1)).strftime("%Y-%m-%d")
 
         # Rule:
         # 00:00 - 00:14 → yesterday
@@ -1819,7 +1421,6 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             print("⚠️ Received 401 Unauthorized. Attempting to refresh cookies...")
 
             # Get Cookies
-            Automation.chrome_CDP()
             cls._get_cookies(
                 bo_link,
                 cls.accounts[bo_name]["merchant_code"],
@@ -1829,7 +1430,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             )
             
             # Retry request...
-            return cls.deposit_list_USERNAME(bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=extra_mongo_collections)
+            return cls.deposit_list_USERNAME(team, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=extra_mongo_collections)
 
         # For loop page and fetch data
         for page in range(1, 10000): 
@@ -1869,16 +1470,16 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     @classmethod
     def ssbo_deposit_list_PID(cls, merchants, currency, collection, gs_id, gs_tab, start_column, end_column, upload_to_sheet=True):
         
-        # Get current time in GMT+8
-        gmt8 = pytz.timezone("Asia/Singapore")   # GMT+8
-        now_gmt8 = datetime.now(gmt8)
+        # Get current time in GMT+7
+        gmt7 = pytz.timezone("Asia/Singapore")   # GMT+7
+        now_gmt7 = datetime.now(gmt7)
 
-        current_time = now_gmt8.time()
-        print(current_time, "GMT+8")
+        current_time = now_gmt7.time()
+        print(current_time, "GMT+7")
 
         # Get today and yesterday date
-        today = now_gmt8.strftime("%Y-%m-%d")
-        yesterday = (now_gmt8 - timedelta(days=1)).strftime("%Y-%m-%d")
+        today = now_gmt7.strftime("%Y-%m-%d")
+        yesterday = (now_gmt7 - timedelta(days=1)).strftime("%Y-%m-%d")
 
         # Rule:
         # 00:00 - 00:14 → yesterday
@@ -1983,7 +1584,6 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             # Handle auth errors before trying to parse JSON
             if response.status_code in (401, 403):
                 print(f"⚠️ Received {response.status_code} from server. Attempting to refresh cookies + bearer token...")
-                Automation.chrome_CDP()
                 cls._ssbo_get_cookies()
                 print("⚠️ Cookies + bearer token refreshed ... Retrying request...\n")
                 cls.ssbo_deposit_list_PID(merchants, currency, collection, gs_id, gs_tab, start_column, end_column)
@@ -2120,7 +1720,6 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         if upload_to_sheet:
             cls.upload_to_google_sheet_ssbo_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
         
-
 ###############=================================== CODE RUN HERE =======================================############
 
 ### ==== README YO!!!! ==== ####
@@ -2132,162 +1731,30 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 while True:
     try:
 
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ================================== IBS BO J8MS A8MS ALL MEMBER REPORT & DEPOSIT LIST ========================================================================
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        
-
-        print(">>== IBS J8M MY (AVA) ==<<")
-        safe_call(Fetch.allmemberReport, "IBS J8M", "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_AMR", "1FoD7rHmGBWkTx0QIGT_yw06-fG-mk7QyzJ84Ep1txVU", "TM - All Member Report")
-        print("======================================================\n")
-
-        print(">>== IBS J8M MY (PEI) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_AMR, "J8M_AMR", "1I54nHH_M-3UXs4DqQGaqBhDewvKksqIWxyorbaMRaJU", "TM - All Member Report")
-        print("======================================================\n")
-
-        print(">>== IBS J8M MY (XY) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_AMR,"J8M_AMR", "1vOikI71wExfzh5luDpX8KQKoINnsKVKYxBMqi-Js0a8", "TM - All Member Report")
-        print("======================================================\n")
-
-        print("\n>>== IBS J8M MY (AVA) ==<<")
-        safe_call(Fetch.deposit_list_USERNAME, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL_USERNAME", "1FoD7rHmGBWkTx0QIGT_yw06-fG-mk7QyzJ84Ep1txVU", "Deposit List", "A", "C")
-        print("======================================================\n")
-
-        print("\n>>== IBS J8M MY (PEI) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "J8M_DL_USERNAME", "1I54nHH_M-3UXs4DqQGaqBhDewvKksqIWxyorbaMRaJU", "Deposit List", "A", "C")
-        print("======================================================\n")
-
-        print("\n>>== IBS J8M MY (XY) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "J8M_DL_USERNAME", "1vOikI71wExfzh5luDpX8KQKoINnsKVKYxBMqi-Js0a8", "Deposit List", "A", "C")
-        print("======================================================\n")
-        
-        print(">>== IBS J8S SG (CINDY) ==<<")
-        safe_call(Fetch.allmemberReport, "IBS J8S", "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_AMR", "1nCKZWdO2qaNy-4-9Zl86wGkZtd3C7x_HjsrjYF81YKo", "TM - All Member Report")
-        print("======================================================\n")
-
-        print(">>== IBS J8S SG (CINDY) ==<<")
-        safe_call(Fetch.deposit_list_USERNAME, "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_DL_USERNAME", "1nCKZWdO2qaNy-4-9Zl86wGkZtd3C7x_HjsrjYF81YKo", "Deposit List", "A", "C")
-        print("======================================================\n")
-
-        # =============================================================================================================================
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS A8M ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-        # =============================================================================================================================
-        
-        print(">>== IBS A8M MY (ANGIE) ==<<")
-        safe_call(Fetch.allmemberReport, "IBS A8M", "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_AMR", "1xy2C52zKX0o6Odcc3TysmPHXuXXhdYIJJyi1NoRrDBw", "TM - All Member Report (IBS)")
-        print("======================================================\n")
-        
-        print(">>== IBS A8M MY (ANGIE 2) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_AMR, "A8M_AMR", "1OtitCR8PXD9WXrOoXrluUdfMPZvzzzN__u4sulB9bio", "TM - All Member Report (IBS)")
-        print("======================================================\n")
-
-        print(">>== IBS A8M MY (AVA) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_AMR, "A8M_AMR", "1bzFhQ6ji5Ch2sk-V1Cc3y2PNWk4CrSBllXhTN2deZX4", "TM - All Member Report (IBS)")
-        print("======================================================\n")
-
-        print("\n>>== SSBO A8M MY (ANGIE) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8M_DL", "1xy2C52zKX0o6Odcc3TysmPHXuXXhdYIJJyi1NoRrDBw", "Deposit List", "A", "C")
-        safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_DL_USERNAME", "1xy2C52zKX0o6Odcc3TysmPHXuXXhdYIJJyi1NoRrDBw", "Deposit List", "E", "G")
-        print("======================================================\n")
-
-        print(">>== IBS A8M MY (ANGIE 2) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8M_DL", "1OtitCR8PXD9WXrOoXrluUdfMPZvzzzN__u4sulB9bio", "Deposit List", "A", "C")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "A8M_DL_USERNAME", "1OtitCR8PXD9WXrOoXrluUdfMPZvzzzN__u4sulB9bio", "Deposit List", "E", "G")
-        print("======================================================\n")
-
-        print("\n>>== SSBO A8M MY (AVA) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8M_DL", "1bzFhQ6ji5Ch2sk-V1Cc3y2PNWk4CrSBllXhTN2deZX4", "Deposit List", "A", "C")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "A8M_DL_USERNAME", "1bzFhQ6ji5Ch2sk-V1Cc3y2PNWk4CrSBllXhTN2deZX4", "Deposit List", "E", "G")
-        print("======================================================\n")
-
-        # =============================================================================================================================
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS A8S ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-        # =============================================================================================================================
-
-        print(">>== IBS A8S SG (AVA) ==<<")
-        safe_call(Fetch.allmemberReport, "IBS A8S", "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_AMR", "1V_qWbLfSJloA6KtEW7QdXz9qkox53WYRP46yRePgD90", "TM - All Member Report (IBS)")
-        print("======================================================\n")
-
-        print(">>== IBS A8S SG (CINDY) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_AMR, "A8S_AMR", "1JmVXGT67naNtM_9GiqPgDKqZXYdarKD-4nfy4zKTeMU", "TM - All Member Report (IBS)")
-        print("======================================================\n")
-
-        print(">>== IBS A8S SG (AVA) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8S_DL", "1V_qWbLfSJloA6KtEW7QdXz9qkox53WYRP46yRePgD90", "Deposit List", "A", "C")
-        safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_DL_USERNAME", "1V_qWbLfSJloA6KtEW7QdXz9qkox53WYRP46yRePgD90", "Deposit List", "E", "G")
-        print("======================================================\n")
-
-        print(">>== IBS A8S SG (AVA) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8S_DL", "1JmVXGT67naNtM_9GiqPgDKqZXYdarKD-4nfy4zKTeMU", "Deposit List", "A", "C")
-        safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_DL_USERNAME", "1JmVXGT67naNtM_9GiqPgDKqZXYdarKD-4nfy4zKTeMU", "Deposit List", "E", "G")
-        print("======================================================\n")
-
-        
         # =============================================================================================================================
         # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J1B ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
         # =============================================================================================================================
 
-        print(">>== J1B (TOP 1000 RABBIT FILE) ==<<")
-        safe_call(Fetch.allmemberReport, "IBS J1B", "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_AMR", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "AMR")
-        print("======================================================\n")
-
-        print(">>== J1B (TOP 1000 RABBIT FILE) ==<<")
-        safe_call(Fetch.deposit_list_USERNAME, "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_DL_USERNAME", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "Deposit List", "A", "C")
-        print("======================================================\n")
-
+        # J1B (MEMBER INFO) 
+        safe_call(Fetch.allmemberReport, "IBS J1B AMR", "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_AMR", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "AMR")
         
+        # J1B (DEPOSIT LIST USERNAME)
+        safe_call(Fetch.deposit_list_USERNAME, "IBS J1B DL USERNAME", "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_DL_USERNAME", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "Deposit List", "A", "C")
+
         # =============================================================================================================================
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS D8M ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS GT ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
         # =============================================================================================================================
 
-        print(">>== D8M RETENTION LIST ==<<")
-        safe_call(Fetch.allmemberReport, "IBS D8M", "dis88bo.com", "dis88", "MYR", "+08:00", "D8M_AMR", "1BV_FRD3T4LquzhZjYZPlidRsNJBComs73UXzTvaqlko", "TM - All Member Report")
-        print("======================================================\n")
+        # GT (MEMBER INFO) 
+        safe_call(Fetch.allmemberReport, "IBS GT AMR", "gcwin99bo.com", "gc99", "GT", "+07:00", "GT_AMR", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "AMR")
+       
+        # GT (DEPOSIT LIST USERNAME)
+        safe_call(Fetch.deposit_list_USERNAME, "IBS GT DL USERNAME", "gcwin99bo.com", "gc99", "GT", "+07:00", "GT_DL_USERNAME", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "Deposit List", "A", "C")
 
-        print(">>== D8M VIP LIST ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_AMR, "D8M_AMR", "1VqKTphZ7CsFMHzASskQoN6yhjsWxtwQ0RbIduc1Q9rc", "TM - All Member Report")
-        print("======================================================\n")
 
-        print(">>== D8M RETENTION LIST ==<<")
-        safe_call(Fetch.deposit_list_USERNAME, "dis88bo.com", "dis88", "MYR", "+08:00",  "D8M_DL_USERNAME", "1BV_FRD3T4LquzhZjYZPlidRsNJBComs73UXzTvaqlko", "DEPOSIT LIST", "A", "C")
-        print("======================================================\n")
 
-        print(">>== D8M VIP LIST ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "D8M_DL_USERNAME", "1VqKTphZ7CsFMHzASskQoN6yhjsWxtwQ0RbIduc1Q9rc", "DEPOSIT LIST", "A", "C")
-        print("======================================================\n")
 
-        
-        
-        
-        
-        
-        
-        
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-
-        # # ============================================== SSBO A8MS USING EXPORT METHOD ====================================================================================
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-
-        
-        
-        # Run Chrome Browser
-        Automation.chrome_CDP()
 
-        print(">>== SSBO A8M MY (ANGIE) ==<<")
-        safe_call(Fetch.ssbo_allmemberReport, "Acewin8", "Malaysia", "SSBO_A8M_AMR", "TM - All Member Report (SS)", "1xy2C52zKX0o6Odcc3TysmPHXuXXhdYIJJyi1NoRrDBw")
-
-        print(">>== SSBO A8M MY (ANGIE 2) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_SSBO_AMR, "SSBO_A8M_AMR", "TM - All Member Report (SS)", "1OtitCR8PXD9WXrOoXrluUdfMPZvzzzN__u4sulB9bio")
-
-        print(">>== SSBO A8M MY (AVA) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_SSBO_AMR, "SSBO_A8M_AMR", "TM - All Member Report (SS)", "1bzFhQ6ji5Ch2sk-V1Cc3y2PNWk4CrSBllXhTN2deZX4")
-
-        print(">>== SSBO A8S SG (AVA) ==<<")
-        safe_call(Fetch.ssbo_allmemberReport, "Acewin8", "Singapore", "SSBO_A8S_AMR", "TM - All Member Report (SS)", "1V_qWbLfSJloA6KtEW7QdXz9qkox53WYRP46yRePgD90")
-
-        print(">>== SSBO A8S SG (CINDY) ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_SSBO_AMR, "SSBO_A8S_AMR", "TM - All Member Report (SS)", "1JmVXGT67naNtM_9GiqPgDKqZXYdarKD-4nfy4zKTeMU")
-
-        # Close Browser
-        Automation.cleanup()
 
         # Delay 5 minutes
         time.sleep(300)

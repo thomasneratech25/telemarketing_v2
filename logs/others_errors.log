@@ -51504,3 +51504,451 @@ Traceback (most recent call last):
     return self._sslobj.read(len, buffer)
            ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
 TimeoutError: The read operation timed out
+2025-12-24 01:04:52,372 [ERROR] Error during I8T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 404 when requesting https://sheets.googleapis.com/v4/spreadsheets/1lelEpA64CynKqfnpcZEpQhGu7w_7bwzDUHpoozVWmwo/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Requested entity was not found.". Details: "Requested entity was not found.">
+2025-12-24 03:36:28,758 [ERROR] Error during S6T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 404 when requesting https://sheets.googleapis.com/v4/spreadsheets/1bHKEfVvunQ4OfU_weF-6CTuMAkcQXqwnSehSZyhMClo/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Requested entity was not found.". Details: "Requested entity was not found.">
+2025-12-24 04:18:44,355 [ERROR] Error during S6T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 404 when requesting https://sheets.googleapis.com/v4/spreadsheets/1bHKEfVvunQ4OfU_weF-6CTuMAkcQXqwnSehSZyhMClo/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Requested entity was not found.". Details: "Requested entity was not found.">
+2025-12-24 04:29:46,925 [ERROR] Error during 2FT deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 404 when requesting https://sheets.googleapis.com/v4/spreadsheets/1j-dyM2v6mjfaWP2BF77_PUhwnHo2D9mrxt8bX1nAXcM/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Requested entity was not found.". Details: "Requested entity was not found.">
+2025-12-24 04:31:03,704 [ERROR] Error during 2FT deposit list (attempt 2/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 404 when requesting https://sheets.googleapis.com/v4/spreadsheets/1j-dyM2v6mjfaWP2BF77_PUhwnHo2D9mrxt8bX1nAXcM/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Requested entity was not found.". Details: "Requested entity was not found.">
+2025-12-24 05:20:44,265 [ERROR] Error during 2FT deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 404 when requesting https://sheets.googleapis.com/v4/spreadsheets/1j-dyM2v6mjfaWP2BF77_PUhwnHo2D9mrxt8bX1nAXcM/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Requested entity was not found.". Details: "Requested entity was not found.">
+2025-12-24 05:53:00,546 [ERROR] Error during S6T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 404 when requesting https://sheets.googleapis.com/v4/spreadsheets/1bHKEfVvunQ4OfU_weF-6CTuMAkcQXqwnSehSZyhMClo/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Requested entity was not found.". Details: "Requested entity was not found.">
+2025-12-24 06:10:46,675 [ERROR] Error during S6T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 404 when requesting https://sheets.googleapis.com/v4/spreadsheets/1bHKEfVvunQ4OfU_weF-6CTuMAkcQXqwnSehSZyhMClo/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Requested entity was not found.". Details: "Requested entity was not found.">
+2025-12-24 06:14:11,621 [ERROR] Error during M1T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 409 when requesting https://sheets.googleapis.com/v4/spreadsheets/1JkMSXyKmAUjqBt5V0MZ8OfUJIEJ9K4Wfrm2qFVcw3fs/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "The operation was aborted.". Details: "The operation was aborted.">
+2025-12-24 06:24:18,459 [ERROR] Error during S8T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 409 when requesting https://sheets.googleapis.com/v4/spreadsheets/1zlB2V3yi9HyVJLKBomkGX0wKkgKfrSV2G8jQa-dzhgI/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "The operation was aborted.". Details: "The operation was aborted.">
+2025-12-24 06:32:33,109 [ERROR] Error during I8T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 502 when requesting https://sheets.googleapis.com/v4/spreadsheets/1lelEpA64CynKqfnpcZEpQhGu7w_7bwzDUHpoozVWmwo/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Bad Gateway". Details: "<!DOCTYPE html>
+<html lang=en>
+  <meta charset=utf-8>
+  <meta name=viewport content="initial-scale=1, minimum-scale=1, width=device-width">
+  <title>Error 502 (Server Error)!!1</title>
+  <style>
+    *{margin:0;padding:0}html,code{font:15px/22px arial,sans-serif}html{background:#fff;color:#222;padding:15px}body{margin:7% auto 0;max-width:390px;min-height:180px;padding:30px 0 15px}* > body{background:url(//www.google.com/images/errors/robot.png) 100% 5px no-repeat;padding-right:205px}p{margin:11px 0 22px;overflow:hidden}ins{color:#777;text-decoration:none}a img{border:0}@media screen and (max-width:772px){body{background:none;margin-top:0;max-width:none;padding-right:0}}#logo{background:url(//www.google.com/images/branding/googlelogo/1x/googlelogo_color_150x54dp.png) no-repeat;margin-left:-5px}@media only screen and (min-resolution:192dpi){#logo{background:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) no-repeat 0% 0%/100% 100%;-moz-border-image:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) 0}}@media only screen and (-webkit-min-device-pixel-ratio:2){#logo{background:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) no-repeat;-webkit-background-size:100% 100%}}#logo{display:inline-block;height:54px;width:150px}
+  </style>
+  <a href=//www.google.com/><span id=logo aria-label=Google></span></a>
+  <p><b>502.</b> <ins>That’s an error.</ins>
+  <p>The server encountered a temporary error and could not complete your request.<p>Please try again in 30 seconds.  <ins>That’s all we know.</ins>
+">
+2025-12-24 06:39:51,098 [ERROR] Error during S5T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 409 when requesting https://sheets.googleapis.com/v4/spreadsheets/1tcUSfgT_Locmmm8M8QUeq7HXzPxJ-NqHvX34N1JLCFc/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "The operation was aborted.". Details: "The operation was aborted.">
+2025-12-24 06:53:35,010 [ERROR] Error during S8T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 409 when requesting https://sheets.googleapis.com/v4/spreadsheets/1zlB2V3yi9HyVJLKBomkGX0wKkgKfrSV2G8jQa-dzhgI/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "The operation was aborted.". Details: "The operation was aborted.">
+2025-12-24 09:08:12,649 [ERROR] Error during upload_to_google_sheet_DL_PID (attempt 1/500)
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 466, in receive_message
+    return receive_message(self, request_id, self.max_message_size)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/network_layer.py", line 778, in receive_message
+    data = receive_data(conn, length - 16, deadline)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/network_layer.py", line 353, in receive_data
+    chunk_length = conn.conn.recv_into(mv[bytes_read:])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/network_layer.py", line 469, in recv_into
+    return self.conn.recv_into(buffer)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pyopenssl_context.py", line 162, in recv_into
+    return self._call(super().recv_into, *args, **kwargs)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pyopenssl_context.py", line 124, in _call
+    return call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/OpenSSL/SSL.py", line 2321, in recv_into
+    self._raise_ssl_error(self._ssl, result)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/OpenSSL/SSL.py", line 2014, in _raise_ssl_error
+    raise SysCallError(errno, errorcode.get(errno))
+OpenSSL.SSL.SysCallError: (54, 'ECONNRESET')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 868, in upload_to_google_sheet_DL_PID
+    documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1289, in __next__
+    return self.next()
+           ~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1265, in next
+    if len(self._data) or self._refresh():
+                          ~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1236, in _refresh
+    self._send_message(g)
+    ~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/cursor.py", line 1108, in _send_message
+    response = client._run_operation(
+        operation, self._unpack_response, address=self._address
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1938, in _run_operation
+    return self._retryable_read(
+           ~~~~~~~~~~~~~~~~~~~~^
+        _cmd,
+        ^^^^^
+    ...<4 lines>...
+        operation=operation.name,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2047, in _retryable_read
+    return self._retry_internal(
+           ~~~~~~~~~~~~~~~~~~~~^
+        func,
+        ^^^^^
+    ...<7 lines>...
+        operation_id=operation_id,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2014, in _retry_internal
+    ).run()
+      ~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2765, in run
+    return self._read() if self._is_read else self._write()
+           ~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 2926, in _read
+    return self._func(self._session, self._server, conn, read_pref)  # type: ignore
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/mongo_client.py", line 1929, in _cmd
+    return server.run_operation(
+           ~~~~~~~~~~~~~~~~~~~~^
+        conn,
+        ^^^^^
+    ...<4 lines>...
+        self,
+        ^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/helpers.py", line 47, in inner
+    return func(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/server.py", line 208, in run_operation
+    reply = conn.receive_message(request_id)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 469, in receive_message
+    self._raise_connection_failure(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/synchronous/pool.py", line 643, in _raise_connection_failure
+    _raise_connection_failure(self.address, error, timeout_details=details)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pymongo/pool_shared.py", line 150, in _raise_connection_failure
+    raise AutoReconnect(msg) from error
+pymongo.errors.AutoReconnect: ac-xfzdix9-shard-00-02.kqgprz4.mongodb.net:27017: (54, 'ECONNRESET') (configured timeouts: connectTimeoutMS: 20000.0ms)
+2025-12-24 09:49:28,420 [ERROR] Error during MST deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 409 when requesting https://sheets.googleapis.com/v4/spreadsheets/1U8Bzy_UsoQhOJh1ETr3ChK1PIc5QzDbPhiQ3aN7EQEI/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "The operation was aborted.". Details: "The operation was aborted.">
+2025-12-24 10:29:32,154 [ERROR] Error during S6T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 404 when requesting https://sheets.googleapis.com/v4/spreadsheets/1bHKEfVvunQ4OfU_weF-6CTuMAkcQXqwnSehSZyhMClo/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Requested entity was not found.". Details: "Requested entity was not found.">
+2025-12-24 11:12:07,698 [ERROR] Error during I8T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 404 when requesting https://sheets.googleapis.com/v4/spreadsheets/1lelEpA64CynKqfnpcZEpQhGu7w_7bwzDUHpoozVWmwo/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Requested entity was not found.". Details: "Requested entity was not found.">
+2025-12-24 11:42:23,892 [ERROR] Error during S6T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 404 when requesting https://sheets.googleapis.com/v4/spreadsheets/1bHKEfVvunQ4OfU_weF-6CTuMAkcQXqwnSehSZyhMClo/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Requested entity was not found.". Details: "Requested entity was not found.">
+2025-12-24 13:41:23,869 [ERROR] Error during S369T deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 938, in execute
+    raise HttpError(resp, content, uri=self.uri)
+googleapiclient.errors.HttpError: <HttpError 404 when requesting https://sheets.googleapis.com/v4/spreadsheets/1O3cnGleSipLATH_c00GmGFe152qFgAPCBYS_CWM8mHk/values/DEPOSIT%20LIST%21A3%3AC?valueInputOption=USER_ENTERED&alt=json returned "Requested entity was not found.". Details: "Requested entity was not found.">
+2025-12-24 14:57:23,539 [ERROR] Error during 2FT deposit list (attempt 1/500)
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 61, in safe_call
+    return func(*args, **kwargs)
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 1762, in deposit_list_PID
+    mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/OTHER2_fix.py", line 887, in upload_to_google_sheet_DL_PID
+    ).execute()
+      ~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 923, in execute
+    resp, content = _retry_request(
+                    ~~~~~~~~~~~~~~^
+        http,
+        ^^^^^
+    ...<7 lines>...
+        headers=self.headers,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 222, in _retry_request
+    raise exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/googleapiclient/http.py", line 191, in _retry_request
+    resp, content = http.request(uri, method, *args, **kwargs)
+                    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/google_auth_httplib2.py", line 218, in request
+    response, content = self.http.request(
+                        ~~~~~~~~~~~~~~~~~^
+        uri,
+        ^^^^
+    ...<5 lines>...
+        **kwargs
+        ^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1727, in request
+    (response, content) = self._request(
+                          ~~~~~~~~~~~~~^
+        conn, authority, uri, request_uri, method, body, headers, redirections, cachekey,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1447, in _request
+    (response, content) = self._conn_request(conn, request_uri, method, body, headers)
+                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/httplib2/__init__.py", line 1399, in _conn_request
+    response = conn.getresponse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/http/client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+TimeoutError: The read operation timed out

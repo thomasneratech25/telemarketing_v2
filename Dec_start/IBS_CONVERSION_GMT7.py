@@ -1320,7 +1320,36 @@ while True:
         # J8N (DEPOSIT LIST) (LAXMI)
         safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J8N_DL", "1eIoVnWjmhjmZTZ9SLHE8ifEuLdOtQicGVdI_s3WQoEw", "DEPOSIT LIST", "A", "C", description="J8N deposit list")
 
-        time.sleep(300)
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= GT MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # GT (MEMBER INFO) 
+        safe_call(Fetch.member_info, "gcwin99bo.com", "gc99", "GT", "THB", "+07:00", "GT_MI", "1iw0jWV7UHUhQ6bTrcBiFYsvCGN02e8kDtBnhKD6agu4", "New Register", description="IBS GT MEMBER INFO")
+            
+        # GT (DEPOSIT LIST)
+        safe_call(Fetch.deposit_list_PID, "gcwin99bo.com", "gc99", "GT", "THB", "+07:00", "GT_DL", "1jek1Aztz1jgvbOmHUX5SLCVl24NY1ZLDAJhS00InJUw", "DEPOSIT LIST", "A", "C", description="GT deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= N855T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # N855T (MEMBER INFO) 
+        safe_call(Fetch.member_info, "f5x3n8v.com", "n855", "N855T", "THB", "+07:00", "N855T_MI", "1iw0jWV7UHUhQ6bTrcBiFYsvCGN02e8kDtBnhKD6agu4", "New Register", description="IBS N855T MEMBER INFO")
+            
+        # N855T (DEPOSIT LIST)
+        safe_call(Fetch.deposit_list_PID, "f5x3n8v.com", "n855", "N855T", "THB", "+07:00", "N855T_DL", "1jek1Aztz1jgvbOmHUX5SLCVl24NY1ZLDAJhS00InJUw", "DEPOSIT LIST", "A", "C", description="N855T deposit list")
+
+        # ==========================================================================
+        # =-=-=-=-==-=-=-=-= N1T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # ==========================================================================
+
+        # N1T (MEMBER INFO) 
+        safe_call(Fetch.member_info, "m8b4x1z6.com", "n191", "N1T", "THB", "+07:00", "N1T_MI", "1iw0jWV7UHUhQ6bTrcBiFYsvCGN02e8kDtBnhKD6agu4", "New Register", description="IBS N1T MEMBER INFO")
+            
+        # N1T (DEPOSIT LIST)
+        safe_call(Fetch.deposit_list_PID, "m8b4x1z6.com", "n191", "N1T", "THB", "+07:00", "N1T_DL", "1jek1Aztz1jgvbOmHUX5SLCVl24NY1ZLDAJhS00InJUw", "DEPOSIT LIST", "A", "C", description="N1T deposit list")
+
 
     except KeyboardInterrupt:
             logger.info("Execution interrupted by user.")

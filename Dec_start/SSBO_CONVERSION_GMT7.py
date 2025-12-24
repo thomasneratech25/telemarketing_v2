@@ -3,9 +3,7 @@ import sys
 import pytz
 import time
 import json
-import atexit
 import requests
-import subprocess
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from colorama import Fore, Style
@@ -18,60 +16,6 @@ from datetime import datetime, timedelta, timezone
 from google_auth_oauthlib.flow import InstalledAppFlow
 from Dec_start.runtime import logger, safe_call, MONGODB_URI
 
-# Chrome Settings
-class Automation:
-
-    # Chrome CDP 
-    chrome_proc = None
-    @classmethod
-    def chrome_CDP(cls):
-
-        # User Profile
-        USER_DATA_DIR = f"/Users/nera_thomas/Library/Application Support/Google/Chrome/Profile 9"
-        
-        # Start Chrome normally
-        cls.chrome_proc = subprocess.Popen([
-            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-            "--remote-debugging-port=9222",
-            "--disable-session-crashed-bubble",
-            "--hide-crash-restore-bubble",
-            "--no-first-run",
-            "--no-default-browser-check",
-            f"--user-data-dir={USER_DATA_DIR}",  # User Profile
-            # "--headless=new",                    # ------> if want to use headless mode, use --windows-size together, due to headless mode small screen size
-            "--window-size=1920,1080",           # ✅ simulate full HD
-            "--force-device-scale-factor=1",     # ✅ ensure no zoom scalin
-        ],
-        stdout=subprocess.DEVNULL,  # ✅ hide chrome cdp logs
-        stderr=subprocess.DEVNULL   # ✅ hide chrome cdp logs
-        )
-    
-        # wait for Chrome CDP launch...
-        cls.wait_for_cdp_ready()
-
-        atexit.register(cls.cleanup)
-
-    # Close Chrome CDP
-    @classmethod
-    def cleanup(cls):
-        try:
-            cls.chrome_proc.terminate()
-        except Exception as e:
-            print(f"Error terminating Chrome: {e}")
-    
-    # Wait for Chrome CDP to be ready
-    @staticmethod
-    def wait_for_cdp_ready(timeout=10):
-        """Wait until Chrome CDP is ready at http://localhost:9222/json"""
-        for _ in range(timeout):
-            try:
-                res = requests.get("http://localhost:9222/json")
-                if res.status_code == 200:
-                    return True
-            except:
-                pass
-            time.sleep(1)
-        raise RuntimeError("Chrome CDP is not ready after waiting.")
 
 # BO Account
 class BO_Account:
@@ -1453,7 +1397,7 @@ class mongodb_2_gs:
         print("Uploaded MongoDB data to Google Sheet.\n")
 
 # Fetch Data
-class Fetch(Automation, BO_Account, mongodb_2_gs):
+class Fetch(BO_Account, mongodb_2_gs):
     
     # ====================================================================================
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- IBS & SSBO GET COOKIES =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -2518,7 +2462,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             time.sleep(0.01)
 
         # Get current time in GMT+7
-        gmt7 = pytz.timezone("Asia/Singapore")   # GMT+7
+        gmt7 = pytz.timezone("Asia/Bangkok")   # GMT+7
         now_gmt7 = datetime.now(gmt7)
 
         current_time = now_gmt7.time()
@@ -2898,61 +2842,29 @@ while True:
     try:
 
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # ============================================================== SSBO 9T NEW REGISTER & DEPOSIT LIST PID ======================================================
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        safe_call(Fetch.ssbo_member_info, "ip9", "THB", "9T_MI", "1fL_qVhAKC8BmbPYrUlxSv4iT8CuFJk34323zn4jv_xe8rjM", "New Register", description="SSBO 9T MEMBER INFO")
+
+        safe_call(Fetch.ssbo_deposit_list_PID, "ip9", ["THB"], "SSBO_9T_DL", "1fL_qVhAKC8BmbPYrUlxSv4iT8CuFJk3zn4jv_xe8rjM", "DEPOSIT LIST", "A", "C", description="SSBO 9T DL PID")
+
+
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         # ============================================================== SSBO A8T NEW REGISTER & DEPOSIT LIST PID ======================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        safe_call(Fetch.ssbo_member_info, "aw8", "THB", "DEMO_MI", "1fL_qVhAKC8BmbPYrUlxSv4iT8CuFJk34323zn4jv_xe8rjM", "New Register", description="SSBO A8T THAI MEMBER INFO")
+        safe_call(Fetch.ssbo_member_info, "aw8", "THB", "A8T_MI", "1fL_qVhAKC8BmbPYrUlxSv4iT8CuFJk34323zn4jv_xe8rjM", "New Register", description="SSBO A8T MEMBER INFO")
 
-        safe_call(Fetch.ssbo_deposit_list_PID, "aw8", ["THB"], "SSBO_A8T_DL", "1fL_qVhAKC8BmbPYrUlxSv4iT8CuFJk3zn4jv_xe8rjM", "DEPOSIT LIST", "A", "C", description="SSBO A8T THAI DL PID")
+        safe_call(Fetch.ssbo_deposit_list_PID, "aw8", ["THB"], "SSBO_A8T_DL", "1fL_qVhAKC8BmbPYrUlxSv4iT8CuFJk3zn4jv_xe8rjM", "DEPOSIT LIST", "A", "C", description="SSBO A8T DL PID")
 
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         # ============================================================== SSBO UT NEW REGISTER & DEPOSIT LIST PID =======================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         
-        safe_call(Fetch.ssbo_member_info, "uea", "THB", "SSBO_UT_MI", "1k4IpLnQAJjDGoUwhbxxLFeTgygI7RlzwRFsEWmk2xPk", "New Register", description="SSBO UT THAI MEMBER INFO")
+        safe_call(Fetch.ssbo_member_info, "uea", "THB", "SSBO_UT_MI", "1k4IpLnQAJjDGoUwhbxxLFeTgygI7RlzwRFsEWmk2xPk", "New Register", description="SSBO UT MEMBER INFO")
         
-        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["THB"], "SSBO_UT_DL", "1k4IpLnQAJjDGoUwhbxxLFeTgygI7RlzwRFsEWmk2xPk", "DEPOSIT LIST", "A", "C", description="SSBO UT THAI DL PID")
-
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== SSBO UM US NEW REGISTER & DEPOSIT LIST PID 【 KAY 】 =============================================================================
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        
-        # IBS UM MY
-        safe_call(Fetch.member_info, "29018465.asia", "uea8", "MYR", "+08:00", "UM_MI", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "UM", upload_to_sheet=False, description="IBS UM MY MEMBER INFO")
-        # SSBO UM MY
-        safe_call(Fetch.ssbo_member_info, "uea", "MYR", "SSBO_UM_MI", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "UM", extra_mongo_collections=["UM_MI"], description="SSBO UM MY MEMBER INFO")
-        # SSBO US SG
-        safe_call(Fetch.ssbo_member_info, "uea", "SGD", "SSBO_US_MI", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "US", description="SSBO US SG MEMBER INFO")
-
-        # SSBO UM MY
-        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["MYR"], "SSBO_UM_DL", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "DEPOSIT LIST", "A", "C", upload_to_sheet=False, description="SSBO UM MY DL PID")
-        # IBS UM MY 
-        safe_call(Fetch.deposit_list_PID, "29018465.asia", "uea8", "MYR", "+08:00", "UM_DL", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "DEPOSIT LIST", "A", "C", extra_mongo_collections=["SSBO_UM_DL"], description="IBS UM MY DL PID")
-        # SSBO US SG
-        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["SGD"], "SSBO_US_DL", "1FcuBvYpRyOQOFt1ZafZIXn_wpOYgS1MDbkwnLCfDqWI", "DEPOSIT LIST", "E", "G", description="SSBO US SG DL PID")
-
-
-
-
-
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== SSBO UM US FTD/STD REPORT & DEPOSIT LIST PID【 WEINEI 】 ====================================================================================
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        # IBS UM MY
-        safe_call(Fetch.ftd_stdReport, "29018465.asia", "uea8", "MYR", "+08:00", "UM_FTD_STD", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "UM", upload_to_sheet=False, description="IBS UM MY FTD/STD")
-        # SSBO UM MY
-        safe_call(Fetch.ssbo_ftd_stdReport, "uea", "MYR", "SSBO_UM_FTD_STD_2", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "UM", extra_mongo_collections=["UM_FTD_STD"], description="SSBO UM MY FTD/STD")
-        # SSBO US SG
-        safe_call(Fetch.ssbo_ftd_stdReport, "uea", "SGD", "SSBO_US_FTD_STD", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "US", description="SSBO US SG FTD/STD")
-
-        # SSBO UM MY
-        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["MYR"], "SSBO_UM_DL", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "DEPOSIT LIST", "A", "C", upload_to_sheet=False, description="SSBO UM MY DL PID")
-        # IBS UM MY 
-        safe_call(Fetch.deposit_list_PID, "29018465.asia", "uea8", "MYR", "+08:00", "UM_DL", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "DEPOSIT LIST", "A", "C", extra_mongo_collections=["SSBO_UM_DL"], description="IBS UM MY DL PID")
-        # SSBO US SG
-        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["SGD"], "SSBO_US_DL", "1uh3qUqLmVQnr2mBYL2bg8wIReK2mzCS5zpexNYda8cI", "DEPOSIT LIST", "E", "G", description="SSBO US SG DL PID")
-
+        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["THB"], "SSBO_UT_DL", "1k4IpLnQAJjDGoUwhbxxLFeTgygI7RlzwRFsEWmk2xPk", "DEPOSIT LIST", "A", "C", description="SSBO UT DL PID")
 
 
         # delay 10 minutes
