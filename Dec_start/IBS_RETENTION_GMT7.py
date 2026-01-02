@@ -13,7 +13,19 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from datetime import datetime, timedelta, timezone
 from google_auth_oauthlib.flow import InstalledAppFlow
-from Dec_start.runtime import logger, safe_call, MONGODB_URI
+from runtime import logger, safe_call, MONGODB_URI
+
+PROXIES = {
+    "http":  "http://127.0.0.1:10809",
+    "https": "http://127.0.0.1:10809",
+}
+
+def create_session():
+    s = requests.Session()
+    s.proxies.update(PROXIES)
+    s.trust_env = False   # VERY IMPORTANT
+    return s
+
 
 # BO Account
 class BO_Account:
@@ -1043,7 +1055,7 @@ class Fetch(BO_Account, mongodb_2_gs):
     @classmethod
     def _get_cookies(cls, bo_link, merchant_code, acc_id, acc_pass, cookies_path):
         
-        session = requests.Session()
+        session = create_session()
 
         url = f"https://v3-bo.{bo_link}/api/be/auth/loginV2"
 
@@ -1327,6 +1339,8 @@ class Fetch(BO_Account, mongodb_2_gs):
     @classmethod
     def deposit_list_USERNAME(cls, team, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=None):
         
+        session = create_session()
+
         # Print Color Messages
         msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {team} {Fore.YELLOW} All MEMBER REPORT Data...{Style.RESET_ALL}\n"
         for ch in msg:
@@ -1412,7 +1426,7 @@ class Fetch(BO_Account, mongodb_2_gs):
         }
 
         # Post Response 
-        response = requests.post(url, headers=headers, json=payload)
+        response = session.post(url, headers=headers, json=payload, timeout=30)
 
         # Check if return unauthorized (401) 
         if response.json().get("statusCode") == 401:
@@ -1731,30 +1745,58 @@ class Fetch(BO_Account, mongodb_2_gs):
 while True:
     try:
 
-        # =============================================================================================================================
-        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J1B ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-        # =============================================================================================================================
+        # # =============================================================================================================================
+        # # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J1B ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # # =============================================================================================================================
 
-        # J1B (MEMBER INFO) 
-        safe_call(Fetch.allmemberReport, "IBS J1B AMR", "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_AMR", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "AMR")
+        # # J1B (MEMBER INFO) 
+        # safe_call(Fetch.allmemberReport, "IBS J1B AMR", "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_AMR", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "AMR")
         
-        # J1B (DEPOSIT LIST USERNAME)
-        safe_call(Fetch.deposit_list_USERNAME, "IBS J1B DL USERNAME", "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_DL_USERNAME", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "Deposit List", "A", "C")
+        # # J1B (DEPOSIT LIST USERNAME)
+        # safe_call(Fetch.deposit_list_USERNAME, "IBS J1B DL USERNAME", "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_DL_USERNAME", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "Deposit List", "A", "C")
 
         # =============================================================================================================================
         # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS GT ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
         # =============================================================================================================================
 
-        # GT (MEMBER INFO) 
-        safe_call(Fetch.allmemberReport, "IBS GT AMR", "gcwin99bo.com", "gc99", "GT", "+07:00", "GT_AMR", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "AMR")
+        # # GT (MEMBER INFO) 
+        # safe_call(Fetch.allmemberReport, "IBS GT AMR", "gcwin99bo.com", "gc99", "THB", "+07:00", "GT_AMR", "1fpuWRQIT1_gR_636vFhFCDVWLx_aNDVqjYX8Ha9ENIM", "AMR")
        
-        # GT (DEPOSIT LIST USERNAME)
-        safe_call(Fetch.deposit_list_USERNAME, "IBS GT DL USERNAME", "gcwin99bo.com", "gc99", "GT", "+07:00", "GT_DL_USERNAME", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "Deposit List", "A", "C")
+        # GT (DEPOSIT LIST) JIRAPORN
+        safe_call(Fetch.deposit_list_USERNAME, "IBS GT DL USERNAME", "gcwin99bo.com", "gc99", "THB", "+07:00", "GT_DL_USERNAME", "1fpuWRQIT1_gR_636vFhFCDVWLx_aNDVqjYX8Ha9ENIM", "Deposit List", "A", "C")
 
+        # GT (DEPOSIT LIST) NOK
+        safe_call(Fetch.deposit_list_USERNAME, "IBS GT DL USERNAME", "gcwin99bo.com", "gc99", "THB", "+07:00", "GT_DL_USERNAME", "16Wjf2lyJR4pwZXtKrf5fdycnAbdKvWvsUKSzUo7pNaM", "Deposit List", "A", "C")
 
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS N855T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
 
+        # # N855T (MEMBER INFO) 
+        # safe_call(Fetch.allmemberReport, "IBS N855T AMR", "f5x3n8v.com", "n855", "THB", "+07:00", "N855T_AMR", "1jKBRkAyY-5PqOYmHgS_SqxWYY4C-JApDNc49YVGMSa8", "AMR")
+       
+        # N855T (DEPOSIT LIST USERNAME)
+        safe_call(Fetch.deposit_list_USERNAME, "IBS N855T DL USERNAME", "f5x3n8v.com", "n855", "THB", "+07:00", "N855T_DL_USERNAME", "1jKBRkAyY-5PqOYmHgS_SqxWYY4C-JApDNc49YVGMSa8", "Deposit List", "A", "C")
 
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS N1T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
 
+        # # N1T (MEMBER INFO) 
+        # safe_call(Fetch.allmemberReport, "IBS N1T AMR", "m8b4x1z6.com", "n191", "THB", "+07:00", "N1T_AMR", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "AMR")
+       
+        # N1T (DEPOSIT LIST USERNAME)
+        safe_call(Fetch.deposit_list_USERNAME, "IBS N1T DL USERNAME", "m8b4x1z6.com", "n191", "THB", "+07:00", "N1T_DL_USERNAME", "1z5cQal2mTKfm94Xx01Kt9yB2Cq90E9SKeGURcp5u7r8", "Deposit List", "A", "C")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS N789T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # # N789T (MEMBER INFO)  HAVEN CHANGE!!!
+        # safe_call(Fetch.allmemberReport, "IBS N1T AMR", "m8b4x1z6.com", "n191", "THB", "+07:00", "N1T_AMR", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "AMR")
+       
+        # N789T (DEPOSIT LIST USERNAME) TOKIE
+        safe_call(Fetch.deposit_list_USERNAME, "IBS N789T DL USERNAME", "q2n5w3z.com", "n789", "THB", "+07:00", "N789T_DL_USERNAME", "1WpAC5wQZ06TSJwfg6UmZzJoj5qJX4P7FkZh3ekhR-GQ", "Deposit List", "A", "C")
 
         # Delay 5 minutes
         time.sleep(300)

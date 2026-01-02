@@ -12,7 +12,18 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
-from Dec_start.runtime import logger, safe_call, MONGODB_URI
+from runtime import logger, safe_call, MONGODB_URI
+
+PROXIES = {
+    "http":  "http://127.0.0.1:10809",
+    "https": "http://127.0.0.1:10809",
+}
+
+def create_session():
+    s = requests.Session()
+    s.proxies.update(PROXIES)
+    s.trust_env = False   # VERY IMPORTANT
+    return s
 
 # BO Account
 class BO_Account:
@@ -164,6 +175,11 @@ class BO_Account:
             "merchant_code": os.getenv("MERCHANT_CODE_NEX8"),
             "acc_ID": os.getenv("ACC_ID_NEX8"),
             "acc_PASS": os.getenv("ACC_PASS_NEX8")
+        },
+        "828": {
+            "merchant_code": os.getenv("MERCHANT_CODE_828"),
+            "acc_ID": os.getenv("ACC_ID_828"),
+            "acc_PASS": os.getenv("ACC_PASS_828")
         },
     }
 
@@ -592,7 +608,7 @@ class Fetch(BO_Account, mongodb_2_gs):
     @classmethod
     def _get_cookies(cls, bo_link, merchant_code, acc_id, acc_pass, cookies_path):
         
-        session = requests.Session()
+        session = create_session()
 
         url = f"https://v3-bo.{bo_link}/api/be/auth/loginV2"
 
@@ -637,6 +653,7 @@ class Fetch(BO_Account, mongodb_2_gs):
 
         # Return Response
         response = session.post(url, headers=headers, data=payload)
+        print(response.json())
 
         # to get Authentication Cookies
         user_cookie = session.cookies.get("user")
@@ -661,6 +678,8 @@ class Fetch(BO_Account, mongodb_2_gs):
     @classmethod
     def deposit_list_PID(cls, bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column):
         
+        session = create_session()
+
         # Print Color Messages
         msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {team} {Fore.YELLOW} DEPOSIT LIST Data...{Style.RESET_ALL}\n"
         for ch in msg:
@@ -691,7 +710,7 @@ class Fetch(BO_Account, mongodb_2_gs):
             end_date = today
 
         # Cookie File
-        cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+        cookie_file = f"/home/thomas/get_cookies/{bo_link}.json"
 
         # Auto-create file if missing
         os.makedirs(os.path.dirname(cookie_file), exist_ok=True)
@@ -744,7 +763,7 @@ class Fetch(BO_Account, mongodb_2_gs):
         }
 
         # Post Response 
-        response = requests.post(url, headers=headers, json=payload)
+        response = session.post(url, headers=headers, json=payload, timeout=30)
 
         # Check if return unauthorized (401) 
         if response.json().get("statusCode") == 401:
@@ -758,7 +777,7 @@ class Fetch(BO_Account, mongodb_2_gs):
                 cls.accounts[bo_name]["merchant_code"],
                 cls.accounts[bo_name]["acc_ID"],
                 cls.accounts[bo_name]["acc_PASS"],
-                f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+                f"/home/thomas/get_cookies/{bo_link}.json"
             )
             
             # Retry request...
@@ -770,7 +789,7 @@ class Fetch(BO_Account, mongodb_2_gs):
             payload["page"] = page
 
             # Send POST request
-            response = requests.post(url, headers=headers, json=payload)
+            response = session.post(url, headers=headers, json=payload, timeout=30)
 
             # Safe JSON Handling
             try:
@@ -793,7 +812,8 @@ class Fetch(BO_Account, mongodb_2_gs):
                 next_payload["page"] = page + 1
 
                 # Request next page
-                next_response = requests.post(url, headers=headers, json=next_payload)
+                next_response = session.post(url, headers=headers, json=next_payload, timeout=30)
+                
                 try:
                     next_data = next_response.json()
                     next_rows = next_data.get("data", [])
@@ -828,6 +848,8 @@ class Fetch(BO_Account, mongodb_2_gs):
     @classmethod
     def member_info(cls, bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab):
         
+        session = create_session()
+
         # Print Team Name Messages
         msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {team} {Fore.YELLOW} MEMBER INFO Data...{Style.RESET_ALL}\n"
         for ch in msg:
@@ -859,7 +881,7 @@ class Fetch(BO_Account, mongodb_2_gs):
             end_date = today
 
         # Cookie File
-        cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+        cookie_file = f"/home/thomas/get_cookies/{bo_link}.json"
 
         # Auto-create file if missing
         os.makedirs(os.path.dirname(cookie_file), exist_ok=True)
@@ -918,7 +940,7 @@ class Fetch(BO_Account, mongodb_2_gs):
         }
 
         # Post Response 
-        response = requests.post(url, headers=headers, json=payload)
+        response = session.post(url, headers=headers, json=payload, timeout=30)
 
         # Check if return unauthorized (401) 
         if response.json().get("statusCode") == 401:
@@ -932,7 +954,7 @@ class Fetch(BO_Account, mongodb_2_gs):
                 cls.accounts[bo_name]["merchant_code"],
                 cls.accounts[bo_name]["acc_ID"],
                 cls.accounts[bo_name]["acc_PASS"],
-                f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+                f"/home/thomas/get_cookies/{bo_link}.json"
             )
             
             # Retry request...
@@ -944,7 +966,7 @@ class Fetch(BO_Account, mongodb_2_gs):
             payload["page"] = page
 
             # Send POST request (CORRECT WAY)
-            response = requests.post(url, headers=headers, json=payload)
+            response = session.post(url, headers=headers, json=payload, timeout=30)
 
             # Safe JSON Handling
             try:
@@ -975,7 +997,9 @@ class Fetch(BO_Account, mongodb_2_gs):
     # Member Info (Split data)
     @classmethod
     def member_info_SPLIT_DATA(cls, bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab):
-        
+
+        session = create_session()
+
         # Print Team Name Messages
         msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {team} {Fore.YELLOW} MEMBER INFO Data...{Style.RESET_ALL}\n"
         for ch in msg:
@@ -1006,7 +1030,7 @@ class Fetch(BO_Account, mongodb_2_gs):
             end_date = today
 
         # Cookie File
-        cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+        cookie_file = f"/home/thomas/get_cookies/{bo_link}.json"
 
         # Auto-create file if missing
         os.makedirs(os.path.dirname(cookie_file), exist_ok=True)
@@ -1064,7 +1088,7 @@ class Fetch(BO_Account, mongodb_2_gs):
         }
         
         # Post Response 
-        response = requests.post(url, headers=headers, json=payload)
+        response = session.post(url, headers=headers, json=payload, timeout=30)
 
         # Check if return unauthorized (401) 
         if response.json().get("statusCode") == 401:
@@ -1078,7 +1102,7 @@ class Fetch(BO_Account, mongodb_2_gs):
                 cls.accounts[bo_name]["merchant_code"],
                 cls.accounts[bo_name]["acc_ID"],
                 cls.accounts[bo_name]["acc_PASS"],
-                f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/testdemo.json"
+                f"/home/thomas/get_cookies/{bo_link}.json"
             )
             
             # Retry request...
@@ -1090,7 +1114,7 @@ class Fetch(BO_Account, mongodb_2_gs):
             payload["page"] = page
 
             # Send POST request (CORRECT WAY)
-            response = requests.post(url, headers=headers, json=payload)
+            response = session.post(url, headers=headers, json=payload, timeout=30)
 
             # Safe JSON Handling
             try:
@@ -1132,224 +1156,251 @@ class Fetch(BO_Account, mongodb_2_gs):
 
 while True:
     try:
-    
+
         # ==========================================================================
-        # =-=-=-=-==-=-=-=-= S5T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # =-=-=-=-==-=-=-=-= JOLIBEE MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=
         # ==========================================================================
 
-        # S5T (MEMBER INFO)
-        safe_call(Fetch.member_info, "s55bo.com", "s55", "S5T", "THB", "+07:00", "DEMO_MI", "1tcUSfgT_Locmmm8M8QUeq7HXzPxJ-NqHvX34N1JLCFc", "New Register", description="S5T member info")
+        # Krisitian & Amber (MEMBER INFO)
+        gs_ids = ["1GD4AJU4hmP6JYRnhe3dTrIuN5Nma8Ab2XGPO-lCo_SU", "1QqtIX4N1Lqij3MKSS5YBI5fIuPARjbWCipN5KjHW6II"]
+        safe_call(Fetch.member_info_SPLIT_DATA, "jolibetbo.com", "joli", "Kristian & Amber", "PHP", "+08:00", "JOLI_MI", gs_ids, "New Register", description="Jolibet Kristian & Amber member info")
+
+        # # Krisitian & Amber (DEPOSIT LIST)
+        # safe_call(Fetch.deposit_list_PID, "jolibetbo.com", "joli", "Joli Kristian", "PHP", "+08:00", "JOLI_DL", "1GD4AJU4hmP6JYRnhe3dTrIuN5Nma8Ab2XGPO-lCo_SU", "DEPOSIT LIST", "A", "C", description="Jolibet Kristian deposit list")
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "JOLI_DL", "1QqtIX4N1Lqij3MKSS5YBI5fIuPARjbWCipN5KjHW6II", "DEPOSIT LIST", "A", "C")
+    
+        # # ==========================================================================
+        # # =-=-=-=-==-=-=-=-= S5T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # # ==========================================================================
+
+        # # S5T (MEMBER INFO)
+        safe_call(Fetch.member_info, "s55bo.com", "s55", "S5T", "THB", "+07:00", "S55_S5T_MI", "1lN3FXPA87TyOCZ7wkiaPMCj6EbW1dxUZ_T5rOO7nVQ4", "New Register", description="S5T member info")
         
         # S5T (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "s55bo.com", "s55", "S5T", "THB", "+07:00", "DEMO_DL", "1tcUSfgT_Locmmm8M8QUeq7HXzPxJ-NqHvX34N1JLCFc", "DEPOSIT LIST", "A", "C", description="S5T deposit list")
+        safe_call(Fetch.deposit_list_PID, "s55bo.com", "s55", "S5T", "THB", "+07:00", "S55_S5T_DL", "1lN3FXPA87TyOCZ7wkiaPMCj6EbW1dxUZ_T5rOO7nVQ4", "DEPOSIT LIST", "A", "C", description="S5T deposit list")
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= N8Y MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
+        # # ==========================================================================
+        # # =-=-=-=-==-=-=-=-= N8Y MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # # ==========================================================================
 
         # N8Y (MEMBER INFO)
-        safe_call(Fetch.member_info, "nex8bo.com", "nex8", "N8Y", "MMK", "+07:00", "NEX8_N8Y_MI", "1wu2CuhTZyddAq0Xj5xENzMDFxvVr8Zykw5gVKBR1PVI", "New Register", description="N8Y member info")
+        safe_call(Fetch.member_info, "nex8bo.com", "nex8", "N8Y", "MMK", "+07:00", "NEX8_N8Y_MI", "1SAmpSWfRwVyM9G2L_6ZlBgQuEBL1Mxn-6iBNVJlCzuc", "New Register", description="N8Y member info")
         
         # N8Y (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "nex8bo.com", "nex8", "N8Y", "MMK", "+07:00", "NEX8_N8Y_DL", "1wu2CuhTZyddAq0Xj5xENzMDFxvVr8Zykw5gVKBR1PVI", "DEPOSIT LIST", "A", "C", description="N8Y deposit list")
+        safe_call(Fetch.deposit_list_PID, "nex8bo.com", "nex8", "N8Y", "MMK", "+07:00", "NEX8_N8Y_DL", "1SAmpSWfRwVyM9G2L_6ZlBgQuEBL1Mxn-6iBNVJlCzuc", "DEPOSIT LIST", "A", "C", description="N8Y deposit list")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= S345T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
         # ==========================================================================
 
         # S345T (MEMBER INFO)
-        safe_call(Fetch.member_info, "57249022.asia", "s345", "S345T", "THB", "+07:00", "S345_S345T_MI", "10sLnd4QBztBNdFqnzIkebJn-ytyEBz1unuQJUCCWpsY", "New Register", description="S345T member info")
+        safe_call(Fetch.member_info, "57249022.asia", "s345", "S345T", "THB", "+07:00", "S345_S345T_MI", "14aF0_HknwdDKrFOKR8ZyXUU-6qNcpIgPVgJ2bKPKhks", "New Register", description="S345T member info")
         
         # S345T (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "57249022.asia", "s345", "S345T", "THB", "+07:00", "S345_S345T_DL", "10sLnd4QBztBNdFqnzIkebJn-ytyEBz1unuQJUCCWpsY", "DEPOSIT LIST", "A", "C", description="S345T deposit list")
+        safe_call(Fetch.deposit_list_PID, "57249022.asia", "s345", "S345T", "THB", "+07:00", "S345_S345T_DL", "14aF0_HknwdDKrFOKR8ZyXUU-6qNcpIgPVgJ2bKPKhks", "DEPOSIT LIST", "A", "C", description="S345T deposit list")
 
         # ==========================================================================
-        # =-=-=-=-==-=-=-=-= S2T MEMBER INFO & DEPOSIT LIST (CHING)=-=-=-=-==-=-=-=-=-=-= 
+        # =-=-=-=-==-=-=-=-= S2T MEMBER INFO & DEPOSIT LIST (CHING)=-=-=-=-==-=-=-=-
         # ==========================================================================
 
-        # S2T (MEMBER INFO)
-        safe_call(Fetch.member_info, "m3v5r6cx.com", "s212", "S2T", "THB", "+07:00", "S212_S2T_MI", "1kRwQnlCz6ZiNNbjwF8O6UacgIhF2kzirqmK05cl_M_s", "New Register", description="S2T member info")
+        # S2T (MEMBER INFO) YOD
+        safe_call(Fetch.member_info, "m3v5r6cx.com", "s212", "S2T", "THB", "+07:00", "S212_S2T_MI", "1Eel69vi1bBw96PeF_PQ3M_1IuziiOZhPwmmEfQeWlHY", "New Register", description="S2T member info")
         
-        # S2T (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "m3v5r6cx.com", "s212", "S2T", "THB", "+07:00", "S212_S2T_DL", "1kRwQnlCz6ZiNNbjwF8O6UacgIhF2kzirqmK05cl_M_s", "DEPOSIT LIST", "A", "C", description="S2T deposit list")
+        # S2T (DEPOSIT LIST) YOD
+        safe_call(Fetch.deposit_list_PID, "m3v5r6cx.com", "s212", "S2T", "THB", "+07:00", "S212_S2T_DL", "1Eel69vi1bBw96PeF_PQ3M_1IuziiOZhPwmmEfQeWlHY", "DEPOSIT LIST", "A", "C", description="S2T deposit list")
+
+        # S2T (DEPOSIT LIST) CHING
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "S212_S2T_DL", "1x4Uuh28P8wh0yzOfv0eQUWcIv8l9KdmSRUibSQsU1CM", "DEPOSIT LIST", "A", "C", description="S2T deposit list")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= S369T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
         # ==========================================================================
 
         # S369T (MEMBER INFO)
-        safe_call(Fetch.member_info, "uhy3umx.com", "s369", "S369T", "THB", "+07:00", "S369_S369T_MI", "1O3cnGleSipLATH_c00GmGFe152qFgAPCBYS_CWM8mHk", "New Register", description="S369T member info")
+        safe_call(Fetch.member_info, "uhy3umx.com", "s369", "S369T", "THB", "+07:00", "S369_S369T_MI", "1lwnVV6rozzk0rgPraUTqZlnp-O7ToNjSDsi8z6oH9NI", "New Register", description="S369T member info")
         
-        # S369T (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "uhy3umx.com", "s369", "S369T", "THB", "+07:00", "S369_S369T_DL", "1O3cnGleSipLATH_c00GmGFe152qFgAPCBYS_CWM8mHk", "DEPOSIT LIST", "A", "C", description="S369T deposit list")
+        # S369T (DEPOSIT LIST) NOON
+        safe_call(Fetch.deposit_list_PID, "uhy3umx.com", "s369", "S369T", "THB", "+07:00", "S369_S369T_DL", "1lwnVV6rozzk0rgPraUTqZlnp-O7ToNjSDsi8z6oH9NI", "DEPOSIT LIST", "A", "C", description="S369T deposit list")
+
+        # S369T (DEPOSIT LIST) MINT
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "JW8_J8T_DL", "1AJxM5m0yOoNk7G8e8S7OdJi2lTK0zVLoiZYGp_on1D8", "DEPOSIT LIST", "A", "C", description="S369T deposit list")
 
         # ==========================================================================
-        # =-=-=-=-==-=-=-=-= S6T MEMBER INFO & DEPOSIT LIST (MEI) =-=-=-=-==-=-=-=-=-=-= 
+        # =-=-=-=-==-=-=-=-= S6T MEMBER INFO & DEPOSIT LIST (MEI) =-=-=-=-==-=-=-=-=
         # ==========================================================================
 
         # S6T (MEMBER INFO)
-        safe_call(Fetch.member_info, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S66_S6T_MI", "1bHKEfVvunQ4OfU_weF-6CTuMAkcQXqwnSehSZyhMClo", "New Register", description="S6T member info")
+        safe_call(Fetch.member_info, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S66_S6T_MI", "1vHhNv5IcpEvFBYJnXkpeGfjsdzemws-QaD0jjkPaqbg", "New Register", description="S6T member info")
         
-        # S6T (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S66_S6T_DL", "1bHKEfVvunQ4OfU_weF-6CTuMAkcQXqwnSehSZyhMClo", "DEPOSIT LIST", "A", "C", description="S6T deposit list")
+        # S6T (DEPOSIT LIST) HOM
+        safe_call(Fetch.deposit_list_PID, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S66_S6T_DL", "1vHhNv5IcpEvFBYJnXkpeGfjsdzemws-QaD0jjkPaqbg", "DEPOSIT LIST", "A", "C", description="S6T deposit list")
+
+        # S6T (DEPOSIT LIST) MEI
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "S66_S6T_DL", "1C9g-iHQDQ0fZJM8tFcr2ZTTD8J5JJdZ7H5iFfUphCYA", "DEPOSIT LIST", "A", "C", description="S6T deposit list")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= J8T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
         # ==========================================================================
 
         # J8T (MEMBER INFO)
-        safe_call(Fetch.member_info, "jw8bo.com", "jw8", "J8T", "THB", "+07:00", "JW8_J8T_MI", "1gwXlJymukzhSqJbz4PAaRoMuSHPszhdXpNmsc15nKdw", "New Register", description="J8T member info")
+        safe_call(Fetch.member_info, "jw8bo.com", "jw8", "J8T", "THB", "+07:00", "JW8_J8T_MI", "1cBzPLsPpUnv80Yolx4UNkurtF1kNwOhTlajE5bR5gQ4", "New Register", description="J8T member info")
         
-        # J8T (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "jw8bo.com", "jw8", "J8T", "THB", "+07:00", "JW8_J8T_DL", "1gwXlJymukzhSqJbz4PAaRoMuSHPszhdXpNmsc15nKdw", "DEPOSIT LIST", "A", "C", description="J8T deposit list")
+        # J8T (DEPOSIT LIST) YING
+        safe_call(Fetch.deposit_list_PID, "jw8bo.com", "jw8", "J8T", "THB", "+07:00", "JW8_J8T_DL", "1cBzPLsPpUnv80Yolx4UNkurtF1kNwOhTlajE5bR5gQ4", "DEPOSIT LIST", "A", "C", description="J8T deposit list")
+
+        # J8T (DEPOSIT LIST) TIP
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "JW8_J8T_DL", "18EoO-iOaMwIJvnLoG59tzSNgBQP5FSAdoonRJ3KKwFE", "DEPOSIT LIST", "A", "C", description="J8T deposit list")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= MST MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
         # ==========================================================================
 
-        # MST (MEMBER INFO)
-        safe_call(Fetch.member_info, "bo-msslot.com", "slot", "MST", "THB", "+07:00", "SLOT_MST_MI", "1U8Bzy_UsoQhOJh1ETr3ChK1PIc5QzDbPhiQ3aN7EQEI", "New Register", description="MST member info")
+        # MST (MEMBER INFO) FON
+        safe_call(Fetch.member_info, "bo-msslot.com", "slot", "MST", "THB", "+07:00", "SLOT_MST_MI", "11gXhX4W221XMVK9qwuw1PHeCvAq0WDhjn-m0csMVb5Q", "New Register", description="MST member info")
         
-        # MST (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "bo-msslot.com", "slot", "MST", "THB", "+07:00", "SLOT_MST_DL", "1U8Bzy_UsoQhOJh1ETr3ChK1PIc5QzDbPhiQ3aN7EQEI", "DEPOSIT LIST", "A", "C", description="MST deposit list")
+        # MST (DEPOSIT LIST) FON
+        safe_call(Fetch.deposit_list_PID, "bo-msslot.com", "slot", "MST", "THB", "+07:00", "SLOT_MST_DL", "11gXhX4W221XMVK9qwuw1PHeCvAq0WDhjn-m0csMVb5Q", "DEPOSIT LIST", "A", "C", description="MST deposit list")
+
+        # MST (DEPOSIT LIST) POP
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "JW8_J8T_DL", "1D_aZd_xkUmw60RxKKMBzgKLJplxSom02nKMbUoIS-cQ", "DEPOSIT LIST", "A", "C", description="G855T deposit list")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= I8T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
         # ==========================================================================
 
         # I8T (MEMBER INFO)
-        safe_call(Fetch.member_info, "i828.asia", "i88", "I8T", "THB", "+07:00", "I828_I8T_MI", "1lelEpA64CynKqfnpcZEpQhGu7w_7bwzDUHpoozVWmwo", "New Register", description="I8T member info")
+        safe_call(Fetch.member_info, "i828.asia", "828", "I8T", "THB", "+07:00", "I828_I8T_MI", "1CLx8eDoAOMTf739rPDpxUxEMuTQucTWA2ASfX7s4HUU", "New Register", description="I8T member info")
         
-        # I8T (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "i828.asia", "i88", "I8T", "THB", "+07:00", "I828_I8T_DL", "1lelEpA64CynKqfnpcZEpQhGu7w_7bwzDUHpoozVWmwo", "DEPOSIT LIST", "A", "C", description="I8T deposit list")
+        # I8T (DEPOSIT LIST) TATA
+        safe_call(Fetch.deposit_list_PID, "i828.asia", "828", "I8T", "THB", "+07:00", "I828_I8T_DL", "1CLx8eDoAOMTf739rPDpxUxEMuTQucTWA2ASfX7s4HUU", "DEPOSIT LIST", "A", "C", description="I8T deposit list")
+
+        # I8T (DEPOSIT LIST) KUNG
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "I828_I8T_DL", "1vvGZ3BWzDAwWAJDsnVtzlupqTOMGEEDGO644_QnU3aU", "DEPOSIT LIST", "A", "C", description="I8T deposit list")
 
         # ==========================================================================
-        # =-=-=-=-==-=-=-=-= G855T MEMBER INFO & DEPOSIT LIST (MEME) =-=-=-=-==-=-=-=-=-=-= 
+        # =-=-=-=-==-=-=-=-= G855T MEMBER INFO & DEPOSIT LIST (MEME) =-=-=-=-==-=-=-
         # ==========================================================================
         
-        # G855T (MEMBER INFO)
-        safe_call(Fetch.member_info, "god855.asia", "g855", "G855T", "THB", "+07:00", "G855_G855T_MI", "154-8gltDhGt1gAZM6KrhFXGmnRaoOPGzPps8v4aJnd4", "New Register", description="G855T member info")
+        # G855T (MEMBER INFO) VIEW
+        safe_call(Fetch.member_info, "god855.asia", "g855", "G855T", "THB", "+07:00", "G855_G855T_MI", "1ijHSzjqJ-DeMzUs8msUReehOwUZiS2GESyG-mfTUqDE", "New Register", description="G855T member info")
         
-        # G855T (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "god855.asia", "g855", "G855T", "THB", "+07:00", "G855_G855T_DL", "154-8gltDhGt1gAZM6KrhFXGmnRaoOPGzPps8v4aJnd4", "DEPOSIT LIST", "A", "C", description="G855T deposit list")
+        # G855T (DEPOSIT LIST) VIEW
+        safe_call(Fetch.deposit_list_PID, "god855.asia", "g855", "G855T", "THB", "+07:00", "G855_G855T_DL", "1ijHSzjqJ-DeMzUs8msUReehOwUZiS2GESyG-mfTUqDE", "DEPOSIT LIST", "A", "C", description="G855T deposit list")
+
+        # G855T (DEPOSIT LIST) VIEW
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "G855_G855T_DL", "1TIzhKJYeGaPkP_UmPOooTxrJBJ99J9Fi_765c_QsiBw", "DEPOSIT LIST", "A", "C", description="G855T deposit list")
+
+        # G855T (MEMBER INFO) MEME
+        safe_call(mongodb_2_gs.upload_to_google_sheet_MI, "G855_G855T_MI", "1B37JEPVLNEcYkdLcHRghucxykBLJSUwTt9TAx5vbXc4", "New Register", description="G855T member info")
+
+        # G855T (DEPOSIT LIST) MEME
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "G855_G855T_DL", "1B37JEPVLNEcYkdLcHRghucxykBLJSUwTt9TAx5vbXc4", "DEPOSIT LIST", "A", "C", description="G855T deposit list")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= 2FT MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
         # ==========================================================================
 
         # 2FT (MEMBER INFO)
-        safe_call(Fetch.member_info, "22funbo.com", "22f", "2FT", "THB", "+07:00", "22F_2FT_MI", "1j-dyM2v6mjfaWP2BF77_PUhwnHo2D9mrxt8bX1nAXcM", "New Register", description="2FT member info")
+        safe_call(Fetch.member_info, "22funbo.com", "22f", "2FT", "THB", "+07:00", "22F_2FT_MI", "1KzVuGBWu56sBuD1VFTXFxQi2LQ2h0M5vxb8s8bzBhtE", "New Register", description="2FT member info")
         
-        # 2FT (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "22funbo.com", "22f", "2FT", "THB", "+07:00", "22F_2FT_DL", "1j-dyM2v6mjfaWP2BF77_PUhwnHo2D9mrxt8bX1nAXcM", "DEPOSIT LIST", "A", "C", description="2FT deposit list")
+        # 2FT (DEPOSIT LIST) DAOW
+        safe_call(Fetch.deposit_list_PID, "22funbo.com", "22f", "2FT", "THB", "+07:00", "22F_2FT_DL", "1KzVuGBWu56sBuD1VFTXFxQi2LQ2h0M5vxb8s8bzBhtE", "DEPOSIT LIST", "A", "C", description="2FT deposit list")
+
+        # 2FT (DEPOSIT LIST) MUAY
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "22F_2FT_DL", "1GqmDUERmWKZWUPFbyvUMLUYQMJfGkdsRFON5HHRESKM", "DEPOSIT LIST", "A", "C", description="2FT deposit list")
+
+        # 2FT (DEPOSIT LIST) AYE
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "22F_2FT_DL", "1ozCbjUYlqLIfBRw-fDqvqc1dYUXdRJBiwneFBWS6HCk", "DEPOSIT LIST", "A", "C", description="2FT deposit list")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= M1T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
         # ==========================================================================
 
-        # M1T (MEMBER INFO)
-        safe_call(Fetch.member_info, "zupra7x.com", "mf191", "M1T", "THB", "+07:00", "MF191_M1T_MI", "1JkMSXyKmAUjqBt5V0MZ8OfUJIEJ9K4Wfrm2qFVcw3fs", "New Register", description="M1T member info")
+        # M1T (MEMBER INFO) ALICE
+        safe_call(Fetch.member_info, "zupra7x.com", "mf191", "M1T", "THB", "+07:00", "MF191_M1T_MI", "1Vc6ZogRmZChCD7PJcIv854nO3YEvh0gYuGEm4CGJsEk", "New Register", description="M1T member info")
         
-        # M1T (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "zupra7x.com", "mf191", "M1T", "THB", "+07:00", "MF191_M1T_DL", "1JkMSXyKmAUjqBt5V0MZ8OfUJIEJ9K4Wfrm2qFVcw3fs", "DEPOSIT LIST", "A", "C", description="M1T deposit list")
+        # M1T (DEPOSIT LIST) ALICE
+        safe_call(Fetch.deposit_list_PID, "zupra7x.com", "mf191", "M1T", "THB", "+07:00", "MF191_M1T_DL", "1Vc6ZogRmZChCD7PJcIv854nO3YEvh0gYuGEm4CGJsEk", "DEPOSIT LIST", "A", "C", description="M1T deposit list")
+        
+        # M1T (DEPOSIT LIST) KAEO
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "MF191_M1T_DL", "1hqtyqLpTN7wXprHVBwdeUlofmFEHcl5c8ovnfO2MV-Q", "DEPOSIT LIST", "A", "C", description="M1T deposit list")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= 2WT MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
         # ==========================================================================
 
-        # 2WT (MEMBER INFO)
-        safe_call(Fetch.member_info, "w8c4n9be.com", "22w", "2WT", "THB", "+07:00", "22W_2WT_MI", "1ofTw7dzHL7gr7Nr-29H6997O8zspX4_LVcTxngaXSso", "New Register", description="2WT member info")
+        # 2WT (MEMBER INFO) NONG SI
+        safe_call(Fetch.member_info, "w8c4n9be.com", "22w", "2WT", "THB", "+07:00", "22W_2WT_MI", "18HSa79DT3rfXKx8KyObQ2klmSuYcChfmIwtA9Ay_z5o", "New Register", description="2WT member info")
         
-        # 2WT (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "w8c4n9be.com", "22w", "2WT", "THB", "+07:00", "22W_2WT_DL", "1ofTw7dzHL7gr7Nr-29H6997O8zspX4_LVcTxngaXSso", "DEPOSIT LIST", "A", "C", description="2WT deposit list")
+        # 2WT (DEPOSIT LIST) NONG SI
+        safe_call(Fetch.deposit_list_PID, "w8c4n9be.com", "22w", "2WT", "THB", "+07:00", "22W_2WT_DL", "18HSa79DT3rfXKx8KyObQ2klmSuYcChfmIwtA9Ay_z5o", "DEPOSIT LIST", "A", "C", description="2WT deposit list")
         
+        # 2WT (DEPOSIT LIST) SAI
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "22W_2WT_DL", "1_17gv5_EM0BaAAHWWobuT88s55duw62uXQ9NHxakKvI", "DEPOSIT LIST", "A", "C", description="2WT deposit list")
+
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= S8T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
         # ==========================================================================
 
-        # S8T (MEMBER INFO)
-        safe_call(Fetch.member_info, "siam855bo.com", "s855", "S8T", "THB", "+07:00", "S855_S8T_MI", "1zlB2V3yi9HyVJLKBomkGX0wKkgKfrSV2G8jQa-dzhgI", "New Register", description="S8T member info")
+        # S8T (MEMBER INFO) NINEW
+        safe_call(Fetch.member_info, "siam855bo.com", "s855", "S8T", "THB", "+07:00", "S855_S8T_MI", "1qpYkDUfTK40VZk5upIKcJj5gIesCnCKD3Tx8Mi-xZFw", "New Register", description="S8T member info")
         
-        # S8T (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "siam855bo.com", "s855", "S8T", "THB", "+07:00", "S855_S8T_DL", "1zlB2V3yi9HyVJLKBomkGX0wKkgKfrSV2G8jQa-dzhgI", "DEPOSIT LIST", "A", "C", description="S8T deposit list")
+        # S8T (DEPOSIT LIST) NINEW
+        safe_call(Fetch.deposit_list_PID, "siam855bo.com", "s855", "S8T", "THB", "+07:00", "S855_S8T_DL", "1qpYkDUfTK40VZk5upIKcJj5gIesCnCKD3Tx8Mi-xZFw", "DEPOSIT LIST", "A", "C", description="S8T deposit list")
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= A8N MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
+        # S8T (DEPOSIT LIST) MEW
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "S855_S8T_DL", "1NwdpMcpwh4pMz5bSPxyRcsEZ4_U9CdGU-2YvGYMpJks", "DEPOSIT LIST", "A", "C", description="S8T deposit list")
 
-        # A8N  (MEMBER INFO)
-        safe_call(Fetch.member_info, "aw8bo.com", "aw8", "A8N", "NPR", "+07:00", "AW8_A8N_MI", "1XH9TYpgF0LYqs9QEnOxxvdv8QW18JdivSV_hudSifUs", "New Register", description="A8N member info")
+        # # ==========================================================================
+        # # =-=-=-=-==-=-=-=-= A8N MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # # ==========================================================================
+
+        # # A8N  (MEMBER INFO)
+        # safe_call(Fetch.member_info, "aw8bo.com", "aw8", "A8N", "NPR", "+07:00", "AW8_A8N_MI", "1XH9TYpgF0LYqs9QEnOxxvdv8QW18JdivSV_hudSifUs", "New Register", description="A8N member info")
         
-        # A8N  (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "aw8bo.com", "aw8", "A8N", "NPR", "+07:00", "AW8_A8N_DL", "1XH9TYpgF0LYqs9QEnOxxvdv8QW18JdivSV_hudSifUs", "DEPOSIT LIST", "A", "C", description="A8N deposit list")
+        # # A8N  (DEPOSIT LIST)
+        # safe_call(Fetch.deposit_list_PID, "aw8bo.com", "aw8", "A8N", "NPR", "+07:00", "AW8_A8N_DL", "1XH9TYpgF0LYqs9QEnOxxvdv8QW18JdivSV_hudSifUs", "DEPOSIT LIST", "A", "C", description="A8N deposit list")
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= J1B MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
+        # # ==========================================================================
+        # # =-=-=-=-==-=-=-=-= J1B MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # # ==========================================================================
 
-        # J1B (MEMBER INFO) (HAFIZUR)
-        safe_call(Fetch.member_info, "batsman88.com", "jaya11", "J1B", "BDT", "+07:00", "J1B_MI", "1ZOv7AniBdas5rwvnmqvrm6y0a2-czdVSd2xMzLgAhjY", "New Register", description="IBS J1B MEMBER INFO")
+        # # J1B (MEMBER INFO) (HAFIZUR)
+        # safe_call(Fetch.member_info, "batsman88.com", "jaya11", "J1B", "BDT", "+07:00", "J1B_MI", "1ZOv7AniBdas5rwvnmqvrm6y0a2-czdVSd2xMzLgAhjY", "New Register", description="IBS J1B MEMBER INFO")
             
-        # J1B (DEPOSIT LIST) (HAFIZUR)
-        safe_call(Fetch.deposit_list_PID, "batsman88.com", "jaya11", "J1B", "BDT", "+07:00", "J1B_DL", "1ZOv7AniBdas5rwvnmqvrm6y0a2-czdVSd2xMzLgAhjY", "DEPOSIT LIST", "A", "C", description="J1B deposit list")
+        # # J1B (DEPOSIT LIST) (HAFIZUR)
+        # safe_call(Fetch.deposit_list_PID, "batsman88.com", "jaya11", "J1B", "BDT", "+07:00", "J1B_DL", "1ZOv7AniBdas5rwvnmqvrm6y0a2-czdVSd2xMzLgAhjY", "DEPOSIT LIST", "A", "C", description="J1B deposit list")
 
-        # J1B (DEPOSIT LIST) (ALAMGIR)
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J1B_DL", "1y8_EFXrMohv4ApBZXuvq9pMEz2288pcRZtj1MSE3E7o", "DEPOSIT LIST", "A", "C", description="J1B deposit list")
+        # # J1B (DEPOSIT LIST) (ALAMGIR)
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J1B_DL", "1y8_EFXrMohv4ApBZXuvq9pMEz2288pcRZtj1MSE3E7o", "DEPOSIT LIST", "A", "C", description="J1B deposit list")
         
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= J1N MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
+        # # ==========================================================================
+        # # =-=-=-=-==-=-=-=-= J1N MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # # ==========================================================================
         
-        # HAVEN SETUP!!!!!!
-        # # J1N (MEMBER INFO) (BADAL) 
-        # safe_call(Fetch.member_info, "dis88bo.com", "dis88", "D8N", "MYR", "+08:00", "D8M_MI", "1iw0jWV7UHUhQ6bTrcBiFYsvCGN02e8kDtBnhKD6agu4", "New Register", description="IBS D8M MEMBER INFO")
+        # # HAVEN SETUP!!!!!!
+        # # # J1N (MEMBER INFO) (BADAL) 
+        # # safe_call(Fetch.member_info, "dis88bo.com", "dis88", "D8N", "MYR", "+08:00", "D8M_MI", "1iw0jWV7UHUhQ6bTrcBiFYsvCGN02e8kDtBnhKD6agu4", "New Register", description="IBS D8M MEMBER INFO")
             
-        # J1N (DEPOSIT LIST) (BADAL)
-        safe_call(Fetch.deposit_list_PID, "batsman88.com", "jaya11", "J1N", "NPR", "+07:00", "J1N_DL", "1jek1Aztz1jgvbOmHUX5SLCVl24NY1ZLDAJhS00InJUw", "DEPOSIT LIST", "A", "C", description="J1N deposit list")
+        # # J1N (DEPOSIT LIST) (BADAL)
+        # safe_call(Fetch.deposit_list_PID, "batsman88.com", "jaya11", "J1N", "NPR", "+07:00", "J1N_DL", "1jek1Aztz1jgvbOmHUX5SLCVl24NY1ZLDAJhS00InJUw", "DEPOSIT LIST", "A", "C", description="J1N deposit list")
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= J8N MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
+        # # ==========================================================================
+        # # =-=-=-=-==-=-=-=-= J8N MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
+        # # ==========================================================================
 
-        # J8N (MEMBER INFO) (LOKENDRA)
-        safe_call(Fetch.member_info, "jw8bo.com", "jw8", "J8N", "NPR", "+07:00", "J8N_MI", "1HD8-yQ1whVvEUkJFVRAPJgWj4wNlEp88LpsHielS7VA", "New Register", description="IBS J8N MEMBER INFO")
+        # # J8N (MEMBER INFO) (LOKENDRA)
+        # safe_call(Fetch.member_info, "jw8bo.com", "jw8", "J8N", "NPR", "+07:00", "J8N_MI", "1HD8-yQ1whVvEUkJFVRAPJgWj4wNlEp88LpsHielS7VA", "New Register", description="IBS J8N MEMBER INFO")
             
-        # J8N (DEPOSIT LIST) (LOKENDRA)
-        safe_call(Fetch.deposit_list_PID, "jw8bo.com", "jw8", "J8N", "NPR", "+07:00", "J8N_DL", "1HD8-yQ1whVvEUkJFVRAPJgWj4wNlEp88LpsHielS7VA", "DEPOSIT LIST", "A", "C", description="J8N deposit list")
+        # # J8N (DEPOSIT LIST) (LOKENDRA)
+        # safe_call(Fetch.deposit_list_PID, "jw8bo.com", "jw8", "J8N", "NPR", "+07:00", "J8N_DL", "1HD8-yQ1whVvEUkJFVRAPJgWj4wNlEp88LpsHielS7VA", "DEPOSIT LIST", "A", "C", description="J8N deposit list")
 
-        # J8N (DEPOSIT LIST) (LAXMI)
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J8N_DL", "1eIoVnWjmhjmZTZ9SLHE8ifEuLdOtQicGVdI_s3WQoEw", "DEPOSIT LIST", "A", "C", description="J8N deposit list")
+        # # J8N (DEPOSIT LIST) (LAXMI)
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J8N_DL", "1eIoVnWjmhjmZTZ9SLHE8ifEuLdOtQicGVdI_s3WQoEw", "DEPOSIT LIST", "A", "C", description="J8N deposit list")
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= GT MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
 
-        # GT (MEMBER INFO) 
-        safe_call(Fetch.member_info, "gcwin99bo.com", "gc99", "GT", "THB", "+07:00", "GT_MI", "1iw0jWV7UHUhQ6bTrcBiFYsvCGN02e8kDtBnhKD6agu4", "New Register", description="IBS GT MEMBER INFO")
-            
-        # GT (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "gcwin99bo.com", "gc99", "GT", "THB", "+07:00", "GT_DL", "1jek1Aztz1jgvbOmHUX5SLCVl24NY1ZLDAJhS00InJUw", "DEPOSIT LIST", "A", "C", description="GT deposit list")
-
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= N855T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
-
-        # N855T (MEMBER INFO) 
-        safe_call(Fetch.member_info, "f5x3n8v.com", "n855", "N855T", "THB", "+07:00", "N855T_MI", "1iw0jWV7UHUhQ6bTrcBiFYsvCGN02e8kDtBnhKD6agu4", "New Register", description="IBS N855T MEMBER INFO")
-            
-        # N855T (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "f5x3n8v.com", "n855", "N855T", "THB", "+07:00", "N855T_DL", "1jek1Aztz1jgvbOmHUX5SLCVl24NY1ZLDAJhS00InJUw", "DEPOSIT LIST", "A", "C", description="N855T deposit list")
-
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-= N1T MEMBER INFO & DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-= 
-        # ==========================================================================
-
-        # N1T (MEMBER INFO) 
-        safe_call(Fetch.member_info, "m8b4x1z6.com", "n191", "N1T", "THB", "+07:00", "N1T_MI", "1iw0jWV7UHUhQ6bTrcBiFYsvCGN02e8kDtBnhKD6agu4", "New Register", description="IBS N1T MEMBER INFO")
-            
-        # N1T (DEPOSIT LIST)
-        safe_call(Fetch.deposit_list_PID, "m8b4x1z6.com", "n191", "N1T", "THB", "+07:00", "N1T_DL", "1jek1Aztz1jgvbOmHUX5SLCVl24NY1ZLDAJhS00InJUw", "DEPOSIT LIST", "A", "C", description="N1T deposit list")
-
+        # Delay 3 minutes
+        time.sleep(180)
 
     except KeyboardInterrupt:
             logger.info("Execution interrupted by user.")

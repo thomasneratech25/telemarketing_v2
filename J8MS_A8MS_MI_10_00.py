@@ -17,6 +17,7 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from datetime import datetime, timedelta, timezone
+from datetime import time as dtime
 from google_auth_oauthlib.flow import InstalledAppFlow
 from playwright.sync_api import sync_playwright, expect
 
@@ -633,7 +634,12 @@ class mongodb_2_gs:
     # Update Data to Google Sheet from MongoDB (MemberInfo)
     @classmethod
     def upload_to_google_sheet_MI(cls, collection, gs_id, gs_tab, rows=None):
-        
+
+        tz = timezone(timedelta(hours=8))
+
+        start_time = dtime(10, 0, 0)      # 10:00
+        end_time   = dtime(23, 59, 59)    # 23:59
+
         # Authenticate with OAuth2
         creds = cls.googleAPI()
         service = build("sheets", "v4", credentials=creds)
@@ -668,8 +674,31 @@ class mongodb_2_gs:
 
             db = client["J8MS_A8MS"]
             collection = db[collection]
-            documents = list(collection.find({}, {"_id": 0}).sort("register_info_date", 1))
-            rows = documents
+
+            documents = list(collection.find({}, {"_id": 0}))
+            filtered = []
+
+            for doc in documents:
+                raw_dt = doc.get("register_info_date")
+                if not raw_dt:
+                    continue
+                try:
+                    dt = datetime.fromisoformat(str(raw_dt))
+                    if dt.tzinfo is None:
+                        dt = dt.replace(tzinfo=tz)
+                    else:
+                        dt = dt.astimezone(tz)
+                except Exception:
+                    continue
+
+                # ✅ TIME-ONLY FILTER
+                if start_time <= dt.time() <= end_time:
+                    filtered.append(doc)
+
+            rows = sorted(filtered, key=lambda x: x.get("register_info_date"))
+
+            if start_time <= dt.time() <= end_time:
+                filtered.append(doc)
             
         rows = sanitize_rows(rows)
 
@@ -843,7 +872,35 @@ class mongodb_2_gs:
                     extra_ref.find({}, {"_id": 0}).sort("register_info_date", 1)
                 )
                 rows.extend(extra_docs)
-        
+
+        # ================= TIME FILTER (10:00–23:59, GMT+8) =================
+
+        tz = timezone(timedelta(hours=8))
+        start_time = dtime(10, 0, 0)
+        end_time   = dtime(23, 59, 59)
+
+        filtered = []
+
+        for doc in rows:
+            raw_dt = doc.get("register_info_date") or doc.get("registerDate")
+            if not raw_dt:
+                continue
+
+            try:
+                dt = datetime.fromisoformat(str(raw_dt).replace("Z", "+00:00"))
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=tz)
+                else:
+                    dt = dt.astimezone(tz)
+            except Exception:
+                continue
+
+            # ✅ TIME-ONLY FILTER
+            if start_time <= dt.time() <= end_time:
+                filtered.append(doc)
+
+        rows = filtered
+
         rows = sanitize_rows(rows)
 
         if not rows:
@@ -1671,9 +1728,35 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     @classmethod
     def member_info(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, upload_to_sheet=True):
 
-        # Get today date and time
-        today = datetime.now()
-        today = today.strftime("%Y-%m-%d")
+        # Print Team Name Messages
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {gs_tab} {Fore.YELLOW} MEMBER INFO Data...{Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
+
+
+        # Get TimeZone (GMT+7)
+        gmt7 = pytz.timezone("Asia/Bangkok")
+        now_gmt7 = datetime.now(gmt7)
+
+        # Get Current Time (GMT +7)    
+        current_time = now_gmt7.time()
+        print(current_time, "GMT+7")
+        
+        # Today & Yesterday Date
+        today = now_gmt7.strftime("%Y-%m-%d")
+        yesterday = (now_gmt7 - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Rule:
+        # 00:00 - 01:00 → use yesterday
+        # 01:01 onward → use today
+        if current_time < datetime.strptime("01:00", "%H:%M").time():
+            start_date = yesterday
+            end_date = yesterday
+        else:
+            start_date = today
+            end_date = today        
 
         # Cookie File
         cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
@@ -1697,8 +1780,8 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
         "currency": [
             currency
         ],
-        "register_from": today,
-        "register_to": today,
+        "register_from": start_date,
+        "register_to": end_date,
         "merchant_id": 1,
         "admin_id": 581,
         "aid": 581
@@ -1755,7 +1838,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             
             # Retry request...
             return cls.member_info(bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, upload_to_sheet=upload_to_sheet)
-
+        
         # For loop page and fetch data
         for page in range(1, 10000): 
 
@@ -1794,6 +1877,13 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     # SSBO Member Info (merchants name = aw8, ip9, uea)
     @classmethod
     def ssbo_member_info(cls, merchants, currency, collection, gs_id, gs_tab, extra_mongo_collections=None):
+        
+        # Print Team Name Messages
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {gs_tab} {Fore.YELLOW} SSBO MEMBER INFO Data...{Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
 
         # Get today and yesterday date
         today = datetime.now().strftime("%Y-%m-%d")
@@ -1859,7 +1949,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             "referrerLogin": None,
             "refCode": None,
             "fingerprint": None,
-            "created_date_from": f"{yesterday}T16:00:00.000Z",
+            "created_date_from": f"2025-11-30T16:00:00.000Z",
             "created_date": f"{today}T15:59:59.000Z",
             "registerDate": None,
             "last_login_date_from": None,
@@ -1956,7 +2046,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "tenantId": 35,
                 "currencies": currency_list,
                 "matchFullPhone": "true",
-                "createdDateFrom": f"{yesterday}T16:00:00.000Z",
+                "createdDateFrom": f"2025-11-30T16:00:00.000Z",
                 "createdDate": f"{today}T15:59:59.000Z",
                 "complianceViewMemberSocialMediaDetails": "true",
                 "enableShowTotalWallet": "false",
@@ -2550,38 +2640,26 @@ while True:
             # ============================================================== J8MS A8MS EMILLIA =============================================================================
             # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-            msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} J8MS A8MS {Fore.YELLOW} MEMBER INFO Data ... {Style.RESET_ALL}\n"
-            for ch in msg:
-                sys.stdout.write(ch)
-                sys.stdout.flush()
-                time.sleep(0.01) 
-
             # IBS J8M MY
-            print("\n>>== IBS J8M ==<<")
-            safe_call(Fetch.member_info, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "J8M IBS", description="IBS J8M MY MEMBER INFO")
+            safe_call(Fetch.member_info, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_MI_10_00", "1IAer3P0IUWNH69itVLlJ8gcZumaHFIQVGchOTkHiMFs", "J8M IBS", description="IBS J8M MY MEMBER INFO")
         
             # IBS J8S SG
-            print("\n>>== IBS J8S ==<<")
-            safe_call(Fetch.member_info, "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "J8S IBS", description="IBS J8S SG MEMBER INFO")
+            safe_call(Fetch.member_info, "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_MI_10_00", "1IAer3P0IUWNH69itVLlJ8gcZumaHFIQVGchOTkHiMFs", "J8S IBS", description="IBS J8S SG MEMBER INFO")
             
             # IBS A8M MY
-            print("\n>>== IBS A8M ==<<")
-            safe_call(Fetch.member_info, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8M IBS", description="IBS A8M MY MEMBER INFO")
+            safe_call(Fetch.member_info, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_MI_10_00", "1IAer3P0IUWNH69itVLlJ8gcZumaHFIQVGchOTkHiMFs", "A8M IBS", description="IBS A8M MY MEMBER INFO")
 
             # SSBO A8M MY
-            print("\n>>== SSBO A8M MY ==<<")
-            safe_call(Fetch.ssbo_member_info, "aw8", ["MYR"], "SSBO_A8M_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8M SS", description="SSBO A8M MY MEMBER INFO")
+            safe_call(Fetch.ssbo_member_info, "aw8", ["MYR"], "SSBO_A8M_MI_10_00", "1IAer3P0IUWNH69itVLlJ8gcZumaHFIQVGchOTkHiMFs", "A8M SS", description="SSBO A8M MY MEMBER INFO")
 
             # IBS A8S SG
-            print("\n>>== IBS A8S ==<<")
-            safe_call(Fetch.member_info, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8S IBS", description="IBS A8S SG MEMBER INFO")
+            safe_call(Fetch.member_info, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_MI_10_00", "1IAer3P0IUWNH69itVLlJ8gcZumaHFIQVGchOTkHiMFs", "A8S IBS", description="IBS A8S SG MEMBER INFO")
 
             # SSBO A8S SG
-            print("\n>>== SSBO A8S SG ==<<")
-            safe_call(Fetch.ssbo_member_info, "aw8", ["SGD"], "SSBO_A8S_MI", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8S SS", description="SSBO A8S SG MEMBER INFO")
+            safe_call(Fetch.ssbo_member_info, "aw8", ["SGD"], "SSBO_A8S_MI_10_00", "1IAer3P0IUWNH69itVLlJ8gcZumaHFIQVGchOTkHiMFs", "A8S SS", description="SSBO A8S SG MEMBER INFO")
             
-        # Delay 10 minutes
-        time.sleep(600)
+        # Delay 1 minute
+        time.sleep(60)
 
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")

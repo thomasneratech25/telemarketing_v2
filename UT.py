@@ -3387,13 +3387,13 @@ while True:
         # ============================================================== SSBO UT MEMBER INFO =============================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         
-        safe_call(Fetch.ssbo_member_info, "uea", "THB", "SSBO_UT_MI", "1k4IpLnQAJjDGoUwhbxxLFeTgygI7RlzwRFsEWmk2xPk", "New Register", description="SSBO UT THAI MEMBER INFO")
+        safe_call(Fetch.ssbo_member_info, "uea", "THB", "SSBO_UT_MI", "1hJRFCU9UGDuarqLQXJo84dqIEptBb8Sumsv0JZoGZ0w", "UT", description="SSBO UT THAI MEMBER INFO")
 
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         # ============================================================== SSBO UT PLAYER ID ===============================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         
-        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["THB"], "SSBO_UT_DL", "1k4IpLnQAJjDGoUwhbxxLFeTgygI7RlzwRFsEWmk2xPk", "DEPOSIT LIST", "A", "C", description="SSBO UT THAI DL PID")
+        safe_call(Fetch.ssbo_deposit_list_PID, "uea", ["THB"], "SSBO_UT_DL", "1hJRFCU9UGDuarqLQXJo84dqIEptBb8Sumsv0JZoGZ0w", "DEPOSIT LIST", "A", "C", description="SSBO UT THAI DL PID")
 
         # delay 10 minutes
         time.sleep(600)
