@@ -2,22 +2,36 @@ import os
 import sys
 import time
 import json
+import urllib3
 import requests
-from datetime import datetime
 from dotenv import load_dotenv
 from colorama import Fore, Style
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from google_auth_oauthlib.flow import InstalledAppFlow
-from Dec_start.runtime import logger, safe_call
+from runtime import logger, safe_call
+
+PROXIES = {
+    "http":  "http://127.0.0.1:10809",
+    "https": "http://127.0.0.1:10809",
+}
+
+def create_session():
+    s = requests.Session()
+    s.proxies.update(PROXIES)
+    s.trust_env = False   # VERY IMPORTANT
+    return s
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # BO Account
 class BO_Account:
-
-   # Load the .env file
-   # Format to use in other Class ===>             cls.accounts["gc99"]["merchant_code"]
+    
+    # Load the .env file
+    # Format to use in other Class ===>             cls.accounts["gc99"]["merchant_code"]
     load_dotenv()
 
     accounts = {
@@ -225,6 +239,10 @@ class GoogleSheetHelper:
 
         rows.sort(key=sort_key, reverse=descending)
 
+    # ====================================================================================
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- IBS LAST LOGIN =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # ====================================================================================
+    
     @classmethod
     def upload_to_google_sheet_Last_Login(cls, gs_id, gs_tab, rows):
         
@@ -285,12 +303,14 @@ class GoogleSheetHelper:
 
 # Fetch Data
 class Fetch(BO_Account, GoogleSheetHelper):
+    
+    # =========================== GET Cookies ===========================
 
     # Get IBS Cookies incase Cookies expired
     @classmethod
     def _get_cookies(cls, bo_link, merchant_code, acc_id, acc_pass, cookies_path):
         
-        session = requests.Session()
+        session = create_session()
 
         url = f"https://v3-bo.{bo_link}/api/be/auth/loginV2"
 
@@ -335,6 +355,7 @@ class Fetch(BO_Account, GoogleSheetHelper):
 
         # Return Response
         response = session.post(url, headers=headers, data=payload)
+        print(response.json())
 
         # to get Authentication Cookies
         user_cookie = session.cookies.get("user")
@@ -353,9 +374,13 @@ class Fetch(BO_Account, GoogleSheetHelper):
 
         print("Saved user cookie to:", file_path)
 
+    # =========================== Last Login Info ===========================
+
     # Last Login Info
     @classmethod
     def last_Login(cls, bo_link, bo_name, team, currency, gmt_time, gs_id, gs_tab):
+
+        session = create_session()
         
         # Print Team Name Messages
         msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {team} {Fore.YELLOW} Last Login Data...{Style.RESET_ALL}\n"
@@ -374,7 +399,7 @@ class Fetch(BO_Account, GoogleSheetHelper):
         print("End:", end_day)
 
         # Cookie File
-        cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+        cookie_file = f"/home/thomas/get_cookies/{bo_link}.json"
 
         # Auto-create file if missing
         os.makedirs(os.path.dirname(cookie_file), exist_ok=True)
@@ -427,7 +452,7 @@ class Fetch(BO_Account, GoogleSheetHelper):
         }
         
         # Post Response 
-        response = requests.post(url, headers=headers, json=payload)
+        response = session.post(url, headers=headers, json=payload, timeout=30)
 
         # Check if return unauthorized (401) 
         if response.json().get("statusCode") == 401:
@@ -435,13 +460,12 @@ class Fetch(BO_Account, GoogleSheetHelper):
             # Print 401 error
             print("⚠️ Received 401 Unauthorized. Attempting to refresh cookies...")
 
-            # Get Cookies
             cls._get_cookies(
                 bo_link,
                 cls.accounts[bo_name]["merchant_code"],
                 cls.accounts[bo_name]["acc_ID"],
                 cls.accounts[bo_name]["acc_PASS"],
-                f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+                f"/home/thomas/get_cookies/{bo_link}.json"
             )
             
             # Retry request...
@@ -455,7 +479,7 @@ class Fetch(BO_Account, GoogleSheetHelper):
             payload["page"] = page
 
             # Send POST request (CORRECT WAY)
-            response = requests.post(url, headers=headers, json=payload)
+            response = session.post(url, headers=headers, json=payload, timeout=30)
 
             # Safe JSON Handling
             try:
@@ -469,32 +493,10 @@ class Fetch(BO_Account, GoogleSheetHelper):
             rows = data.get("data", [])
             print(f"\nPage {page} → {len(rows)} rows")
 
-            # STOP only after double-checking the next page
+            # STOP if 0 rows
             if not rows:
-                print(f"⚠️ Page {page} returned 0 rows — double checking Page {page + 1}...")
-
-                # Prepare next-page payload
-                next_payload = payload.copy()
-                next_payload["page"] = page + 1
-
-                # Request next page
-                next_response = requests.post(url, headers=headers, json=next_payload)
-                try:
-                    next_data = next_response.json()
-                    next_rows = next_data.get("data", [])
-                except Exception:
-                    print("⚠️ Invalid JSON while double checking next page.")
-                    next_rows = []
-
-                print(f"Page {page + 1} → {len(next_rows)} rows (double check)")
-
-                # Only break if next page *also* returns 0
-                if not next_rows:
-                    print(f"No transaction ID found on Page {page} and Page {page + 1}. Breaking loop.")
-                    break
-                else:
-                    print(f"Page {page} was empty but Page {page + 1} has data → continuing...")
-                    continue
+                print(f"🛑 Page {page} returned 0 rows. Stopping pagination.")
+                break
 
             all_rows.extend(rows)
 
@@ -507,21 +509,22 @@ while True:
     try:
 
         # ==========================================================================
-        # =-=-=-=-==-=-=-=-=-=-=-=-= Last Login Info =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-
+        # =-=-=-=-==-=-=-=-= Last Login Info =-=-=-=-==-=-=-=-=-=-= 
         # ==========================================================================
 
         # J1B
-        safe_call(Fetch.last_Login, "batsman88.com", "jaya11", "J1B", "BDT", "+07:00", "1vAmjUff6yxKyBgZGqu0JZzAihOUOIMyKpx4Gpxmtf5U", "J1B", description="J1B LAST LOGIN")
+        safe_call(Fetch.last_Login, "batsman88.com", "jaya11", "J1B", "BDT", "+07:00", "1j4ykgy_HvReu08rmAawUs8qxwCzzn7wMs9-OmmtcINU", "J1B", description="J1B LAST LOGIN")
         # J8N
-        safe_call(Fetch.last_Login, "jw8bo.com", "jw8", "J8N", "NPR", "+07:00", "1vAmjUff6yxKyBgZGqu0JZzAihOUOIMyKpx4Gpxmtf5U", "J8N", description="J8N LAST LOGIN")
+        safe_call(Fetch.last_Login, "jw8bo.com", "jw8", "J8N", "NPR", "+07:00", "1j4ykgy_HvReu08rmAawUs8qxwCzzn7wMs9-OmmtcINU", "J8N", description="J8N LAST LOGIN")
         # J1N
-        safe_call(Fetch.last_Login, "batsman88.com", "jaya11", "J1N", "NPR", "+07:00", "1vAmjUff6yxKyBgZGqu0JZzAihOUOIMyKpx4Gpxmtf5U", "J1N", description="J1N LAST LOGIN")
+        safe_call(Fetch.last_Login, "batsman88.com", "jaya11", "J1N", "NPR", "+07:00", "1j4ykgy_HvReu08rmAawUs8qxwCzzn7wMs9-OmmtcINU", "J1N", description="J1N LAST LOGIN")
         # K8N
-        safe_call(Fetch.last_Login, "6668889.store", "k88", "K8N", "NPR", "+07:00", "1vAmjUff6yxKyBgZGqu0JZzAihOUOIMyKpx4Gpxmtf5U", "K8N", description="K8N LAST LOGIN")
+        safe_call(Fetch.last_Login, "6668889.store", "k88", "K8N", "NPR", "+07:00", "1j4ykgy_HvReu08rmAawUs8qxwCzzn7wMs9-OmmtcINU", "K8N", description="K8N LAST LOGIN")
         # I8N
-        safe_call(Fetch.last_Login, "6668889.site", "i88", "I8N", "NPR", "+07:00", "1vAmjUff6yxKyBgZGqu0JZzAihOUOIMyKpx4Gpxmtf5U", "I8N", description="I8N LAST LOGIN")
+        safe_call(Fetch.last_Login, "6668889.site", "i88", "I8N", "NPR", "+07:00", "1j4ykgy_HvReu08rmAawUs8qxwCzzn7wMs9-OmmtcINU", "I8N", description="I8N LAST LOGIN")
         
-        time.sleep(1800)
+        # SSBO
+        # safe_call(Fetch.ssbo_last_Login, "aw8", ["MYR"], "1j4ykgy_HvReu08rmAawUs8qxwCzzn7wMs9-OmmtcINU", "LAST LOGIN", description="SSBO A8M MY LAST LOGIN")
 
     except KeyboardInterrupt:
             logger.info("Execution interrupted by user.")

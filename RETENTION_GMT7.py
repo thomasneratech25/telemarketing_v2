@@ -84,12 +84,12 @@ class Automation:
     def chrome_CDP(cls):
 
         # User Profile
-        USER_DATA_DIR = f"/Users/nera_thomas/Library/Application Support/Google/Chrome/Profile 9"
+        USER_DATA_DIR = f"/Users/nera_thomas/Library/Application Support/Google/Chrome/Profile 10"
         
         # Start Chrome normally
         cls.chrome_proc = subprocess.Popen([
             "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-            "--remote-debugging-port=9222",
+            "--remote-debugging-port=9223",
             "--disable-session-crashed-bubble",
             "--hide-crash-restore-bubble",
             "--no-first-run",
@@ -119,10 +119,10 @@ class Automation:
     # Wait for Chrome CDP to be ready
     @staticmethod
     def wait_for_cdp_ready(timeout=10):
-        """Wait until Chrome CDP is ready at http://localhost:9222/json"""
+        """Wait until Chrome CDP is ready at http://localhost:9223/json"""
         for _ in range(timeout):
             try:
-                res = requests.get("http://localhost:9222/json")
+                res = requests.get("http://localhost:9223/json")
                 if res.status_code == 200:
                     return True
             except:
@@ -146,7 +146,7 @@ class BO_Account:
             "acc_ID": os.getenv("ACC_ID_WDB1"),
             "acc_PASS": os.getenv("ACC_PASS_WDB1")
         },
-        "22fun": {
+        "22f": {
             "merchant_code": os.getenv("MERCHANT_CODE_22FUN"),
             "acc_ID": os.getenv("ACC_ID_22FUN"),
             "acc_PASS": os.getenv("ACC_PASS_22FUN")
@@ -246,7 +246,7 @@ class BO_Account:
             "acc_ID": os.getenv("ACC_ID_R99"),
             "acc_PASS": os.getenv("ACC_PASS_R99")
         },
-        "22W": {
+        "22w": {
             "merchant_code": os.getenv("MERCHANT_CODE_22W"),
             "acc_ID": os.getenv("ACC_ID_22W"),
             "acc_PASS": os.getenv("ACC_PASS_22W")
@@ -275,6 +275,11 @@ class BO_Account:
             "merchant_code": os.getenv("MERCHANT_CODE_UEA8"),
             "acc_ID": os.getenv("ACC_ID_UEA8"),
             "acc_PASS": os.getenv("ACC_PASS_UEA8")
+        },
+        "dis88": {
+            "merchant_code": os.getenv("MERCHANT_CODE_DIS88"),
+            "acc_ID": os.getenv("ACC_ID_DIS88"),
+            "acc_PASS": os.getenv("ACC_PASS_DIS88")
         },
     }
 
@@ -536,7 +541,7 @@ class mongodb_2_gs:
         if not MONGODB_URI:
             raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
         client = MongoClient(MONGODB_URI)
-        db = client["Telemarketing"]
+        db = client["RETENTION"]
         combined = []
         for col_name in collection_names:
             col = db[col_name]
@@ -592,7 +597,7 @@ class mongodb_2_gs:
 
         # Call MongoDB database and collection
         client = MongoClient(MONGODB_URI)
-        db = client["Telemarketing"]
+        db = client["RETENTION"]
         collection = db[collection]
 
         # Drop any legacy indexes that might conflict
@@ -787,7 +792,7 @@ class mongodb_2_gs:
         if not MONGODB_URI:
             raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
         client = MongoClient(MONGODB_URI)
-        db = client["Telemarketing"]
+        db = client["RETENTION"]
 
         if not rows:
             collection_ref = db[collection]
@@ -858,7 +863,7 @@ class mongodb_2_gs:
 
         # Call MongoDB database and collection
         client = MongoClient(MONGODB_URI)
-        db = client["Telemarketing"]
+        db = client["RETENTION"]
         collection = db[collection]
 
         # Set and Ensure when upload data this 3 Field is Unique Data
@@ -994,7 +999,7 @@ class mongodb_2_gs:
                 raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
             client = MongoClient(MONGODB_URI)
 
-            db = client["Telemarketing"]
+            db = client["RETENTION"]
             collection = db[collection]
             documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
             rows = documents
@@ -1046,7 +1051,7 @@ class mongodb_2_gs:
 
         # Call MongoDB database and collection
         client = MongoClient(MONGODB_URI)
-        db = client["J8MS_A8MS"]
+        db = client["RETENTION"]
         collection = db[collection]
 
         # Set and Ensure when upload data this 3 Field are Unique Data
@@ -1182,7 +1187,7 @@ class mongodb_2_gs:
                 raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
             client = MongoClient(MONGODB_URI)
 
-            db = client["J8MS_A8MS"]
+            db = client["RETENTION"]
             collection = db[collection]
             documents = list(collection.find({}, {"_id": 0}).sort("lastModifiedDate", 1))
             rows = documents
@@ -1230,6 +1235,196 @@ class mongodb_2_gs:
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n\n")
 
+    # ====================================================================================
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= IBS DEPOSIT LIST (PLAYER ID) =-=-=-=-=-=-=-=-=-=-=-=-
+    # ====================================================================================
+
+    # MongoDB Database
+    def mongodbAPI_DL_PID(rows, collection):
+
+        # MongoDB API KEY
+        MONGODB_URI = os.getenv("MONGODB_API_KEY")
+
+        # Call MongoDB database and collection
+        client = MongoClient(MONGODB_URI)
+        db = client["RETENTION"]
+        collection = db[collection]
+
+        # Set and Ensure when upload data this 3 Field is Unique Data
+        collection.create_index(
+            [("player_id", 1), ("amount", 1), ("completed_at", 1)],
+            unique=True
+        )
+
+        # Count insert and skip
+        inserted = 0
+        skipped = 0
+        cleaned_docs = []
+
+        batch = []
+
+        # for each rows in a list of JSON objects return
+        for row in rows:
+            # Extract only the fields you want (Extract Data from json file)
+            player_id = row.get("player_id")
+            amount = row.get("amount")
+            completed_at = row.get("completed_at")
+
+            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
+            dt = datetime.fromisoformat(completed_at)
+            completed_at_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
+
+            # Build the new cleaned document (Use for upload data to MongoDB)
+            doc = {
+                "player_id": player_id,
+                "amount": amount,
+                "completed_at": completed_at_fmt,
+            }
+
+            # Keep the version without _id for uploading later
+            cleaned_docs.append(doc.copy())
+            batch.append(doc)
+
+            if len(batch) == 500:
+                try:
+                    collection.insert_many(batch, ordered=False)
+                    inserted += len(batch)
+                except Exception as exc:
+                    if hasattr(exc, "details"):
+                        skipped += len(exc.details.get("writeErrors", []))
+                        inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                    else:
+                        skipped += 0
+                batch = []
+
+        # Insert any remaining documents in batch
+        if batch:
+            try:
+                collection.insert_many(batch, ordered=False)
+                inserted += len(batch)
+            except Exception as exc:
+                if hasattr(exc, "details"):
+                    skipped += len(exc.details.get("writeErrors", []))
+                    inserted += len(batch) - len(exc.details.get("writeErrors", []))
+                else:
+                    skipped += 0
+
+        print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}")
+        return cleaned_docs
+
+    # Update Data to Google Sheet from MongoDB
+    @classmethod
+    def upload_to_google_sheet_DL_PID(cls, collection, gs_id, gs_tab, start_column, end_column, rows=None, extra_mongo_collections=None, overwrite=False, upload_to_sheet=True):
+
+        # Authenticate with OAuth2
+        creds = cls.googleAPI()
+        service = build("sheets", "v4", credentials=creds)
+        sheet = service.spreadsheets()
+
+        # Google Sheet ID and Sheet Tab Name (range name)
+        SPREADSHEET_ID = gs_id
+
+        # Convert from MongoDB (dics) to Google Sheet API (list), because Google Sheets API only accept "list".
+        def sanitize_rows(raw_rows):
+            """Normalize rows into list-of-lists; keep completed_at unchanged."""
+            sanitized = []
+            for r in raw_rows:
+                if isinstance(r, dict):
+                    pid = str(r.get("player_id", ""))
+                    if pid and not pid.startswith("'"):
+                        pid = f"'{pid}"  # force Google Sheets to treat as text
+                    # --- BEGIN PATCHED AMOUNT HANDLING ---
+                    amount_raw = r.get("amount", "")
+
+                    # Force 2 decimal places WITHOUT rounding
+                    if "." in amount_raw:
+                        whole, frac = amount_raw.split(".", 1)
+                        frac = (frac + "00")[:2]   # pad then truncate
+                        amount_clean = f"{whole}.{frac}"
+                    else:
+                        amount_clean = f"{amount_raw}.00"
+                    # --- END PATCHED AMOUNT HANDLING ---
+
+                    sanitized.append([
+                        pid,
+                        amount_clean,
+                        r.get("completed_at", ""),
+                    ])
+                elif isinstance(r, (list, tuple)):
+                    pid = str(r[0]) if len(r) > 0 else ""
+                    if pid and not pid.startswith("'"):
+                        pid = f"'{pid}"
+                    sanitized.append([
+                        pid,
+                        str(r[1]) if len(r) > 1 else "",
+                        r[2] if len(r) > 2 else "",  # do not coerce to str
+                    ])
+                else:
+                    sanitized.append([str(r), "", ""])
+            return sanitized
+
+        # If no data upload to MongoDB, it auto upload data to google sheet
+        if not upload_to_sheet:
+            print(f"upload_to_sheet=False → Skipping Google Sheet update for tab '{gs_tab}'.")
+            return
+
+        if not rows:
+            load_dotenv()
+            MONGODB_URI = os.getenv("MONGODB_API_KEY")
+            if not MONGODB_URI:
+                raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
+            client = MongoClient(MONGODB_URI)
+
+            db = client["RETENTION"]
+            collection = db[collection]
+            documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
+            rows = documents
+            
+        combined_rows = cls._normalize_pid_rows(rows)
+        if extra_mongo_collections:
+            combined_rows.extend(cls._fetch_extra_pid_rows(extra_mongo_collections))
+
+        cls._sort_rows_by_datetime(combined_rows, "completed_at")
+        rows = sanitize_rows(combined_rows)
+
+        if not rows:
+            print("No rows found to upload to Google Sheet.")
+            return
+
+        if overwrite or extra_mongo_collections or (start_column, end_column) in {("A", "C"), ("E", "G")}:
+            first_empty_row = 3
+        else:
+            first_empty_row = cls._find_first_empty_row(
+                sheet,
+                SPREADSHEET_ID,
+                gs_tab,
+                start_column,
+                end_column,
+                start_row=3
+            )
+        end_row = first_empty_row + len(rows) - 1
+        target_range = cls._build_a1_range(gs_tab, start_column, first_empty_row, end_column, end_row)
+
+        body = {"values": rows, "majorDimension": "ROWS"}
+
+        cls._ensure_sheet_row_capacity(service, SPREADSHEET_ID, gs_tab, end_row)
+
+        print(f"Uploading {len(rows)} rows to Google Sheet range {target_range}")
+
+        try:
+            sheet.values().update(
+                spreadsheetId=SPREADSHEET_ID,
+                range=target_range,
+                valueInputOption="USER_ENTERED",  # let Sheets parse dates/numbers
+                body=body
+            ).execute()
+        except Exception as exc:
+            print(f"Failed to upload to Google Sheets: {exc}")
+            raise
+
+        # print("Rows to upload:", rows)
+        print("Uploaded MongoDB data to Google Sheet.\n\n")
+
 # Fetch Data
 class Fetch(Automation, BO_Account, mongodb_2_gs):
     
@@ -1243,7 +1438,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             cls.wait_for_cdp_ready()
 
             # Connect to running Chrome
-            browser = p.chromium.connect_over_cdp("http://localhost:9222")
+            browser = p.chromium.connect_over_cdp("http://localhost:9223")
             context = browser.contexts[0] if browser.contexts else browser.new_context()
             # Clean Cookies
             context.clear_cookies()
@@ -1322,7 +1517,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             cls.wait_for_cdp_ready()
 
             # Connect to running Chrome
-            browser = p.chromium.connect_over_cdp("http://localhost:9222")
+            browser = p.chromium.connect_over_cdp("http://localhost:9223")
             context = browser.contexts[0] if browser.contexts else browser.new_context()    
 
             # Open a new browser page
@@ -1332,7 +1527,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             # if announment appear, then click close
             try:
                 # Wait for "Member" appear
-                expect(page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[4]/div[1]/div[1]/a[1]/ul[1]/li[2]")).to_be_visible(timeout=30000)
+                expect(page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[4]/div[1]/div[1]/a[1]/ul[1]/li[2]")).to_be_visible(timeout=3000)
                 # Check whether "Merchant credit balance is low" appear, else pass
                 expect(page.locator("//div[normalize-space()='Merchant credit balance is low.']")).to_be_visible(timeout=1500)
                 # Click checkbox
@@ -1346,7 +1541,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             # if is in Login Page, then Login, else Skip
             try:
                 # Check whether "Sign In" appear, else pass
-                expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=2000)
+                expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=3000)
                 # Fill in Username
                 page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan"]["acc_ID"])
                 # Fill in Password
@@ -1362,11 +1557,11 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             # if is in Login Page, then Login, else Skip
             try:
                 # Check whether "Sign In" appear, else pass
-                expect(page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[1]/h5[1]")).to_be_visible(timeout=4000)
+                expect(page.locator("//body[1]/ngb-modal-window[14]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[1]/h5[1]")).to_be_visible(timeout=3000)
                 # Fill in Username
-                page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[2]/div[2]/jhi-text-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_ID"])
+                page.locator("//body[1]/ngb-modal-window[14]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[2]/div[2]/jhi-text-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_ID"])
                 # Fill in Password
-                page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[3]/div[2]/jhi-password-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_PASS"])
+                page.locator("//body[1]/ngb-modal-window[14]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[3]/div[2]/jhi-password-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_PASS"])
                 # Login 
                 page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
                 # Delay 2 second
@@ -1620,7 +1815,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             cls.wait_for_cdp_ready()
 
             # Connect to running Chrome
-            browser = p.chromium.connect_over_cdp("http://localhost:9222")
+            browser = p.chromium.connect_over_cdp("http://localhost:9223")
             context = browser.contexts[0] if browser.contexts else browser.new_context()    
 
             # Open a new browser page
@@ -1731,7 +1926,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 # Run Chrome Browser
                 Automation.chrome_CDP()
                 
-    # =========================== DEPOSIT LIST USERNAME ===========================
+    # =========================== DEPOSIT LIST ===========================
 
     # Deposit List (Username)
     @classmethod
@@ -1862,6 +2057,199 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             rows = data.get("data", [])
             print(f"\nPage {page} → {len(rows)} rows")
 
+            # ====================== EMPTY PAGE SAFETY RETRY ======================
+            # ⚠️ IMPORTANT:
+            # This API is unstable and may randomly return 0 rows even when data exists.
+            # A single (or even double) empty response MUST NOT be trusted.
+            #
+            # Strategy:
+            # - Retry the SAME page up to MAX_EMPTY_RETRIES times
+            # - Sleep briefly between retries to avoid backend race conditions
+            # - If ANY retry returns data → treat page as valid
+            # - Only stop pagination if ALL retries return 0 rows
+            
+            if not rows:
+                
+                # number of retries before confirming page is truly empty
+                MAX_EMPTY_RETRIES = 5
+                # retry counter
+                empty_attempts = 0
+                # holds rows from retry attempts
+                retry_rows = []
+
+                print(f"⚠️ Page {page} returned 0 rows — retrying up to {MAX_EMPTY_RETRIES} times...")
+
+                while empty_attempts < MAX_EMPTY_RETRIES:
+
+                    # short delay to avoid API race condition
+                    time.sleep(1.5)  
+
+                    # Re-request the SAME page (do NOT increment page number)
+                    retry_response = requests.post(
+                            url,
+                            headers=headers,
+                            json=payload,
+                            timeout=30,
+                            verify=certifi.where()
+                    )
+
+                    try:
+                        retry_data = retry_response.json()
+                        retry_rows = retry_data.get("data", [])
+                    except Exception:
+                        # Treat invalid JSON as empty response and retry
+                        retry_rows = []
+
+                    print(f"Retry {empty_attempts + 1}/{MAX_EMPTY_RETRIES} → {len(retry_rows)} rows")
+
+                    if retry_rows:
+                        # ✅ Recovery success: backend glitch resolved
+                        print(f"✅ Page {page} recovered after retry.")
+                        rows = retry_rows
+                        break
+
+                    empty_attempts += 1
+
+                # ⛔ Only reach here if ALL retries returned 0 rows
+                # This is considered a TRUE end-of-data signal
+                if not rows:
+                    print(f"⛔ Page {page} confirmed empty after {MAX_EMPTY_RETRIES} retries. Stopping pagination.")
+                    break
+
+            # Insert into MongoDB
+            rows_to_insert = rows if isinstance(rows, list) else []
+
+            if rows_to_insert:
+                cls.mongodbAPI_DL_USERNAME(rows_to_insert, collection)
+            else:
+                print("No data returned from API.")
+
+        # Upload Data to Google Sheet by reading from MongoDB
+        cls.upload_to_google_sheet_DL_USERNAME(collection, gs_id, gs_tab, start_column, end_column, rows=None, extra_mongo_collections=extra_mongo_collections)
+
+    # Deposit List (Player ID)
+    @classmethod
+    def deposit_list_PID(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=None):
+
+        # Get current time in GMT+8
+        gmt8 = pytz.timezone("Asia/Singapore")   # GMT+8
+        now_gmt8 = datetime.now(gmt8)
+
+        current_time = now_gmt8.time()
+        print(current_time, "GMT+8")
+
+        # Get today and yesterday date
+        today = now_gmt8.strftime("%Y-%m-%d")
+        yesterday = (now_gmt8 - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        # Rule:
+        # 00:00 - 01:00 → use yesterday
+        # 01:01 onward → use today
+        cutoff_time = datetime.strptime("01:00", "%H:%M").time()
+
+        if current_time < cutoff_time:
+            start_date = yesterday
+            end_date = yesterday
+        else:
+            start_date = today
+            end_date = today
+
+        # Cookie File
+        cookie_file = f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+
+        # Auto-create file if missing
+        os.makedirs(os.path.dirname(cookie_file), exist_ok=True)
+        if not os.path.exists(cookie_file):
+            open(cookie_file, "w").write('{"user_cookie": ""}')
+
+        # Load cookie
+        with open(cookie_file, "r", encoding="utf-8") as f:
+            user_cookie = json.load(f).get("user_cookie", "")
+        
+        url = f"https://v3-bo.{bo_link}/api/be/finance/get-deposit"
+
+        payload = {
+        "paginate": 100,
+        "page": 1,
+        "currency": [
+            currency
+        ],
+        "status": "approved",
+        "start_date": "2026-01-01",
+        "end_date": end_date,
+        "gmt": gmt_time,
+        "merchant_id": 1,
+        "admin_id": 337,
+        "aid": 337
+        }
+        headers = {
+        'accept': 'application/json',
+        'accept-language': 'en-US,en;q=0.9',
+        'cache-control': 'no-cache',
+        'content-type': 'application/json',
+        'domain': f'v3-bo.{bo_link}',
+        'gmt': gmt_time,
+        'lang': 'en-US',
+        'loggedin': 'true',
+        'origin': f'https://v3-bo.{bo_link}',
+        'page': '/en-us/finance-management/deposit',
+        'pragma': 'no-cache',
+        'priority': 'u=1, i',
+        'referer': f'https://v3-bo.{bo_link}/en-us/finance-management/deposit',
+        'sec-ch-ua': '"Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
+        'type': 'POST',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
+        'Cookie': f"i18n_redirected=en-us; user={user_cookie}",
+        }
+
+        # Post Response 
+        response = requests.post(url, headers=headers, json=payload)
+
+        # Check if return unauthorized (401) 
+        if response.json().get("statusCode") == 401:
+            
+            # Print 401 error
+            print("⚠️ Received 401 Unauthorized. Attempting to refresh cookies...")
+
+            # Get Cookies
+            Automation.chrome_CDP()
+            cls._get_cookies(
+                bo_link,
+                cls.accounts[bo_name]["merchant_code"],
+                cls.accounts[bo_name]["acc_ID"],
+                cls.accounts[bo_name]["acc_PASS"],
+                f"/Users/nera_thomas/Desktop/Telemarketing/get_cookies/{bo_link}.json"
+            )
+            
+            # Retry request...
+            return cls.deposit_list_PID(bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections)
+
+
+        # For loop page and fetch data
+        for page in range(1, 10000): 
+
+            payload["page"] = page
+
+            # Send POST request
+            response = requests.post(url, headers=headers, json=payload)
+            
+            # Safe JSON Handling
+            try:
+                data = response.json()
+            except Exception:
+                print("Invalid JSON response from API!")
+                print("Status Code:", response.status_code)
+                print("Response text:", response.text[:500])
+                return
+
+            rows = data.get("data", [])
+            print(f"\nPage {page} → {len(rows)} rows")
+
             # STOP when no data
             if not rows:
                 print(f"Finished. Last page = {page-1}")
@@ -1869,12 +2257,12 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 
             # Insert into MongoDB
             if "data" in data and len(data["data"]) > 0:
-                cls.mongodbAPI_DL_USERNAME(data["data"], collection)
+                cls.mongodbAPI_DL_PID(data["data"], collection)
             else:
                 print("No data returned from API.")
 
         # Upload Data to Google Sheet by reading from MongoDB
-        cls.upload_to_google_sheet_DL_USERNAME(collection, gs_id, gs_tab, start_column, end_column, rows=None, extra_mongo_collections=extra_mongo_collections)
+        mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column, rows=None, extra_mongo_collections=extra_mongo_collections)
 
     # SSBO Deposit List (Player ID)
     @classmethod
@@ -2142,56 +2530,172 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 
 while True:
     try:
+        
 
         # =============================================================================================================================
         # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS GT ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
         # =============================================================================================================================
 
-        # # GT (MEMBER INFO) 
-        # safe_call(Fetch.allmemberReport, "IBS GT AMR", "gcwin99bo.com", "gc99", "THB", "+07:00", "GT_AMR", "1fpuWRQIT1_gR_636vFhFCDVWLx_aNDVqjYX8Ha9ENIM", "AMR")
-       
-        # GT (DEPOSIT LIST) JIRAPORN
-        safe_call(Fetch.deposit_list_USERNAME, "gcwin99bo.com", "gc99", "GT", "THB", "+07:00", "GT_DL_USERNAME", "1fpuWRQIT1_gR_636vFhFCDVWLx_aNDVqjYX8Ha9ENIM", "DEPOSIT LIST", "A", "C")
+        # GT (ALL MEMBER INFO) KOI
+        safe_call(Fetch.allmemberReport, "IBS GT AMR", "gcwin99bo.com", "gc99", "THB", "+08:00", "GT_AMR", "1fOWjL0KQa5Q7x2ApvFz2C3Mg-n1qM9yjeqrVcXn3hME", "TM - All Member Report")
 
-        # GT (DEPOSIT LIST) NOK
-        safe_call(Fetch.deposit_list_USERNAME, "gcwin99bo.com", "gc99", "GT", "THB", "+07:00", "GT_DL_USERNAME", "16Wjf2lyJR4pwZXtKrf5fdycnAbdKvWvsUKSzUo7pNaM", "DEPOSIT LIST", "A", "C")
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS N855T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
 
-        # # =============================================================================================================================
-        # # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS N855T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-        # # =============================================================================================================================
-
-        # # # N855T (MEMBER INFO) 
-        # # safe_call(Fetch.allmemberReport, "IBS N855T AMR", "f5x3n8v.com", "n855", "THB", "+07:00", "N855T_AMR", "1jKBRkAyY-5PqOYmHgS_SqxWYY4C-JApDNc49YVGMSa8", "AMR")
-       
-        # N855T (DEPOSIT LIST USERNAME)
-        safe_call(Fetch.deposit_list_USERNAME, "f5x3n8v.com", "n855", "N855T", "THB", "+07:00", "N855T_DL_USERNAME", "1jKBRkAyY-5PqOYmHgS_SqxWYY4C-JApDNc49YVGMSa8", "DEPOSIT LIST", "A", "C")
-
+        # N855T (ALL MEMBER INFO) JIRAPORN
+        safe_call(Fetch.allmemberReport, "IBS N855T AMR", "f5x3n8v.com", "n855", "THB", "+08:00", "N855T_AMR", "1tJQJuy2-VsZ7u051fOAWjzsjFgP-9H7s25Z4NsVG6tA", "TM - All Member Report")
+    
         # =============================================================================================================================
         # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS N1T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
         # =============================================================================================================================
 
-        # # N1T (MEMBER INFO) 
-        # safe_call(Fetch.allmemberReport, "IBS N1T AMR", "m8b4x1z6.com", "n191", "THB", "+07:00", "N1T_AMR", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "AMR")
-       
-        # N1T (DEPOSIT LIST USERNAME)
-        safe_call(Fetch.deposit_list_USERNAME, "m8b4x1z6.com", "n191", "N191T", "THB", "+07:00", "N1T_DL_USERNAME", "1z5cQal2mTKfm94Xx01Kt9yB2Cq90E9SKeGURcp5u7r8", "DEPOSIT LIST", "A", "C")
+        # N1T (ALL MEMBER INFO) SUPATTA
+        safe_call(Fetch.allmemberReport, "IBS N1T AMR", "m8b4x1z6.com", "n191", "THB", "+08:00", "N1T_AMR", "19yThSHpDPkXsjI_q-1X1CKhLS_p5BIS9Hk8Qn9fTGfE", "TM - All Member Report")
 
         # =============================================================================================================================
         # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS N789T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
         # =============================================================================================================================
 
-        # # N789T (MEMBER INFO)  HAVEN CHANGE!!!
-        # safe_call(Fetch.allmemberReport, "IBS N1T AMR", "m8b4x1z6.com", "n191", "THB", "+07:00", "N1T_AMR", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "AMR")
-       
-        # N789T (DEPOSIT LIST USERNAME) TOKIE
-        safe_call(Fetch.deposit_list_USERNAME, "q2n5w3z.com", "n789", "N789T", "THB", "+07:00", "N789T_DL_USERNAME", "1WpAC5wQZ06TSJwfg6UmZzJoj5qJX4P7FkZh3ekhR-GQ", "DEPOSIT LIST", "A", "C")
+        # N789T (ALL MEMBER INFO) SUPATTA
+        safe_call(Fetch.allmemberReport, "IBS N789T AMR", "q2n5w3z.com", "n789", "THB", "+08:00", "N789T_AMR", "1Aubkpmr1ViquwVgIoA87T--mVjd5bl4zCJLPo03Hxgk", "TM - All Member Report")
 
-        # Delay 5 minutes
-        time.sleep(300)
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS S8T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # S8T (ALL MEMBER INFO) MIN
+        safe_call(Fetch.allmemberReport, "IBS S8T AMR", "siam855bo.com", "s855", "THB", "+08:00", "S8T_AMR", "1qdu-hI9yitWLKuFUVVAK7LLVfW7DbPelGDmk-VuU7s4", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS S6T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # S6T (ALL MEMBER INFO) PU
+        safe_call(Fetch.allmemberReport, "IBS S6T AMR", "siam66bo.com", "s66", "THB", "+08:00", "S6T_AMR", "18m1h7K_AUy-dm0dhad3J4JiYEgZuzoxEbvc4BQoFcCE", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS 2WT ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # 2WT (ALL MEMBER INFO) SATANG
+        safe_call(Fetch.allmemberReport, "IBS 2WT AMR", "w8c4n9be.com", "22w", "THB", "+08:00", "2WT_AMR", "1aShl2QYJbwy1y97nUnKPzjkjlK-JEOHl8KrhzXtbti0", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS 2FT ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # 2FT (ALL MEMBER INFO) NING
+        safe_call(Fetch.allmemberReport, "IBS 2FT AMR", "22funbo.com", "22f", "THB", "+08:00", "2FT_AMR", "1YmcYjn2RaQe7b9x7UZof7V9xHwQvSR7qkSLlQPz3hSA", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS S2T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # S2T (ALL MEMBER INFO) BOOM
+        safe_call(Fetch.allmemberReport, "IBS S2T AMR", "m3v5r6cx.com", "s212", "THB", "+08:00", "S2T_AMR", "1lp2eBaXG_-CfZ52OXUxtLSXoQcPeWJ6IJJ676F95K2c", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS M1T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # M1T (ALL MEMBER INFO) KAEO
+        safe_call(Fetch.allmemberReport, "IBS M1T AMR", "zupra7x.com", "mf191", "THB", "+08:00", "M1T_AMR", "1w4Yto0PDjsyYnPsLZnSm72l6bPAiwXuEJasfcld09mI", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J8T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # J8T (ALL MEMBER INFO) TIP
+        safe_call(Fetch.allmemberReport, "IBS J8T AMR", "jw8bo.com", "jw8", "THB", "+08:00", "J8T_AMR", "1dYSGFLO9emW-BGjfxcGVC28esDld1_BYD1npK-NkUpI", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS MST ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # MST (ALL MEMBER INFO) POP
+        safe_call(Fetch.allmemberReport, "IBS MST AMR", "bo-msslot.com", "slot", "THB", "+08:00", "MST_AMR", "1k70B4OniQ8_C1MzZNyGoWt0dBGJrC83n0XW0MQEEHCE", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS I8T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # I8T (ALL MEMBER INFO) KUNG
+        safe_call(Fetch.allmemberReport, "IBS I8T AMR", "i828.asia", "828", "THB", "+08:00", "I8T_AMR", "12xJ4diNv1rJItUwH9XroDDesqPcffZcJL4Pw2d7rY68", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS G855T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # G855T (ALL MEMBER INFO) VIEW
+        safe_call(Fetch.allmemberReport, "IBS G855T AMR", "god855.asia", "g855", "THB", "+08:00", "G855T_AMR", "1Urk-Zo1xVlzeiCJF0HB0F2-n1_ptto5sTzdy4U9g3J0", "TM - All Member Report")
+
+        # # =============================================================================================================================
+        # # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS S345T ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # # =============================================================================================================================
+
+        # S345T (ALL MEMBER INFO) BUA
+        safe_call(Fetch.allmemberReport, "IBS S345T AMR", "57249022.asia", "s345", "THB", "+08:00", "S345T_AMR", "1npR2LLvMZ4hzsdH5bjdI1zabnJy75fq9K4-gWT_xbCo", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS A8N ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # A8N (ALL MEMBER INFO) ANNA
+        safe_call(Fetch.allmemberReport, "IBS A8N", "aw8bo.com", "aw8", "NPR", "+08:00", "A8N_AMR", "1tM_8cObTssJKrWY8k1B_w5aWI-IMXMcVVggXDFDXTZ0", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J1B ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # J1B (ALL MEMBER INFO) RABBY
+        safe_call(Fetch.allmemberReport, "IBS J1B", "batsman88.com", "jaya11", "BDT", "+08:00", "J1B_AMR", "1szQDOMtgWeUT7AWF668PQadx2n0opJUVn9fJFm03N64", "TM - All Member Report")
+        
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS I8N ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # I8N (ALL MEMBER INFO) LOKENDRA
+        safe_call(Fetch.allmemberReport, "IBS I8N", "6668889.site", "i88", "NPR", "+08:00", "I8N_AMR", "1Kn6CLHwPX9ugds9Knx0vvup35ClkB1WttZxft96aaIQ", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J1N ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # J1N (ALL MEMBER INFO) LAXMI
+        safe_call(Fetch.allmemberReport, "IBS J1N", "batsman88.com", "jaya11", "NPR", "+08:00", "J1N_AMR", "1ikAy2DIQzkTEOhibQkNKSPKRwfg0G2J1dG453IDnjBU", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J8N ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # J8N (ALL MEMBER INFO) SIJAPATI
+        safe_call(Fetch.allmemberReport, "IBS J8N", "jw8bo.com", "jw8", "NPR", "+08:00", "J8N_AMR", "1JbqUaaKa1TXnYryZL6nalV1R6Oy1-o8pIrePm9k7NV4", "TM - All Member Report")
+        
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J8B ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # J8B (ALL MEMBER INFO) ALI
+        safe_call(Fetch.allmemberReport, "IBS J8B", "jw8bo.com", "jw8", "BDT", "+08:00", "J8B_AMR", "16y9dNrRShQIjYwBS5T9t-dPo2h8muXxF7qa-wdxmiAg", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS K8N ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # K8N (ALL MEMBER INFO) HIMANI
+        safe_call(Fetch.allmemberReport, "IBS K8N", "6668889.store", "k88", "NPR", "+08:00", "K8N_AMR", "14dPUrque2e_1A5TQMnnDgfCvgdQe1ozADt9wpO5wWrM", "TM - All Member Report")
+
+        # =============================================================================================================================
+        # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS D8M ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+        # =============================================================================================================================
+
+        # D8M (ALL MEMBER INFO) RY
+        safe_call(Fetch.allmemberReport, "IBS D8M", "dis88bo.com", "dis88", "MYR", "+08:00", "D8M_AMR", "1lbzsoka2arD6LHDI3krA3DmwsDHcaB7uaBlirfUEugY", "TM - All Member Report")
 
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")
         break
-    except Exception:
+    except Exception:   
         logger.exception("Unexpected error; retrying in 60 seconds.")
         time.sleep(60)

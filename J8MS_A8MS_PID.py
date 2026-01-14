@@ -1592,11 +1592,11 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             # if is in Login Page, then Login, else Skip
             try:
                 # Check whether "Sign In" appear, else pass
-                expect(page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[1]/h5[1]")).to_be_visible(timeout=4000)
+                expect(page.locator("//body[1]/ngb-modal-window[14]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[1]/h5[1]")).to_be_visible(timeout=3000)
                 # Fill in Username
-                page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[2]/div[2]/jhi-text-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_ID"])
+                page.locator("//body[1]/ngb-modal-window[14]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[2]/div[2]/jhi-text-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_ID"])
                 # Fill in Password
-                page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[3]/div[2]/jhi-password-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_PASS"])
+                page.locator("//body[1]/ngb-modal-window[14]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[3]/div[2]/jhi-password-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_PASS"])
                 # Login 
                 page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
                 # Delay 2 second
@@ -1670,7 +1670,6 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             # Browser Quit
             browser.close()
             Automation.cleanup()
-
 
     # ====================================================================================
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SSBO & IBS MEMBER INFO =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -2668,9 +2667,7 @@ while True:
         # IBS A8S SG  
         print(">>== IBS A8S SG ==<<")
         safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "A8S_DL", "1DV6CBvbKIb6LzCfcF6CeIA25q6U2PPjX8WBaAEaef60", "DEPOSIT LIST", "M", "O", extra_mongo_collections=["SSBO_A8S_DL"])
-        
-        # Delay 10 minutes
-        time.sleep(600)
+    
 
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")

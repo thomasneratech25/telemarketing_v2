@@ -80,12 +80,12 @@ class Automation:
     def chrome_CDP(cls):
 
         # User Profile
-        USER_DATA_DIR = f"/Users/nera_thomas/Library/Application Support/Google/Chrome/Profile 9"
+        USER_DATA_DIR = f"/Users/nera_thomas/Library/Application Support/Google/Chrome/Profile 10"
         
         # Start Chrome normally
         cls.chrome_proc = subprocess.Popen([
             "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-            "--remote-debugging-port=9222",
+            "--remote-debugging-port=9333",
             "--disable-session-crashed-bubble",
             "--hide-crash-restore-bubble",
             "--no-first-run",
@@ -115,10 +115,10 @@ class Automation:
     # Wait for Chrome CDP to be ready
     @staticmethod
     def wait_for_cdp_ready(timeout=10):
-        """Wait until Chrome CDP is ready at http://localhost:9222/json"""
+        """Wait until Chrome CDP is ready at http://localhost:9333/json"""
         for _ in range(timeout):
             try:
-                res = requests.get("http://localhost:9222/json")
+                res = requests.get("http://localhost:9333/json")
                 if res.status_code == 200:
                     return True
             except:
@@ -137,6 +137,10 @@ class BO_Account:
         "super_swan": {
             "acc_ID": os.getenv("ACC_ID_SUPERSWAN"),
             "acc_PASS": os.getenv("ACC_PASS_SUPERSWAN")
+        },
+        "super_swan2": {
+            "acc_ID": os.getenv("ACC_ID_SUPERSWAN2"),
+            "acc_PASS": os.getenv("ACC_PASS_SUPERSWAN2")
         },
         "wdb1": {
             "acc_ID": os.getenv("ACC_ID_WDB1"),
@@ -532,7 +536,7 @@ class mongodb_2_gs:
         if not MONGODB_URI:
             raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
         client = MongoClient(MONGODB_URI)
-        db = client["Telemarketing"]
+        db = client["RETENTION"]
         combined = []
         for col_name in collection_names:
             col = db[col_name]
@@ -588,7 +592,7 @@ class mongodb_2_gs:
 
         # Call MongoDB database and collection
         client = MongoClient(MONGODB_URI)
-        db = client["Telemarketing"]
+        db = client["RETENTION"]
         collection = db[collection]
 
         # Drop any legacy indexes that might conflict
@@ -783,7 +787,7 @@ class mongodb_2_gs:
         if not MONGODB_URI:
             raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
         client = MongoClient(MONGODB_URI)
-        db = client["Telemarketing"]
+        db = client["RETENTION"]
 
         if not rows:
             collection_ref = db[collection]
@@ -854,7 +858,7 @@ class mongodb_2_gs:
 
         # Call MongoDB database and collection
         client = MongoClient(MONGODB_URI)
-        db = client["Telemarketing"]
+        db = client["RETENTION"]
         collection = db[collection]
 
         # Set and Ensure when upload data this 3 Field is Unique Data
@@ -990,7 +994,7 @@ class mongodb_2_gs:
                 raise RuntimeError("MONGODB_API_KEY is not set. Please add it to your environment or .env file.")
             client = MongoClient(MONGODB_URI)
 
-            db = client["Telemarketing"]
+            db = client["RETENTION"]
             collection = db[collection]
             documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
             rows = documents
@@ -1239,7 +1243,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             cls.wait_for_cdp_ready()
 
             # Connect to running Chrome
-            browser = p.chromium.connect_over_cdp("http://localhost:9222")
+            browser = p.chromium.connect_over_cdp("http://localhost:9333")
             context = browser.contexts[0] if browser.contexts else browser.new_context()
             # Clean Cookies
             context.clear_cookies()
@@ -1318,7 +1322,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             cls.wait_for_cdp_ready()
 
             # Connect to running Chrome
-            browser = p.chromium.connect_over_cdp("http://localhost:9222")
+            browser = p.chromium.connect_over_cdp("http://localhost:9333")
             context = browser.contexts[0] if browser.contexts else browser.new_context()    
 
             # Open a new browser page
@@ -1358,11 +1362,11 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             # if is in Login Page, then Login, else Skip
             try:
                 # Check whether "Sign In" appear, else pass
-                expect(page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[1]/h5[1]")).to_be_visible(timeout=4000)
+                expect(page.locator("//body[1]/ngb-modal-window[14]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[1]/h5[1]")).to_be_visible(timeout=3000)
                 # Fill in Username
-                page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[2]/div[2]/jhi-text-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_ID"])
+                page.locator("//body[1]/ngb-modal-window[14]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[2]/div[2]/jhi-text-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_ID"])
                 # Fill in Password
-                page.locator("//body[1]/ngb-modal-window[11]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[3]/div[2]/jhi-password-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_PASS"])
+                page.locator("//body[1]/ngb-modal-window[14]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[3]/div[2]/jhi-password-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan"]["acc_PASS"])
                 # Login 
                 page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
                 # Delay 2 second
@@ -1616,7 +1620,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             cls.wait_for_cdp_ready()
 
             # Connect to running Chrome
-            browser = p.chromium.connect_over_cdp("http://localhost:9222")
+            browser = p.chromium.connect_over_cdp("http://localhost:9333")
             context = browser.contexts[0] if browser.contexts else browser.new_context()    
 
             # Open a new browser page
@@ -1627,7 +1631,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 # if announment appear, then click close
                 try:
                     # Wait for "Member" appear
-                    expect(page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[4]/div[1]/div[1]/a[1]/ul[1]/li[2]")).to_be_visible(timeout=30000)
+                    expect(page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[4]/div[1]/div[1]/a[1]/ul[1]/li[2]")).to_be_visible(timeout=3000)
                     # Check whether "Merchant credit balance is low" appear, else pass
                     expect(page.locator("//div[normalize-space()='Merchant credit balance is low.']")).to_be_visible(timeout=1500)
                     # Click checkbox
@@ -1643,16 +1647,31 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                     # Check whether "Sign In" appear, else pass
                     expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=2000)
                     # Fill in Username
-                    page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan"]["acc_ID"])
+                    page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan2"]["acc_ID"])
                     # Fill in Password
-                    page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan"]["acc_PASS"])
+                    page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan2"]["acc_PASS"])
                     # Login 
                     page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
                     # Delay 2 second
                     page.wait_for_timeout(2000)
-                    # 
                 except:
                     pass
+
+                # if is in Login Page, then Login, else Skip
+                try:
+                    # Check whether "Sign In" appear, else pass
+                    expect(page.locator("//body[1]/ngb-modal-window[3]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[1]/h5[1]")).to_be_visible(timeout=2000)
+                    # Fill in Username
+                    page.locator("//body[1]/ngb-modal-window[3]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[2]/div[2]/jhi-text-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan2"]["acc_ID"])
+                    # Fill in Password
+                    page.locator("//body[1]/ngb-modal-window[3]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[3]/div[2]/jhi-password-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan2"]["acc_PASS"])
+                    # Login 
+                    page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
+                    # Delay 2 second
+                    page.wait_for_timeout(2000)
+                except:
+                    pass
+                
                 
                 # Click Report
                 page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[7]/div[1]/div[1]/a[1]/ul[1]/li[2]").click()
@@ -1666,9 +1685,9 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                     # Check whether "Sign In" appear, else pass
                     expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=5000)
                     # Fill in Username
-                    page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan"]["acc_ID"])
+                    page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan2"]["acc_ID"])
                     # Fill in Password
-                    page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan"]["acc_PASS"])
+                    page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan2"]["acc_PASS"])
                     # Login 
                     page.click("//button[normalize-space()='Login']", force=True)
                     # Delay 2 second
@@ -1731,7 +1750,14 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
 
     # Deposit List (Username)
     @classmethod
-    def deposit_list_USERNAME(cls, bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=None):
+    def deposit_list_USERNAME(cls, bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=None):
+
+        # Print Color Messages
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {team} {Fore.YELLOW} DEPOSIT LIST Data...{Style.RESET_ALL}\n"
+        for ch in msg:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(0.01)
 
         # Get current time in GMT+8
         gmt8 = pytz.timezone("Asia/Singapore")   # GMT+8
@@ -1829,7 +1855,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             )
             
             # Retry request...
-            return cls.deposit_list_USERNAME(bo_link, bo_name, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=extra_mongo_collections)
+            return cls.deposit_list_USERNAME(bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column, extra_mongo_collections=extra_mongo_collections)
 
         # For loop page and fetch data
         for page in range(1, 10000): 
@@ -1925,9 +1951,9 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "merchant": merchants,
                 "merchantCode": merchants,
                 "currencies": currency,
-                "start": f"{end_date}T16:00:00.000Z",
-                "startTime": f"{end_date}T16:00:00.000Z",
-                "startCreatedTime": f"{end_date}T16:00:00.000Z",
+                "start": f"2025-12-31T16:00:00.000Z",
+                "startTime": f"2025-12-31T16:00:00.000Z",
+                "startCreatedTime": f"2025-12-31T16:00:00.000Z",
                 "end": f"{today}T15:59:59.000Z",
                 "endTime": f"{today}T15:59:59.000Z",
                 "endCreatedTime": f"{today}T15:59:59.000Z",
@@ -2029,9 +2055,9 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 "merchant": merchants,
                 "merchantCode": merchants,
                 "currencies": currency,
-                "start": f"{end_date}T16:00:00.000Z",
-                "startTime": f"{end_date}T16:00:00.000Z",
-                "startCreatedTime": f"{end_date}T16:00:00.000Z",
+                "start": f"2025-12-31T16:00:00.000Z",
+                "startTime": f"2025-12-31T16:00:00.000Z",
+                "startCreatedTime": f"2025-12-31T16:00:00.000Z",
                 "end": f"{today}T15:59:59.000Z",
                 "endTime": f"{today}T15:59:59.000Z",
                 "endCreatedTime": f"{today}T15:59:59.000Z",
@@ -2150,7 +2176,7 @@ while True:
         print("======================================================\n")
 
         print("\n>>== IBS J8M MY (AVA) ==<<")
-        safe_call(Fetch.deposit_list_USERNAME, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL_USERNAME", "1KJyt3V3a15VuOzu98eimVXENnSr1BDn4qdi-b_TnpeU", "Deposit List", "A", "C")
+        safe_call(Fetch.deposit_list_USERNAME, "jw8bo.com", "jw8", "J8M", "MYR", "+08:00", "J8M_DL_USERNAME", "1KJyt3V3a15VuOzu98eimVXENnSr1BDn4qdi-b_TnpeU", "Deposit List", "A", "C")
         print("======================================================\n")
 
         print("\n>>== IBS J8M MY (EUNICE) ==<<")
@@ -2166,7 +2192,7 @@ while True:
         print("======================================================\n")
 
         print(">>== IBS J8S SG (CINDY) ==<<")
-        safe_call(Fetch.deposit_list_USERNAME, "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_DL_USERNAME", "11IBUD7F91W2KkLFm6pLarDoiYmTutMcOJaoyeF92yW8", "Deposit List", "A", "C")
+        safe_call(Fetch.deposit_list_USERNAME, "jw8bo.com", "jw8", "J8S", "SGD", "+08:00", "J8S_DL_USERNAME", "11IBUD7F91W2KkLFm6pLarDoiYmTutMcOJaoyeF92yW8", "Deposit List", "A", "C")
         print("======================================================\n")
 
         # =============================================================================================================================
@@ -2187,7 +2213,7 @@ while True:
 
         print("\n>>== SSBO A8M MY (ANGIE) ==<<")
         safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8M_DL", "1vX5xRodP7-n8zNlFDtZi0ZEjrCfOl8uEJsR_DRixYKc", "Deposit List", "A", "C")
-        safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_DL_USERNAME", "1vX5xRodP7-n8zNlFDtZi0ZEjrCfOl8uEJsR_DRixYKc", "Deposit List", "E", "G")
+        safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "A8M", "MYR", "+08:00", "A8M_DL_USERNAME", "1vX5xRodP7-n8zNlFDtZi0ZEjrCfOl8uEJsR_DRixYKc", "Deposit List", "E", "G")
         print("======================================================\n")
 
         print(">>== IBS A8M MY (ANGIE 2) ==<<")
@@ -2214,54 +2240,19 @@ while True:
 
         print(">>== IBS A8S SG (AVA) ==<<")
         safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8S_DL", "19jfd2yS2cItX2UUfZewXk-qr91eNIJzMxjPTM1tz2KU", "Deposit List", "A", "C")
-        safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_DL_USERNAME", "19jfd2yS2cItX2UUfZewXk-qr91eNIJzMxjPTM1tz2KU", "Deposit List", "E", "G")
+        safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "A8S", "SGD", "+08:00", "A8S_DL_USERNAME", "19jfd2yS2cItX2UUfZewXk-qr91eNIJzMxjPTM1tz2KU", "Deposit List", "E", "G")
         print("======================================================\n")
 
         print(">>== IBS A8S SG (CINDY) ==<<")
         safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_PID, "SSBO_A8S_DL", "1tZW0CKCCx6espAQgFRLmGnL5f5rXsLlMB0UkVVPdzYs", "Deposit List", "A", "C")
-        safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_DL_USERNAME", "1tZW0CKCCx6espAQgFRLmGnL5f5rXsLlMB0UkVVPdzYs", "Deposit List", "E", "G")
+        safe_call(Fetch.deposit_list_USERNAME, "aw8bo.com", "aw8", "A8S", "SGD", "+08:00", "A8S_DL_USERNAME", "1tZW0CKCCx6espAQgFRLmGnL5f5rXsLlMB0UkVVPdzYs", "Deposit List", "E", "G")
         print("======================================================\n")
 
         
-        # # =============================================================================================================================
-        # # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS J1B ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-        # # =============================================================================================================================
-
-        # # print(">>== J1B (TOP 1000 RABBIT FILE) ==<<")
-        # # safe_call(Fetch.allmemberReport, "IBS J1B", "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_AMR", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "AMR")
-        # # print("======================================================\n")
-
-        # print(">>== J1B (TOP 1000 RABBIT FILE) ==<<")
-        # safe_call(Fetch.deposit_list_USERNAME, "batsman88.com", "jaya11", "BDT", "+07:00", "J1B_DL_USERNAME", "1vjybD6v2I0sewy_LKYDMkU8e3tuacgg0g3-vPU4YmNY", "Deposit List", "A", "C")
-        # print("======================================================\n")
-
         
-        # # =============================================================================================================================
-        # # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS D8M ALL MEMBER REPORT & DEPOSIT LIST -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-        # # =============================================================================================================================
-
-        # # print(">>== D8M RETENTION LIST ==<<")
-        # # safe_call(Fetch.allmemberReport, "IBS D8M", "dis88bo.com", "dis88", "MYR", "+08:00", "D8M_AMR", "1BV_FRD3T4LquzhZjYZPlidRsNJBComs73UXzTvaqlko", "TM - All Member Report")
-        # # print("======================================================\n")
-
-        # # print(">>== D8M VIP LIST ==<<")
-        # # safe_call(mongodb_2_gs.upload_to_google_sheet_AMR, "D8M_AMR", "1VqKTphZ7CsFMHzASskQoN6yhjsWxtwQ0RbIduc1Q9rc", "TM - All Member Report")
-        # # print("======================================================\n")
-
-        # print(">>== D8M RETENTION LIST ==<<")
-        # safe_call(Fetch.deposit_list_USERNAME, "dis88bo.com", "dis88", "MYR", "+08:00",  "D8M_DL_USERNAME", "1BV_FRD3T4LquzhZjYZPlidRsNJBComs73UXzTvaqlko", "DEPOSIT LIST", "A", "C")
-        # print("======================================================\n")
-
-        # print(">>== D8M VIP LIST ==<<")
-        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "D8M_DL_USERNAME", "1VqKTphZ7CsFMHzASskQoN6yhjsWxtwQ0RbIduc1Q9rc", "DEPOSIT LIST", "A", "C")
-        # print("======================================================\n")
-
-        
-        
-
-        # # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-
-        # # # ============================================== SSBO A8MS USING EXPORT METHOD ====================================================================================
-        # # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-
+        # ============================================== SSBO A8MS USING EXPORT METHOD ====================================================================================
+        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-
         
         
         # Run Chrome Browser
@@ -2282,11 +2273,15 @@ while True:
         print(">>== SSBO A8S SG (CINDY) ==<<")
         safe_call(mongodb_2_gs.upload_to_google_sheet_SSBO_AMR, "SSBO_A8S_AMR", "TM - All Member Report (SS)", "1tZW0CKCCx6espAQgFRLmGnL5f5rXsLlMB0UkVVPdzYs")
 
+        print(">>== SSBO 9T (KOI) ==<<")
+        safe_call(Fetch.ssbo_allmemberReport, "Ivip9", "Thailand", "SSBO_9T_AMR", "TM - All Member Report", "1_HAotlBSwJTA6jVyVWrd4qBhfPN_S8Z-ncMXfr7BTGg")
+        
+        print(">>== SSBO A8T (VIEW) ==<<")
+        safe_call(Fetch.ssbo_allmemberReport, "Acewin8", "Thailand", "SSBO_A8T_AMR", "TM - All Member Report", "1BajQbvCSFqHiiXOOfv22RjfWlyZCw0J5drafx6BQbgY")
+
+
         # Close Browser
         Automation.cleanup()
-
-        # Delay 5 minutes
-        time.sleep(300)
 
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")
