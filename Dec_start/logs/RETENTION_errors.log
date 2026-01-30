@@ -1,0 +1,28 @@
+2026-01-28 11:03:12,680 [ERROR] Unexpected error; retrying in 60 seconds.
+Traceback (most recent call last):
+  File "/Users/nera_thomas/Desktop/Telemarketing/Dec_start/SSBO_RETENTION_Playwright.py", line 978, in <module>
+    Automation.chrome_CDP()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/nera_thomas/Desktop/Telemarketing/Dec_start/SSBO_RETENTION_Playwright.py", line 87, in chrome_CDP
+    cls.chrome_proc = subprocess.Popen([
+                      ~~~~~~~~~~~~~~~~^^
+        "/usr/bin/google-chrome",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<15 lines>...
+    stderr=subprocess.DEVNULL   # ✅ hide chrome cdp logs
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 1039, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 1972, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: '/usr/bin/google-chrome'

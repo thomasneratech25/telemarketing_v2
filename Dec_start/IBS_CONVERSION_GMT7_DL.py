@@ -1256,7 +1256,7 @@ while True:
         safe_call(Fetch.deposit_list_PID, "jw8bo.com", "jw8", "J8N", "NPR", "+07:00", "J8N_DL", "1k3Xf32Fpl1OIjorkaVTlo5XOkuBjmUiIgFuyLxu2VW8", "DEPOSIT LIST", "A", "C", description="J8N deposit list")
         
         # J8N (DEPOSIT LIST) (SIJAPATI)
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J1B_DL", "1JbqUaaKa1TXnYryZL6nalV1R6Oy1-o8pIrePm9k7NV4", "DEPOSIT LIST", "A", "C")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J8N_DL", "1JbqUaaKa1TXnYryZL6nalV1R6Oy1-o8pIrePm9k7NV4", "DEPOSIT LIST", "A", "C")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= I8N DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-= 

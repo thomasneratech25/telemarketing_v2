@@ -1206,7 +1206,7 @@ class Fetch(BO_Account, mongodb_2_gs):
 
             url = f"https://aw8.premium-bo.com/cashmarket/api/sbo/member-management/get-member-list-by-filter?page={page}&size=200&sort=m.id,DESC&cacheBuster=1762790852830"
 
-            payload = json.dumps({
+            payload = {
             "tenantId": 35,
             "merchants": [
                 merchants
@@ -1259,7 +1259,7 @@ class Fetch(BO_Account, mongodb_2_gs):
             "dobDateFrom": None,
             "dobDateTo": None,
             "mask": False
-            })
+            }
             headers = {
             'accept': 'application/json, text/plain, */*',
             'accept-language': 'en-US,en;q=0.9',

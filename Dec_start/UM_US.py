@@ -2773,6 +2773,8 @@ class Fetch(BO_Account, mongodb_2_gs):
             start_date = yesterday
             end_date = today
 
+        print(f"Start Date: {start_date}, End Date: {end_date}")
+
         # Cookie File
         cookie_file = f"/home/thomas/get_cookies/superswan.json"
 
@@ -2865,9 +2867,8 @@ class Fetch(BO_Account, mongodb_2_gs):
 
                 # Check if 401 or 403 error
                 print(f"⚠️ Received {response.status_code} from server. Attempting to refresh cookies + bearer token...")
-
-                # Get Cookies
-                cls._ssbo_get_cookies()
+                cls._ssbo_get_cookies(cls.accounts["super_swan2"]["acc_ID"], cls.accounts["super_swan2"]["acc_PASS"])
+                
                 print("⚠️ Cookies + bearer token refreshed ... Retrying request...\n")
                 cls.ssbo_deposit_list_PID(merchants, currency, collection, gs_id, gs_tab, start_column, end_column)
                 return
