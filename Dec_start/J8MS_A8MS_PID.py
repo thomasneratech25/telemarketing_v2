@@ -1646,76 +1646,88 @@ while True:
         if current_time >= STOP_DATETIME:
             logger.info(f"Reached stop date ({STOP_DATETIME}). Bot is stopping.")
             break
-
+        
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== J8MS A8MS EMILLIA =============================================================================
+        # ============================================================== D8M =============================================================================
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         
-        # SSBO A8M MY
-        print("\n>>== SSBO A8M MY ==<<")
-        safe_call(Fetch.ssbo_deposit_list_PID, "aw8", ["MYR"], "SSBO_A8M_DL", "1bS27VLaSaIMJcs-hULkbINjH8MkGmpK8BVLH838Gphc", "DEPOSIT LIST", "I", "K", upload_to_sheet=False)
-        # SSBO A8S SG
-        print("\n>>== SSBO A8S SG ==<<")
-        safe_call(Fetch.ssbo_deposit_list_PID, "aw8", ["SGD"], "SSBO_A8S_DL", "1bS27VLaSaIMJcs-hULkbINjH8MkGmpK8BVLH838Gphc", "DEPOSIT LIST", "M", "O", upload_to_sheet=False)
-        # IBS J8M MY
-        print("\n>>== IBS J8M MY ==<<")
-        safe_call(Fetch.deposit_list_PID, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL", "1bS27VLaSaIMJcs-hULkbINjH8MkGmpK8BVLH838Gphc", "DEPOSIT LIST", "A", "C")
-        # IBS J8S SG 
-        print(">>== IBS J8S SG  ==<<")
-        safe_call(Fetch.deposit_list_PID, "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_DL", "1bS27VLaSaIMJcs-hULkbINjH8MkGmpK8BVLH838Gphc", "DEPOSIT LIST", "E", "G")
-        # IBS A8M MY 
-        print(">>== IBS A8M MY ==<<")
-        safe_call(Fetch.deposit_list_PID, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_DL", "1bS27VLaSaIMJcs-hULkbINjH8MkGmpK8BVLH838Gphc", "DEPOSIT LIST", "I", "K", extra_mongo_collections=["SSBO_A8M_DL"])
-        # IBS A8S SG  
-        print(">>== IBS A8S SG ==<<")
-        safe_call(Fetch.deposit_list_PID, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_DL", "1bS27VLaSaIMJcs-hULkbINjH8MkGmpK8BVLH838Gphc", "DEPOSIT LIST", "M", "O", extra_mongo_collections=["SSBO_A8S_DL"])
+        # IBS D8M MY (SERINE)
+        print("\n>>== IBS D8M MY (SERINE)==<<")
+        safe_call(Fetch.deposit_list_PID, "dis88bo.com", "dis88", "MYR", "+08:00", "D8M_DL", "11jRZoxmKiRQmLFOTkksMrT25hKdtXlSlbMYU8g6M-L0", "DEPOSIT LIST", "A", "C")
+        
+        # IBS D8M MY (RY)
+        print("\n>>== IBS D8M MY (RY)==<<")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "D8M_DL", "1lbzsoka2arD6LHDI3krA3DmwsDHcaB7uaBlirfUEugY", "DEPOSIT LIST", "A", "C")
+        
+        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # # ============================================================== J8MS A8MS EMILLIA =============================================================================
+        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        
+        # # SSBO A8M MY
+        # print("\n>>== SSBO A8M MY ==<<")
+        # safe_call(Fetch.ssbo_deposit_list_PID, "aw8", ["MYR"], "SSBO_A8M_DL", "1bS27VLaSaIMJcs-hULkbINjH8MkGmpK8BVLH838Gphc", "DEPOSIT LIST", "I", "K", upload_to_sheet=False)
+        # # SSBO A8S SG
+        # print("\n>>== SSBO A8S SG ==<<")
+        # safe_call(Fetch.ssbo_deposit_list_PID, "aw8", ["SGD"], "SSBO_A8S_DL", "1bS27VLaSaIMJcs-hULkbINjH8MkGmpK8BVLH838Gphc", "DEPOSIT LIST", "M", "O", upload_to_sheet=False)
+        # # IBS J8M MY
+        # print("\n>>== IBS J8M MY ==<<")
+        # safe_call(Fetch.deposit_list_PID, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_DL", "1bS27VLaSaIMJcs-hULkbINjH8MkGmpK8BVLH838Gphc", "DEPOSIT LIST", "A", "C")
+        # # IBS J8S SG 
+        # print(">>== IBS J8S SG  ==<<")
+        # safe_call(Fetch.deposit_list_PID, "jw8bo.com", "jw8", "SGD", "+08:00", "J8S_DL", "1bS27VLaSaIMJcs-hULkbINjH8MkGmpK8BVLH838Gphc", "DEPOSIT LIST", "E", "G")
+        # # IBS A8M MY 
+        # print(">>== IBS A8M MY ==<<")
+        # safe_call(Fetch.deposit_list_PID, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_DL", "1bS27VLaSaIMJcs-hULkbINjH8MkGmpK8BVLH838Gphc", "DEPOSIT LIST", "I", "K", extra_mongo_collections=["SSBO_A8M_DL"])
+        # # IBS A8S SG  
+        # print(">>== IBS A8S SG ==<<")
+        # safe_call(Fetch.deposit_list_PID, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_DL", "1bS27VLaSaIMJcs-hULkbINjH8MkGmpK8BVLH838Gphc", "DEPOSIT LIST", "M", "O", extra_mongo_collections=["SSBO_A8S_DL"])
         
 
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== J8MS A8MS KAYREEN =============================================================================
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # # ============================================================== J8MS A8MS KAYREEN =============================================================================
+        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        # SSBO A8M MY
-        print("\n>>== SSBO A8M MY ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "SSBO_A8M_DL", "1I7HfAvys_KTW7EIxtedPmVaKRUDxtMJE5KfhlVCOYiw", "DEPOSIT LIST", "I", "K",  upload_to_sheet=False)
-        # SSBO A8S SG
-        print("\n>>== SSBO A8S SG ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "SSBO_A8S_DL", "1I7HfAvys_KTW7EIxtedPmVaKRUDxtMJE5KfhlVCOYiw", "DEPOSIT LIST", "M", "O", upload_to_sheet=False)
-        # IBS J8M MY
-        print("\n>>== IBS J8M MY ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J8M_DL", "1I7HfAvys_KTW7EIxtedPmVaKRUDxtMJE5KfhlVCOYiw", "DEPOSIT LIST", "A", "C")
-        # IBS J8S SG 
-        print(">>== IBS J8S SG  ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J8S_DL", "1I7HfAvys_KTW7EIxtedPmVaKRUDxtMJE5KfhlVCOYiw", "DEPOSIT LIST", "E", "G")
-        # IBS A8M MY 
-        print(">>== IBS A8M MY ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "A8M_DL", "1I7HfAvys_KTW7EIxtedPmVaKRUDxtMJE5KfhlVCOYiw", "DEPOSIT LIST", "I", "K", extra_mongo_collections=["SSBO_A8M_DL"])
-        # IBS A8S SG  
-        print(">>== IBS A8S SG ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "A8S_DL", "1I7HfAvys_KTW7EIxtedPmVaKRUDxtMJE5KfhlVCOYiw", "DEPOSIT LIST", "M", "O", extra_mongo_collections=["SSBO_A8S_DL"])
+        # # SSBO A8M MY
+        # print("\n>>== SSBO A8M MY ==<<")
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "SSBO_A8M_DL", "1I7HfAvys_KTW7EIxtedPmVaKRUDxtMJE5KfhlVCOYiw", "DEPOSIT LIST", "I", "K",  upload_to_sheet=False)
+        # # SSBO A8S SG
+        # print("\n>>== SSBO A8S SG ==<<")
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "SSBO_A8S_DL", "1I7HfAvys_KTW7EIxtedPmVaKRUDxtMJE5KfhlVCOYiw", "DEPOSIT LIST", "M", "O", upload_to_sheet=False)
+        # # IBS J8M MY
+        # print("\n>>== IBS J8M MY ==<<")
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J8M_DL", "1I7HfAvys_KTW7EIxtedPmVaKRUDxtMJE5KfhlVCOYiw", "DEPOSIT LIST", "A", "C")
+        # # IBS J8S SG 
+        # print(">>== IBS J8S SG  ==<<")
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J8S_DL", "1I7HfAvys_KTW7EIxtedPmVaKRUDxtMJE5KfhlVCOYiw", "DEPOSIT LIST", "E", "G")
+        # # IBS A8M MY 
+        # print(">>== IBS A8M MY ==<<")
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "A8M_DL", "1I7HfAvys_KTW7EIxtedPmVaKRUDxtMJE5KfhlVCOYiw", "DEPOSIT LIST", "I", "K", extra_mongo_collections=["SSBO_A8M_DL"])
+        # # IBS A8S SG  
+        # print(">>== IBS A8S SG ==<<")
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "A8S_DL", "1I7HfAvys_KTW7EIxtedPmVaKRUDxtMJE5KfhlVCOYiw", "DEPOSIT LIST", "M", "O", extra_mongo_collections=["SSBO_A8S_DL"])
 
-        # # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # # # ============================================================== J8MS A8MS YVONNE =============================================================================
-        # # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # # # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        # # # # ============================================================== J8MS A8MS YVONNE =============================================================================
+        # # # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        # SSBO A8M MY
-        print("\n>>== SSBO A8M MY ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "SSBO_A8M_DL", "1DV6CBvbKIb6LzCfcF6CeIA25q6U2PPjX8WBaAEaef60", "DEPOSIT LIST", "I", "K", upload_to_sheet=False)
-        # SSBO A8S SG
-        print(">>== SSBO A8S SG ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "SSBO_A8S_DL", "1DV6CBvbKIb6LzCfcF6CeIA25q6U2PPjX8WBaAEaef60", "DEPOSIT LIST", "M", "O", upload_to_sheet=False)
-        # IBS J8M MY
-        print(">>== IBS J8M MY ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J8M_DL", "1DV6CBvbKIb6LzCfcF6CeIA25q6U2PPjX8WBaAEaef60", "DEPOSIT LIST", "A", "C")
-        # IBS J8S SG 
-        print(">>== IBS J8S SG  ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J8S_DL", "1DV6CBvbKIb6LzCfcF6CeIA25q6U2PPjX8WBaAEaef60", "DEPOSIT LIST", "E", "G")
-        # IBS A8M MY 
-        print(">>== IBS A8M MY ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "A8M_DL", "1DV6CBvbKIb6LzCfcF6CeIA25q6U2PPjX8WBaAEaef60", "DEPOSIT LIST", "I", "K", extra_mongo_collections=["SSBO_A8M_DL"])
-        # IBS A8S SG  
-        print(">>== IBS A8S SG ==<<")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "A8S_DL", "1DV6CBvbKIb6LzCfcF6CeIA25q6U2PPjX8WBaAEaef60", "DEPOSIT LIST", "M", "O", extra_mongo_collections=["SSBO_A8S_DL"])
+        # # SSBO A8M MY
+        # print("\n>>== SSBO A8M MY ==<<")
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "SSBO_A8M_DL", "1DV6CBvbKIb6LzCfcF6CeIA25q6U2PPjX8WBaAEaef60", "DEPOSIT LIST", "I", "K", upload_to_sheet=False)
+        # # SSBO A8S SG
+        # print(">>== SSBO A8S SG ==<<")
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "SSBO_A8S_DL", "1DV6CBvbKIb6LzCfcF6CeIA25q6U2PPjX8WBaAEaef60", "DEPOSIT LIST", "M", "O", upload_to_sheet=False)
+        # # IBS J8M MY
+        # print(">>== IBS J8M MY ==<<")
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J8M_DL", "1DV6CBvbKIb6LzCfcF6CeIA25q6U2PPjX8WBaAEaef60", "DEPOSIT LIST", "A", "C")
+        # # IBS J8S SG 
+        # print(">>== IBS J8S SG  ==<<")
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "J8S_DL", "1DV6CBvbKIb6LzCfcF6CeIA25q6U2PPjX8WBaAEaef60", "DEPOSIT LIST", "E", "G")
+        # # IBS A8M MY 
+        # print(">>== IBS A8M MY ==<<")
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "A8M_DL", "1DV6CBvbKIb6LzCfcF6CeIA25q6U2PPjX8WBaAEaef60", "DEPOSIT LIST", "I", "K", extra_mongo_collections=["SSBO_A8M_DL"])
+        # # IBS A8S SG  
+        # print(">>== IBS A8S SG ==<<")
+        # safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "A8S_DL", "1DV6CBvbKIb6LzCfcF6CeIA25q6U2PPjX8WBaAEaef60", "DEPOSIT LIST", "M", "O", extra_mongo_collections=["SSBO_A8S_DL"])
     
 
     except KeyboardInterrupt:

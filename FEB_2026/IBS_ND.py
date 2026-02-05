@@ -19,11 +19,44 @@ PROXIES = {
     "https": "http://127.0.0.1:10809",
 }
 
+REQUEST_TIMEOUT = (10, 60)  # connect timeout, read timeout (seconds)
+MAX_POST_RETRIES = 3
+RETRY_BACKOFF_SECONDS = 2.0
+
 def create_session():
     s = requests.Session()
     s.proxies.update(PROXIES)
     s.trust_env = False   # VERY IMPORTANT
     return s
+
+def post_with_retry(session, url, *, headers=None, json_payload=None, data=None,
+                    timeout=REQUEST_TIMEOUT, max_retries=MAX_POST_RETRIES,
+                    backoff_seconds=RETRY_BACKOFF_SECONDS):
+    last_err = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            return session.post(
+                url,
+                headers=headers,
+                json=json_payload,
+                data=data,
+                timeout=timeout
+            )
+        except (requests.exceptions.ReadTimeout,
+                requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout) as err:
+            last_err = err
+            if attempt >= max_retries:
+                break
+            sleep_for = backoff_seconds * attempt
+            print(f"Warning: request failed ({type(err).__name__}) "
+                  f"attempt {attempt}/{max_retries}. Retrying in {sleep_for:.1f}s...")
+            time.sleep(sleep_for)
+        except requests.exceptions.RequestException as err:
+            last_err = err
+            break
+    print(f"Error: request failed after {max_retries} attempts: {last_err}")
+    return None
 
 # BO Account
 class BO_Account:
@@ -206,8 +239,8 @@ class mongodb_2_gs:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google2/token.json"
-    CREDS_PATH = "./api/google2/credentials.json"
+    TOKEN_PATH = "/home/thomas/api/google3/token.json"
+    CREDS_PATH = "/home/thomas/api/google3/credentials.json"
 
     # Google API Authentication
     @classmethod
@@ -261,6 +294,21 @@ class mongodb_2_gs:
 
         batch = []
 
+        def format_iso_datetime(value):
+            if value is None:
+                return None
+            if isinstance(value, datetime):
+                return value.strftime("%Y-%m-%d %H:%M:%S")
+            if isinstance(value, str):
+                stripped = value.strip()
+                if not stripped or stripped.lower() in ("null", "none"):
+                    return None
+                try:
+                    return datetime.fromisoformat(stripped).strftime("%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    return stripped
+            return str(value)
+
         # for each rows in a list of JSON objects return
         for row in rows:
 
@@ -278,9 +326,8 @@ class mongodb_2_gs:
             last_deposit = row.get("last_deposit")
 
             # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
-            dt = datetime.fromisoformat(register_info_date)
-            register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
-            last_deposit_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
+            register_info_date_fmt = format_iso_datetime(register_info_date)
+            last_deposit_fmt = format_iso_datetime(last_deposit)
 
             # Build the new cleaned document (Use for upload data to MongoDB)
             doc = {
@@ -365,7 +412,6 @@ class mongodb_2_gs:
                         str(r.get("mobileno", "")),
                         str(r.get("member_id", "")),
                         str(r.get("email", "")),
-                        str(r.get("last_deposit", "")),
                     ])
                 else:
                     sanitized.append(["", "", "", "", "", ""])
@@ -506,7 +552,7 @@ class Fetch(BO_Account, mongodb_2_gs):
             time.sleep(0.01)
 
         # Get today date
-        today = datetime.now().strftime("%Y-%m-%d")
+        today = datetime.now().date()
 
         # First day of LAST month 
         first_day_this_month = today.replace(day=1)
@@ -579,7 +625,10 @@ class Fetch(BO_Account, mongodb_2_gs):
         }
 
         # Post Response 
-        response = session.post(url, headers=headers, json=payload, timeout=30)
+        response = post_with_retry(session, url, headers=headers, json_payload=payload)
+        if response is None:
+            print("Error: unable to reach API after retries. Stopping.")
+            return
 
         # Check if return unauthorized (401) 
         if response.json().get("statusCode") == 401:
@@ -605,7 +654,10 @@ class Fetch(BO_Account, mongodb_2_gs):
             payload["page"] = page
 
             # Send POST request (CORRECT WAY)
-            response = session.post(url, headers=headers, json=payload, timeout=30)
+            response = post_with_retry(session, url, headers=headers, json_payload=payload)
+            if response is None:
+                print("Error: unable to reach API after retries. Stopping pagination.")
+                break
 
             # Safe JSON Handling
             try:
@@ -673,8 +725,8 @@ while True:
         # =-=-=-=-==-=-=-=-=-=-=-=-=-= N1T ND =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=
         # ==========================================================================
 
-        # PENDING
-        # safe_call(Fetch.ND, "m8b4x1z6.com", "n191", "N1T", "THB", "+07:00", "N1T_ND", "", "ND", description="N1T ND")
+        # Riley
+        safe_call(Fetch.ND, "m8b4x1z6.com", "n191", "N1T", "THB", "+07:00", "N1T_ND", "1MN69M3PuBOHBDbLKk9Ycx5Z143PQeITDOE4xoLPHuMI", "ND", description="N1T ND")
 
 
     except KeyboardInterrupt:

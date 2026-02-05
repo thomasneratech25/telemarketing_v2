@@ -206,8 +206,8 @@ class mongodb_2_gs:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google2/token.json"
-    CREDS_PATH = "./api/google2/credentials.json"
+    TOKEN_PATH = "/home/thomas/api/google3/token.json"
+    CREDS_PATH = "/home/thomas/api/google3/credentials.json"
 
     # Google API Authentication
     @classmethod
@@ -254,12 +254,30 @@ class mongodb_2_gs:
             unique=True
         )
 
+        collection.create_index(
+            [("username", 1), ("first_name", 1), ("register_info_date", 1), ("mobileno", 1)],
+
         # Count insert and skip
         inserted = 0
         skipped = 0
         cleaned_docs = []
 
         batch = []
+
+        def format_iso_datetime(value):
+            if value is None:
+                return None
+            if isinstance(value, datetime):
+                return value.strftime("%Y-%m-%d %H:%M:%S")
+            if isinstance(value, str):
+                stripped = value.strip()
+                if not stripped or stripped.lower() in ("null", "none"):
+                    return None
+                try:
+                    return datetime.fromisoformat(stripped).strftime("%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    return stripped
+            return str(value)
 
         # for each rows in a list of JSON objects return
         for row in rows:
@@ -278,9 +296,8 @@ class mongodb_2_gs:
             last_deposit = row.get("last_deposit")
 
             # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
-            dt = datetime.fromisoformat(register_info_date)
-            register_info_date_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
-            last_deposit_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
+            register_info_date_fmt = format_iso_datetime(register_info_date)
+            last_deposit_fmt = format_iso_datetime(last_deposit)
 
             # Build the new cleaned document (Use for upload data to MongoDB)
             doc = {
@@ -365,7 +382,6 @@ class mongodb_2_gs:
                         str(r.get("mobileno", "")),
                         str(r.get("member_id", "")),
                         str(r.get("email", "")),
-                        str(r.get("last_deposit", "")),
                     ])
                 else:
                     sanitized.append(["", "", "", "", "", ""])
@@ -510,12 +526,9 @@ class Fetch(BO_Account, mongodb_2_gs):
 
         # Yesterday & Day before yesterday
         yesterday = today - timedelta(days=1)
-        yes_yesterday = today - timedelta(days=2)
 
         # Format to string YYYY-MM-DD
-        today_str = today.strftime("%Y-%m-%d")
         yesterday_str = yesterday.strftime("%Y-%m-%d")
-        yes_yesterday_str = yes_yesterday.strftime("%Y-%m-%d")
 
         # Cookie File
         cookie_file = f"/home/thomas/get_cookies/{bo_link}.json"
@@ -539,7 +552,7 @@ class Fetch(BO_Account, mongodb_2_gs):
         "currency": [
             currency
         ],
-        "register_from": yes_yesterday_str,
+        "register_from": "2026-02-01",
         "register_to": yesterday_str,
         "merchant_id": 1,
         "admin_id": 581,
@@ -643,37 +656,51 @@ class Fetch(BO_Account, mongodb_2_gs):
 # safe_call(Fetch.NON_FRESH, "BO Link", "merchant code", "team name", "currency", "gmt time", "database name", "google sheet link", "google sheet tab name", description="can write any")
 # safe_call(Fetch.deposit_list_PID, "BO Link", "merchant code", "team name", "currency", "gmt time", "database name", "google sheet link", "google sheet tab name", "A", "C", description="can write any")
 
+last_run_date = None
+
 while True:
     try:
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-=-=-=-=-=-= GT NON_FRESH =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=
-        # ==========================================================================
+        # Check current time to use correct google sheet tab to upload data
+        now = datetime.now()
+        print(now.time())
+        
+        # Run code when is 7am
+        if last_run_date != now.date() and now.hour == 7 and now.minute == 0:
 
-        # NAREM
-        safe_call(Fetch.NON_FRESH, "gcwin99bo.com", "gc99", "GT", "THB", "+07:00", "GT_NON_FRESH", "1X3_U_OaqDp7IYEVITUh-PaLJtq3VbV6MzI58wRzXcLs", "NON_FRESH", description="GT NON_FRESH")
+            # ==========================================================================
+            # =-=-=-=-==-=-=-=-=-=-=-=-=-= GT NON_FRESH =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=
+            # ==========================================================================
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-=-=-=-=-=-= N855T NON_FRESH =-=-=-=-==-=-=-=-=-=-=-=-=-=-
-        # ==========================================================================
+            # NAREM
+            safe_call(Fetch.NON_FRESH, "gcwin99bo.com", "gc99", "GT", "THB", "+07:00", "GT_NON_FRESH", "1X3_U_OaqDp7IYEVITUh-PaLJtq3VbV6MzI58wRzXcLs", "NON_FRESH", description="GT NON_FRESH")
 
-        # ELSA
-        safe_call(Fetch.NON_FRESH, "f5x3n8v.com", "n855", "N855T", "THB", "+07:00", "N855T_NON_FRESH", "1PhrRokHUYNLKvI8QWINUD5DtbhtJNkkToDZB0k4frjQ", "NON_FRESH", description="N855T NON_FRESH")
+            # # ==========================================================================
+            # =-=-=-=-==-=-=-=-=-=-=-=-=-= N855T NON_FRESH =-=-=-=-==-=-=-=-=-=-=-=-=-=-
+            # ==========================================================================
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-=-=-=-=-=-= N789T NON_FRESH =-=-=-=-==-=-=-=-=-=-=-=-=-=-
-        # ==========================================================================
+            # ELSA
+            safe_call(Fetch.NON_FRESH, "f5x3n8v.com", "n855", "N855T", "THB", "+07:00", "N855T_NON_FRESH", "1PhrRokHUYNLKvI8QWINUD5DtbhtJNkkToDZB0k4frjQ", "NON_FRESH", description="N855T NON_FRESH")
 
-        # SOFIA
-        safe_call(Fetch.NON_FRESH, "q2n5w3z.com", "n789", "N789T", "THB", "+07:00", "N789T_NON_FRESH", "15jh_5Aulx-PFwA73UhUg32iLon_kiLWw3reik-0t0uU", "NON_FRESH", description="N789T NON_FRESH")
+            # ==========================================================================
+            # =-=-=-=-==-=-=-=-=-=-=-=-=-= N789T NON_FRESH =-=-=-=-==-=-=-=-=-=-=-=-=-=-
+            # ==========================================================================
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-=-=-=-=-=-= N1T NON_FRESH =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-
-        # ==========================================================================
+            # SOFIA
+            safe_call(Fetch.NON_FRESH, "q2n5w3z.com", "n789", "N789T", "THB", "+07:00", "N789T_NON_FRESH", "15jh_5Aulx-PFwA73UhUg32iLon_kiLWw3reik-0t0uU", "NON_FRESH", description="N789T NON_FRESH")
 
-        # PENDING
-        # safe_call(Fetch.NON_FRESH, "m8b4x1z6.com", "n191", "N1T", "THB", "+07:00", "N1T_NON_FRESH", "", "NON_FRESH", description="N1T NON_FRESH")
+            # ==========================================================================
+            # =-=-=-=-==-=-=-=-=-=-=-=-=-= N1T NON_FRESH =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-
+            # ==========================================================================
 
+            # Riley
+            safe_call(Fetch.NON_FRESH, "m8b4x1z6.com", "n191", "N1T", "THB", "+07:00", "N1T_NON_FRESH", "1MN69M3PuBOHBDbLKk9Ycx5Z143PQeITDOE4xoLPHuMI", "NON_FRESH", description="N1T NON_FRESH")
+            
+            # Prevent rerun today
+            last_run_date = now.date()
+            
+        # Delay 5 minutes
+        time.sleep(300)
 
     except KeyboardInterrupt:
             logger.info("Execution interrupted by user.")

@@ -185,8 +185,8 @@ class gs_helpers:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google3/token.json"
-    CREDS_PATH = "./api/google3/credentials.json"
+    TOKEN_PATH = "/home/thomas/api/google3/token.json"
+    CREDS_PATH = "/home/thomas/api/google3/credentials.json"
 
     # Google API Authentication
     @classmethod
@@ -491,7 +491,7 @@ class Fetch(BO_Account, gs_helpers):
 
     # BO All Member Report
     @classmethod
-    def allmemberReport(cls, team, bo_link, bo_name, currency, gmt_time, g_sheet_ID, g_sheet_tab):
+    def allmemberReport(cls, team, bo_link, bo_name, currency, gmt_time, g_sheet_ID, g_sheet_tab, upload=True):
         
         session = create_session()
         
@@ -596,7 +596,7 @@ class Fetch(BO_Account, gs_helpers):
                 )
                 # Retry request...
                 print("⚠️  Cookies refreshed ... Retrying request...")
-                return cls.allmemberReport(team, bo_link, bo_name, currency, gmt_time, g_sheet_ID, g_sheet_tab)
+                return cls.allmemberReport(team, bo_link, bo_name, currency, gmt_time, g_sheet_ID, g_sheet_tab, upload=upload)
 
             rows = data.get("data", [])
             pagination = data.get("pagination", {})
@@ -674,7 +674,10 @@ class Fetch(BO_Account, gs_helpers):
 
         all_rows = list(by_member_id.values()) + no_id_rows
         all_rows.sort(key=lambda row: str(row.get("username") or ""))
-        cls.upload_to_google_sheet_AMR(g_sheet_ID, g_sheet_tab, rows=all_rows)  
+        if upload:
+            cls.upload_to_google_sheet_AMR(g_sheet_ID, g_sheet_tab, rows=all_rows)
+            return None
+        return all_rows
 
 ###############=================================== CODE RUN HERE =======================================############
 
@@ -758,7 +761,7 @@ while True:
         # =============================================================================================================================
 
         # 2WT (ALL MEMBER INFO) SATANG
-        safe_call(Fetch.allmemberReport, "IBS 2WT", "w8c4n9be.com", "22w", "THB", "+08:00", "JgEWHohCHU-SYtY4IMVnuTTfMIYartGEuXSllLawmto", "TM - All Member Report")
+        safe_call(Fetch.allmemberReport, "IBS 2WT", "w8c4n9be.com", "22w", "THB", "+08:00", "1JgEWHohCHU-SYtY4IMVnuTTfMIYartGEuXSllLawmto", "TM - All Member Report")
 
         # =============================================================================================================================
         # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS 2FT TM ALL MEMBER REPORT -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_

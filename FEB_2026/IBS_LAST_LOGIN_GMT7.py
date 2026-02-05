@@ -188,8 +188,8 @@ class GoogleSheetHelper:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google/token.json"
-    CREDS_PATH = "./api/google/credentials.json"
+    TOKEN_PATH = "/home/thomas/api/google/token.json"
+    CREDS_PATH = "/home/thomas/api/google/credentials.json"
 
     # Google API Authentication
     @classmethod

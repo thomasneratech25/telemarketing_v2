@@ -11,7 +11,7 @@ from urllib.parse import urlencode
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from google_auth_oauthlib.flow import InstalledAppFlow
 from runtime import logger, safe_call, MONGODB_URI
 
@@ -186,8 +186,8 @@ class mongodb_2_gs:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google2/token.json"
-    CREDS_PATH = "./api/google2/credentials.json"
+    TOKEN_PATH = "/home/thomas/api/google2/token.json"
+    CREDS_PATH = "/home/thomas/api/google2/credentials.json"
 
     # Google API Authentication
     @classmethod

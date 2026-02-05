@@ -285,8 +285,8 @@ class mongodb_2_gs:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google/token.json"
-    CREDS_PATH = "./api/google/credentials.json"
+    TOKEN_PATH = "/Users/nera_thomas/Desktop/Telemarketing/api/google/token.json"
+    CREDS_PATH = "/Users/nera_thomas/Desktop/Telemarketing/api/google/credentials.json"
 
     # Google API Authentication
     @classmethod
@@ -990,7 +990,7 @@ while True:
 
         print("\n\033[1;36mSSBO 9T THAI\033[0m \033[2m(KOI)\033[0m \033[1;36mLM AMR\033[0m")
         safe_call(Fetch.ssbo_allmemberReport, "Ivip9", "Thailand", "SSBO_9T_LM_AMR", "LM - All Member Report", "1DUBOOOYMVmwMo9v1R9CYuX24stlpjRkDDpeJ9sVXyBE")
-        
+
         # Close Browser
         Automation.cleanup()
     

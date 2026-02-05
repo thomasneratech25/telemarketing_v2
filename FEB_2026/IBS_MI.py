@@ -206,8 +206,8 @@ class mongodb_2_gs:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google2/token.json"
-    CREDS_PATH = "./api/google2/credentials.json"
+    TOKEN_PATH = "/home/thomas/api/google6/token.json"
+    CREDS_PATH = "/home/thomas/api/google6/credentials.json"
 
     # Google API Authentication
     @classmethod
@@ -232,155 +232,6 @@ class mongodb_2_gs:
                 token.write(creds.to_json())
 
         return creds
-
-    # ====================================================================================
-    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= DEPOSIT LIST (PLAYER ID) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    # ====================================================================================
-
-    # MongoDB Database
-    def mongodbAPI_DL_PID(rows, collection):
-
-        # MongoDB API KEY
-        MONGODB_URI = os.getenv("MONGODB_API_KEY")
-
-        # Call MongoDB database and collection
-        client = MongoClient(MONGODB_URI)
-        db = client["CONVERSION_0226"]
-        collection = db[collection]
-
-        # Set and Ensure when upload data this 3 Field is Unique Data
-        collection.create_index(
-            [("player_id", 1), ("amount", 1), ("completed_at", 1)],
-            unique=True
-        )
-
-        # Count insert and skip
-        inserted = 0
-        skipped = 0
-        cleaned_docs = []
-
-        batch = []
-
-        # for each rows in a list of JSON objects return
-        for row in rows:
-            # Extract only the fields you want (Extract Data from json file)
-            player_id = row.get("player_id")
-            amount = row.get("amount")
-            completed_at = row.get("completed_at")
-
-            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
-            dt = datetime.fromisoformat(completed_at)
-            completed_at_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
-
-            # Build the new cleaned document (Use for upload data to MongoDB)
-            doc = {
-                "player_id": player_id,
-                "amount": amount,
-                "completed_at": completed_at_fmt,
-            }
-
-            # Keep the version without _id for uploading later
-            cleaned_docs.append(doc.copy())
-            batch.append(doc)
-
-            if len(batch) == 500:
-                try:
-                    collection.insert_many(batch, ordered=False)
-                    inserted += len(batch)
-                except Exception as exc:
-                    if hasattr(exc, "details"):
-                        skipped += len(exc.details.get("writeErrors", []))
-                        inserted += len(batch) - len(exc.details.get("writeErrors", []))
-                    else:
-                        skipped += 0
-                batch = []
-
-        # Insert any remaining documents in batch
-        if batch:
-            try:
-                collection.insert_many(batch, ordered=False)
-                inserted += len(batch)
-            except Exception as exc:
-                if hasattr(exc, "details"):
-                    skipped += len(exc.details.get("writeErrors", []))
-                    inserted += len(batch) - len(exc.details.get("writeErrors", []))
-                else:
-                    skipped += 0
-
-        print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}\n")
-        return cleaned_docs
-
-    # Update Data to Google Sheet from MongoDB
-    @classmethod
-    def upload_to_google_sheet_DL_PID(cls, collection, gs_id, gs_tab, start_column, end_column, rows=None):
-
-        # Authenticate with OAuth2
-        creds = cls.googleAPI()
-        service = build("sheets", "v4", credentials=creds)
-        sheet = service.spreadsheets()
-
-        # Google Sheet ID and Sheet Tab Name (range name)
-        SPREADSHEET_ID = gs_id
-        RANGE_NAME = f"{gs_tab}!{start_column}3:{end_column}"
-
-        # Convert from MongoDB (dics) to Google Sheet API (list), because Google Sheets API only accept "list".
-        def sanitize_rows(raw_rows):
-            """Normalize rows into list-of-lists; keep completed_at unchanged."""
-            sanitized = []
-            for r in raw_rows:
-                if isinstance(r, dict):
-                    pid = str(r.get("player_id", ""))
-                    if pid and not pid.startswith("'"):
-                        pid = f"'{pid}"  # force Google Sheets to treat as text
-                    sanitized.append([
-                        pid,
-                        str(r.get("amount", "")),
-                        r.get("completed_at", ""),  # do not coerce to str
-                    ])
-                elif isinstance(r, (list, tuple)):
-                    pid = str(r[0]) if len(r) > 0 else ""
-                    if pid and not pid.startswith("'"):
-                        pid = f"'{pid}"
-                    sanitized.append([
-                        pid,
-                        str(r[1]) if len(r) > 1 else "",
-                        r[2] if len(r) > 2 else "",  # do not coerce to str
-                    ])
-                else:
-                    sanitized.append([str(r), "", ""])
-            return sanitized
-
-        # If no data upload to MongoDB, it auto upload data to google sheet
-        if not rows:
-            client = MongoClient(MONGODB_URI)
-            db = client["CONVERSION_0226"]
-            collection = db[collection]
-            documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
-            rows = documents
-            
-        rows = sanitize_rows(rows)
-
-        if not rows:
-            print("No rows found to upload to Google Sheet.")
-            return
-
-        body = {"values": rows, "majorDimension": "ROWS"}
-
-        print(f"Uploading {len(rows)} rows to Google Sheet range {RANGE_NAME}")
-
-        try:
-            sheet.values().update(
-                spreadsheetId=SPREADSHEET_ID,
-                range=RANGE_NAME,
-                valueInputOption="USER_ENTERED",  # let Sheets parse dates/numbers
-                body=body
-            ).execute()
-        except Exception as exc:
-            print(f"Failed to upload to Google Sheets: {exc}")
-            raise
-
-        # print("Rows to upload:", rows)
-        print("Uploaded MongoDB data to Google Sheet.")
 
     # ====================================================================================
     # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=- MEMBER INFO =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -687,176 +538,6 @@ class Fetch(BO_Account, mongodb_2_gs):
 
         print("Saved user cookie to:", file_path)
 
-    # =========================== DEPOSIT LIST ===========================
-
-    # Deposit List (Player ID)
-    @classmethod
-    def deposit_list_PID(cls, bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column):
-        
-        session = create_session()
-
-        # Print Color Messages
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {team} {Fore.YELLOW} DEPOSIT LIST Data...{Style.RESET_ALL}\n"
-        for ch in msg:
-            sys.stdout.write(ch)
-            sys.stdout.flush()
-            time.sleep(0.01)
-
-        # Get TimeZone (GMT+7)
-        gmt7 = pytz.timezone("Asia/Bangkok")
-        now_gmt7 = datetime.now(gmt7)
-
-        # Get Current Time (GMT +7)    
-        current_time = now_gmt7.time()
-        print(current_time, "GMT+7")
-        
-        # Today & Yesterday Date
-        today = now_gmt7.strftime("%Y-%m-%d")
-        yesterday = (now_gmt7 - timedelta(days=1)).strftime("%Y-%m-%d")
-
-        # Rule:
-        # 00:00 - 00:14 → use yesterday
-        # 00:15 onward → use today
-        if current_time < datetime.strptime("01:00", "%H:%M").time():
-            start_date = yesterday
-            end_date = yesterday
-        else:
-            start_date = today
-            end_date = today
-
-        # Cookie File
-        cookie_file = f"/home/thomas/get_cookies/{bo_link}.json"
-
-        # Auto-create file if missing
-        os.makedirs(os.path.dirname(cookie_file), exist_ok=True)
-        if not os.path.exists(cookie_file):
-            open(cookie_file, "w").write('{"user_cookie": ""}')
-
-        # Load cookie
-        with open(cookie_file, "r", encoding="utf-8") as f:
-            user_cookie = json.load(f).get("user_cookie", "")
-        
-        url = f"https://v3-bo.{bo_link}/api/be/finance/get-deposit"
-
-        payload = {
-        "paginate": 100,
-        "page": 1,
-        "currency": [
-            currency
-        ],
-        "status": "approved",
-        "start_date": start_date,
-        "end_date": end_date,
-        "gmt": gmt_time,
-        "merchant_id": 1,
-        "admin_id": 337,
-        "aid": 337
-        }
-        headers = {
-        'accept': 'application/json',
-        'accept-language': 'en-US,en;q=0.9',
-        'cache-control': 'no-cache',
-        'content-type': 'application/json',
-        'domain': f'v3-bo.{bo_link}',
-        'gmt': gmt_time,
-        'lang': 'en-US',
-        'loggedin': 'true',
-        'origin': f'https://v3-bo.{bo_link}',
-        'page': '/en-us/finance-management/deposit',
-        'pragma': 'no-cache',
-        'priority': 'u=1, i',
-        'referer': f'https://v3-bo.{bo_link}/en-us/finance-management/deposit',
-        'sec-ch-ua': '"Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"macOS"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-origin',
-        'type': 'POST',
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
-        'Cookie': f"i18n_redirected=en-us; user={user_cookie}",
-        }
-
-        # Post Response 
-        response = session.post(url, headers=headers, json=payload, timeout=30)
-
-        # Check if return unauthorized (401) 
-        if response.json().get("statusCode") == 401:
-            
-            # Print 401 error
-            print("⚠️ Received 401 Unauthorized. Attempting to refresh cookies...")
-
-            # Get Cookies
-            cls._get_cookies(
-                bo_link,
-                cls.accounts[bo_name]["merchant_code"],
-                cls.accounts[bo_name]["acc_ID"],
-                cls.accounts[bo_name]["acc_PASS"],
-                f"/home/thomas/get_cookies/{bo_link}.json"
-            )
-            
-            # Retry request...
-            return cls.deposit_list_PID(bo_link, bo_name, team, currency, gmt_time, collection, gs_id, gs_tab, start_column, end_column)
-
-
-        # For loop page and fetch data
-        for page in range(1, 10000):
-            payload["page"] = page
-
-            # Send POST request
-            response = session.post(url, headers=headers, json=payload, timeout=30)
-
-            # Safe JSON Handling
-            try:
-                data = response.json()
-            except Exception:
-                print("Invalid JSON response from API!")
-                print("Status Code:", response.status_code)
-                print("Response text:", response.text[:500])
-                return
-
-            rows = data.get("data", [])
-            print(f"\nPage {page} → {len(rows)} rows")
-
-            # STOP only after double-checking the next page
-            if not rows:
-                print(f"⚠️ Page {page} returned 0 rows — double checking Page {page + 1}...")
-
-                # Prepare next-page payload
-                next_payload = payload.copy()
-                next_payload["page"] = page + 1
-
-                # Request next page
-                next_response = session.post(url, headers=headers, json=next_payload, timeout=30)
-                
-                try:
-                    next_data = next_response.json()
-                    next_rows = next_data.get("data", [])
-                except Exception:
-                    print("⚠️ Invalid JSON while double checking next page.")
-                    next_rows = []
-
-                print(f"Page {page + 1} → {len(next_rows)} rows (double check)")
-
-                # Only break if next page *also* returns 0
-                if not next_rows:
-                    print(f"No transaction ID found on Page {page} and Page {page + 1}. Breaking loop.")
-                    break
-                else:
-                    print(f"Page {page} was empty but Page {page + 1} has data → continuing...")
-                    continue
-
-            # Insert into MongoDB
-            if "data" in data and len(data["data"]) > 0:
-                cls.mongodbAPI_DL_PID(data["data"], collection)
-            else:
-                print("No data returned from API.")
-
-        # # Upload Data to Google Sheet by reading from MongoDB
-        mongodb_2_gs.upload_to_google_sheet_DL_PID(collection, gs_id, gs_tab, start_column, end_column)
-
-        # Python Requests Method
-    
     # =========================== Member Info ===========================
 
     # Member Info
@@ -1210,98 +891,98 @@ while True:
         # # ==========================================================================
 
         # # S5T (MEMBER INFO)
-        safe_call(Fetch.member_info, "s55bo.com", "s55", "S5T", "THB", "+07:00", "S55_S5T_MI", "1M4d7S2IpcUokUF3RsDQAMGFaVRKs4y21zwdyiTgk12o", "S5T", description="S5T member info")
+        safe_call(Fetch.member_info, "s55bo.com", "s55", "S5T", "THB", "+07:00", "S5T_MI", "1M4d7S2IpcUokUF3RsDQAMGFaVRKs4y21zwdyiTgk12o", "S5T", description="S5T member info")
         
         # # ==========================================================================
         # # =-=-=-=-==-=-=-=-= N8Y MEMBER INFO =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=- 
         # # ==========================================================================
 
         # THIDAR
-        safe_call(Fetch.member_info, "nex8bo.com", "nex8", "N8Y", "MMK", "+07:00", "NEX8_N8Y_MI", "1qZY2LFPEZHpSk2tLOeaFif-nAmC1FaDr7JdzcFseAJ4", "New Register", description="N8Y member info")
+        safe_call(Fetch.member_info, "nex8bo.com", "nex8", "N8Y", "MMK", "+07:00", "N8Y_MI", "1qZY2LFPEZHpSk2tLOeaFif-nAmC1FaDr7JdzcFseAJ4", "New Register", description="N8Y member info")
         
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= S345T MEMBER INFO =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-
         # ==========================================================================
 
         # LIN
-        safe_call(Fetch.member_info, "57249022.asia", "s345", "S345T", "THB", "+07:00", "S345_S345T_MI", "11Kz5AOzFR92S_bpRsKBBt_b-VGsj2NztzQe96uUIUzo", "New Register", description="S345T member info")
+        safe_call(Fetch.member_info, "57249022.asia", "s345", "S345T", "THB", "+07:00", "S345T_MI", "11Kz5AOzFR92S_bpRsKBBt_b-VGsj2NztzQe96uUIUzo", "New Register", description="S345T member info")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= S2T MEMBER INFO =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         # ==========================================================================
 
         # YOD
-        safe_call(Fetch.member_info, "m3v5r6cx.com", "s212", "S2T", "THB", "+07:00", "S212_S2T_MI", "1ijEyJn06GLt2b62OpFuKIvfB0E5Z2B76kZ4vw5FFW-A", "New Register", description="S2T member info")
+        safe_call(Fetch.member_info, "m3v5r6cx.com", "s212", "S2T", "THB", "+07:00", "S2T_MI", "1ijEyJn06GLt2b62OpFuKIvfB0E5Z2B76kZ4vw5FFW-A", "New Register", description="S2T member info")
         
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= S369T MEMBER INFO =-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-=-=
         # ==========================================================================
 
         # S369T (MEMBER INFO)
-        safe_call(Fetch.member_info, "uhy3umx.com", "s369", "S369T", "THB", "+07:00", "S369_S369T_MI", "11HL1lEyeqoiEwbJMPIamWDoDwRZXPpuMnWyCh7RtL0M", "New Register", description="S369T member info")
+        safe_call(Fetch.member_info, "uhy3umx.com", "s369", "S369T", "THB", "+07:00", "S369T_MI", "11HL1lEyeqoiEwbJMPIamWDoDwRZXPpuMnWyCh7RtL0M", "New Register", description="S369T member info")
         
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= S6T MEMBER INFO  =-=-=-=-==-=-=-=-==-=-=-=-=-=-=-=-=-=-
         # ==========================================================================
 
         # HOM
-        safe_call(Fetch.member_info, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S66_S6T_MI", "1FeDA1z2hL9Uk7Vna2nt5HuNxIHnEGZRzRQoA1O4IcD0", "New Register", description="S6T member info")
+        safe_call(Fetch.member_info, "siam66bo.com", "s66", "S6T", "THB", "+07:00", "S6T_MI", "1FeDA1z2hL9Uk7Vna2nt5HuNxIHnEGZRzRQoA1O4IcD0", "New Register", description="S6T member info")
         
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= J8T MEMBER INFO =-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-=-=-= 
         # ==========================================================================
 
         # J8T (YING)
-        safe_call(Fetch.member_info, "jw8bo.com", "jw8", "J8T", "THB", "+07:00", "JW8_J8T_MI", "1vcH2zmeJ1bIvup-pmcHR9J5dlzsCaJg9hf9Jr7C5OZg", "New Register", description="J8T member info")
+        safe_call(Fetch.member_info, "jw8bo.com", "jw8", "J8T", "THB", "+07:00", "J8T_MI", "1vcH2zmeJ1bIvup-pmcHR9J5dlzsCaJg9hf9Jr7C5OZg", "New Register", description="J8T member info")
         
         # # ==========================================================================
         # # =-=-=-=-==-=-=-=-= MST MEMBER INFO =-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-=-=-= 
         # # ==========================================================================
 
         # FON
-        safe_call(Fetch.member_info, "bo-msslot.com", "slot", "MST", "THB", "+07:00", "SLOT_MST_MI", "1gmvtZ05WTC4lu60rmnSATBYQGxF9e4HS8s-9u3HsgBg", "New Register", description="MST member info")
+        safe_call(Fetch.member_info, "bo-msslot.com", "slot", "MST", "THB", "+07:00", "MST_MI", "1gmvtZ05WTC4lu60rmnSATBYQGxF9e4HS8s-9u3HsgBg", "New Register", description="MST member info")
         
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= I8T MEMBER INFO =-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-=-=-= 
         # ==========================================================================
 
         # TATA
-        safe_call(Fetch.member_info, "i828.asia", "828", "I8T", "THB", "+07:00", "I828_I8T_MI", "1ZrIrFBaBsiliGFMfVeO5Kq5ExnC5nJfTk7i3FI5S-UU", "New Register", description="I8T member info")
+        safe_call(Fetch.member_info, "i828.asia", "828", "I8T", "THB", "+07:00", "I8T_MI", "1ZrIrFBaBsiliGFMfVeO5Kq5ExnC5nJfTk7i3FI5S-UU", "New Register", description="I8T member info")
         
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= G855T MEMBER INFO =-=-=-=-==-=-=-
         # ==========================================================================
         
         # G855T (MEMBER INFO) MEME
-        safe_call(Fetch.member_info, "god855.asia", "g855", "G855T", "THB", "+07:00", "G855_G855T_MI", "12AVH011V35qWUCqpMWfMpmYzhRflyaxWZ5BUCCYHWhQ", "New Register", description="G855T member info")
+        safe_call(Fetch.member_info, "god855.asia", "g855", "G855T", "THB", "+07:00", "G855T_MI", "12AVH011V35qWUCqpMWfMpmYzhRflyaxWZ5BUCCYHWhQ", "New Register", description="G855T member info")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= 2FT MEMBER INFO =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         # ==========================================================================
 
         # 2FT (MEMBER INFO)
-        safe_call(Fetch.member_info, "22funbo.com", "22f", "2FT", "THB", "+07:00", "22F_2FT_MI", "1cizS7oiv6uD9DzmdiTVhIxQ8xgnSYNMgt93RtCsGI_E", "New Register", description="2FT member info")
+        safe_call(Fetch.member_info, "22funbo.com", "22f", "2FT", "THB", "+07:00", "2FT_MI", "1cizS7oiv6uD9DzmdiTVhIxQ8xgnSYNMgt93RtCsGI_E", "New Register", description="2FT member info")
         
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= M1T MEMBER INFO =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         # ==========================================================================
 
         # ALICE
-        safe_call(Fetch.member_info, "zupra7x.com", "mf191", "M1T", "THB", "+07:00", "MF191_M1T_MI", "1t_Nz_v0e6P-_rOlN9gyqSs2ncgZeGmbJsybk5M8ayDY", "New Register", description="M1T member info")
+        safe_call(Fetch.member_info, "zupra7x.com", "mf191", "M1T", "THB", "+07:00", "M1T_MI", "1t_Nz_v0e6P-_rOlN9gyqSs2ncgZeGmbJsybk5M8ayDY", "New Register", description="M1T member info")
 
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= 2WT MEMBER INFO =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=- 
         # ==========================================================================
 
         # NONG SI
-        safe_call(Fetch.member_info, "w8c4n9be.com", "22w", "2WT", "THB", "+07:00", "22W_2WT_MI", "1TTd1TgPwZUX_sdQJX-CzdZM2imLZi1vLgUkBmFXgZQ8", "New Register", description="2WT member info")
+        safe_call(Fetch.member_info, "w8c4n9be.com", "22w", "2WT", "THB", "+07:00", "2WT_MI", "1TTd1TgPwZUX_sdQJX-CzdZM2imLZi1vLgUkBmFXgZQ8", "New Register", description="2WT member info")
         
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= S8T MEMBER INFO =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=- 
         # ==========================================================================
 
         # MEW
-        safe_call(Fetch.member_info, "siam855bo.com", "s855", "S8T", "THB", "+07:00", "S855_S8T_MI", "1BlvW1IwKMMHGN4n4kmh9nWZCoXHSdnn_Vw_6BT4k0Yk", "New Register", description="S8T member info")
+        safe_call(Fetch.member_info, "siam855bo.com", "s855", "S8T", "THB", "+07:00", "S8T_MI", "1BlvW1IwKMMHGN4n4kmh9nWZCoXHSdnn_Vw_6BT4k0Yk", "New Register", description="S8T member info")
         
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= J1B MEMBER INFO =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-  

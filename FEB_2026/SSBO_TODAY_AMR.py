@@ -285,8 +285,8 @@ class mongodb_2_gs:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google/token.json"
-    CREDS_PATH = "./api/google/credentials.json"
+    TOKEN_PATH = "/Users/nera_thomas/Desktop/Telemarketing/api/google/token.json"
+    CREDS_PATH = "/Users/nera_thomas/Desktop/Telemarketing/api/google/credentials.json"
 
     # Google API Authentication
     @classmethod
@@ -786,7 +786,7 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
     # BO All Member Report (Extract Data like Postman/API and save as json file)
     # (merchants name = Acewin8, Ivip9, UEABET)
     @classmethod
-    def ssbo_allmemberReport(cls, merchant, currency, file_name, g_sheet_tab, g_sheet_ID):
+    def ssbo_TODAYallmemberReport(cls, merchant, currency, file_name, g_sheet_tab, g_sheet_ID):
         with sync_playwright() as p:  
 
             # Wait for Chrome CDP to be ready
@@ -963,7 +963,7 @@ while True:
         Automation.chrome_CDP()
 
         print("\n\033[1;36mSSBO A8T THAI\033[0m \033[2m(VIEW, TIP, KUNG)\033[0m \033[1;36mTODAY AMR\033[0m")
-        safe_call(Fetch.ssbo_allmemberReport, "Acewin8", "Thailand", "SSBO_A8T_TODAY_AMR", "TODAY AMR", "1sJkHxS9PUUrNAjxPwcsb5FVvQgAS6o1LiqG2gOeWJIg")
+        safe_call(Fetch.ssbo_TODAYallmemberReport, "Acewin8", "Thailand", "SSBO_A8T_TODAY_AMR", "TODAY AMR", "1sJkHxS9PUUrNAjxPwcsb5FVvQgAS6o1LiqG2gOeWJIg")
 
         # Close Browser
         Automation.cleanup()

@@ -18,7 +18,6 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from runtime import logger, safe_call, MONGODB_URI
 from google_auth_oauthlib.flow import InstalledAppFlow
-
 from datetime import date, datetime, timedelta, timezone
 
 PROXIES = {
@@ -188,8 +187,8 @@ class mongodb_2_gs:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google4/token.json"
-    CREDS_PATH = "./api/google4/credentials.json"
+    TOKEN_PATH = "/home/thomas/api/google/token.json"
+    CREDS_PATH = "/home/thomas/api/google/credentials.json"
 
     # Google API Authentication
     @classmethod
@@ -1000,17 +999,31 @@ class Fetch(BO_Account, mongodb_2_gs):
 # member_info_2 format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name)
 # deposit_list format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name, google sheet start column, google sheet end column)
 
+last_run_date = None
 
 while True:
     try:
 
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-
-        # ======================================= SSBO 9T NON_FRESH  ==========================================
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-
+        # Check current time to use correct google sheet tab to upload data
+        now = datetime.now()
+        print(now.time())
         
-        # ARRIM
-        safe_call(Fetch.ssbo_NON_FRESH, "ip9", "THB", "SSBO_9T_NON_FRESH", "1Xr5ZZwp-ESPvoMeFEQ2Zq1SaIum5vFbskKnmyh71AlM", "NON_FRESH", description="SSBO 9T NON_FRESH")
+        # Run code when is 7am
+        if last_run_date != now.date() and now.hour == 7 and 0 <= now.minute < 10:
+
+            # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-
+            # ======================================= SSBO 9T NON_FRESH  ==========================================
+            # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-
+            
+            # ARRIM
+            safe_call(Fetch.ssbo_NON_FRESH, "ip9", "THB", "SSBO_9T_NON_FRESH", "1Xr5ZZwp-ESPvoMeFEQ2Zq1SaIum5vFbskKnmyh71AlM", "NON FRESH", description="SSBO 9T NON_FRESH")
+            
+            # Prevent rerun today
+            last_run_date = now.date()
         
+        # Delay 30 seconds
+        time.sleep(30)
+
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")
         break

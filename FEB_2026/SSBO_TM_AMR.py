@@ -79,7 +79,7 @@ class Automation:
     def chrome_CDP(cls):
 
         # User Profile
-        USER_DATA_DIR = f"/Users/nera_thomas/Library/Application Support/Google/Chrome/Profile 15"
+        USER_DATA_DIR = f"/Users/nera_thomas/Library/Application Support/Google/Chrome/Profile 17"
         
         # Start Chrome normally
         cls.chrome_proc = subprocess.Popen([
@@ -285,8 +285,8 @@ class mongodb_2_gs:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google/token.json"
-    CREDS_PATH = "./api/google/credentials.json"
+    TOKEN_PATH = "/Users/nera_thomas/Desktop/Telemarketing/api/google/token.json"
+    CREDS_PATH = "/Users/nera_thomas/Desktop/Telemarketing/api/google/credentials.json"
 
     # Google API Authentication
     @classmethod
@@ -781,12 +781,12 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
             browser.close()
             Automation.cleanup()
 
-    # =========================== ALL MEMBER REPORT ===========================
+    # =========================== LM ALL MEMBER REPORT ===========================
 
     # BO All Member Report (Extract Data like Postman/API and save as json file)
     # (merchants name = Acewin8, Ivip9, UEABET)
     @classmethod
-    def ssbo_allmemberReport(cls, merchant, currency, file_name, g_sheet_tab, g_sheet_ID):
+    def ssbo_TMallmemberReport(cls, merchant, currency, file_name, g_sheet_tab, g_sheet_ID):
         with sync_playwright() as p:  
 
             # Wait for Chrome CDP to be ready
@@ -918,7 +918,148 @@ class Fetch(Automation, BO_Account, mongodb_2_gs):
                 Automation.cleanup()
                 # Run Chrome Browser
                 Automation.chrome_CDP()
+
+
+        # =========================== ALL MEMBER REPORT ===========================
+
+    # =========================== TODAY ALL MEMBER REPORT ===========================
+
+    # BO All Member Report (Extract Data like Postman/API and save as json file)
+    # (merchants name = Acewin8, Ivip9, UEABET)
+    @classmethod
+    def ssbo_TODAYallmemberReport(cls, merchant, currency, file_name, g_sheet_tab, g_sheet_ID):
+        with sync_playwright() as p:  
+
+            # Wait for Chrome CDP to be ready
+            cls.wait_for_cdp_ready()
+
+            # Connect to running Chrome
+            browser = p.chromium.connect_over_cdp("http://localhost:9333")
+            context = browser.contexts[0] if browser.contexts else browser.new_context()    
+
+            # Open a new browser page
+            page = context.pages[0] if context.pages else context.new_page()
+            page.goto("https://aw8.premium-bo.com/", wait_until="load", timeout=0)
+
+            try:
+                # if announment appear, then click close
+                try:
+                    # Wait for "Member" appear
+                    expect(page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[4]/div[1]/div[1]/a[1]/ul[1]/li[2]")).to_be_visible(timeout=3000)
+                    # Check whether "Merchant credit balance is low" appear, else pass
+                    expect(page.locator("//div[normalize-space()='Merchant credit balance is low.']")).to_be_visible(timeout=1500)
+                    # Click checkbox
+                    page.locator("//div[@class='disable-low-merchant-credit-balance']//input[@type='checkbox']").click()
+                    time.sleep(1)
+                    # Click Close
+                    page.locator("//button[normalize-space()='Close']").click()
+                except:
+                    pass
                 
+                # if is in Login Page, then Login, else Skip
+                try:
+                    # Check whether "Sign In" appear, else pass
+                    expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=2000)
+                    # Fill in Username
+                    page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan2"]["acc_ID"])
+                    # Fill in Password
+                    page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan2"]["acc_PASS"])
+                    # Login 
+                    page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
+                    # Delay 2 second
+                    page.wait_for_timeout(2000)
+                except:
+                    pass
+
+                # if is in Login Page, then Login, else Skip
+                try:
+                    # Check whether "Sign In" appear, else pass
+                    expect(page.locator("//body[1]/ngb-modal-window[3]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[1]/h5[1]")).to_be_visible(timeout=2000)
+                    # Fill in Username
+                    page.locator("//body[1]/ngb-modal-window[3]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[2]/div[2]/jhi-text-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan2"]["acc_ID"])
+                    # Fill in Password
+                    page.locator("//body[1]/ngb-modal-window[3]/div[1]/div[1]/jhi-re-login[1]/div[2]/jhi-login-route[1]/div[1]/div[1]/div[2]/jhi-form-shared-component[1]/form[1]/div[1]/div[3]/div[2]/jhi-password-shared-component[1]/div[1]/div[1]/div[1]/input[1]").fill(cls.accounts["super_swan2"]["acc_PASS"])
+                    # Login 
+                    page.click("//jhi-form-shared-component[@ng-reflect-disabled='false']//button[@class='btn btn-primary btn-form btn-submit login-label-color'][normalize-space()='Login']", force=True)
+                    # Delay 2 second
+                    page.wait_for_timeout(2000)
+                except:
+                    pass
+                
+                
+                # Click Report
+                page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[7]/div[1]/div[1]/a[1]/ul[1]/li[2]").click()
+                # Click All Member Report
+                page.locator("//a[@ng-reflect-router-link='/report/all-member-report']//li[@class='parent-nav-item'][normalize-space()='10.2. All Member Report']").click() 
+                # Delay 5 seconds
+                page.wait_for_timeout(5000)
+                
+                # if is in Login Page, then Login, else Skip
+                try:
+                    # Check whether "Sign In" appear, else pass
+                    expect(page.locator("//h5[normalize-space()='Sign In?']")).to_be_visible(timeout=5000)
+                    # Fill in Username
+                    page.locator("//input[@placeholder='Username:']").fill(cls.accounts["super_swan2"]["acc_ID"])
+                    # Fill in Password
+                    page.locator("//input[@id='password-input']").fill(cls.accounts["super_swan2"]["acc_PASS"])
+                    # Login 
+                    page.click("//button[normalize-space()='Login']", force=True)
+                    # Delay 2 second
+                    page.wait_for_timeout(2000)
+                    # Click Report
+                    page.locator("//body/jhi-main/jhi-route/div[@class='en']/div[@id='left-navbar']/jhi-left-menu-main-component[@class='full']/div[@class='row']/div[@class='col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12']/div[@id='left-menu-body']/jhi-sub-left-menu-component/ul[@class='navbar-nav flex-direction-col']/li[7]/div[1]/div[1]/a[1]/ul[1]/li[2]").click()
+                    # Click All Member Report
+                    page.locator("//a[@ng-reflect-router-link='/report/all-member-report']//li[@class='parent-nav-item'][normalize-space()='10.2. All Member Report']").click()    
+                except:
+                    pass
+                
+                # Click Region dropdown
+                page.locator("ng-select .ng-select-container").nth(0).click()
+                page.locator(".ng-dropdown-panel .ng-option").filter(has_text=merchant).click()
+                # Delay 1 second
+                page.wait_for_timeout(1000)
+                # Click Region dropdown
+                page.locator("ng-select .ng-select-container").nth(1).click()
+                page.locator(".ng-dropdown-panel .ng-option").filter(has_text=currency).click()
+                # Delay 1 second
+                page.wait_for_timeout(1000)
+                # Button Click "Today"
+                page.locator("//button[normalize-space()='Today']").click()
+                # Delay 1 second
+                page.wait_for_timeout(1000)
+                # Button Click "Search"
+                page.locator("//button[normalize-space()='Search']").click()
+                # wait for the first row data appear 
+                page.locator("tbody tr").first.wait_for(state="visible", timeout=10000)
+                # Delay 3 seconds
+                page.wait_for_timeout(3000)
+
+                # Download .CSV Report File
+                with page.expect_download(timeout=600000) as download_info:
+                    page.locator("//button[normalize-space()='Export']").click(timeout=10000)   # ---> button click downnload csv file
+                download = download_info.value
+
+                # Save the file manually
+                base_dir = "/Users/nera_thomas/Desktop/Telemarketing/excel_file"
+                os.makedirs(base_dir, exist_ok=True)
+                download_path = os.path.join(base_dir, f"{file_name}.zip")
+                download.save_as(download_path)
+
+                # Unzip file
+                cls.unzip(file_name)
+                # Delay 1 second
+                page.wait_for_timeout(1000)
+                # Upload to Google Sheet
+                cls.upload_to_google_sheet_SSBO_AMR(file_name, g_sheet_tab, g_sheet_ID)
+            finally:
+                try:
+                    browser.close()
+                except:
+                    pass  # Browser already closed or failed to close
+                Automation.cleanup()
+                # Run Chrome Browser
+                Automation.chrome_CDP()
+                       
 ###############=================================== CODE RUN HERE =======================================############
 
 ### ==== README YO!!!! ==== ####
@@ -962,27 +1103,38 @@ while True:
         # Run Chrome Browser
         Automation.chrome_CDP()
 
-        print("\n\033[1;36mSSBO A8M MY\033[0m \033[2m(ANGIE)\033[0m \033[1;36mTM AMR\033[0m")
-        safe_call(Fetch.ssbo_allmemberReport, "Acewin8", "Malaysia", "SSBO_A8M_TM_AMR", "TM - All Member Report (SS)", "1xodhapPpnOHXgFWYGuG6fWCGoVKUZ6Y_hC5HmpvMdzg")
+        ##################################
+        #########  THIS MONTH ############
+        ##################################
 
-        print("\n033[1;36mSSBO A8M MY\033[0m \033[2m(ANGIE 2)\033[0m \033[1;36mTM AMR\033[0m")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_SSBO_AMR, "SSBO_A8M_TM_AMR", "TM - All Member Report (SS)", "1e-Fhwyc0yON1IBnzyHmBITujmSzZdci1rzOzL4urXa4")
+        print("\n\033[1;36mSSBO A8M MY\033[0m \033[2m(ANGIE)\033[0m \033[1;36mTM AMR\033[0m")
+        safe_call(Fetch.ssbo_TMallmemberReport, "Acewin8", "Malaysia", "SSBO_A8M_TM_AMR", "TM - All Member Report (SS)", "1xodhapPpnOHXgFWYGuG6fWCGoVKUZ6Y_hC5HmpvMdzg")
+
+        print("\n\033[1;36mSSBO A8M MY\033[0m \033[2m(ANGIE 2)\033[0m \033[1;36mTM AMR\033[0m")
+        safe_call(Fetch.ssbo_TMallmemberReport, "Acewin8", "Malaysia", "SSBO_A8M_TM_AMR", "TM - All Member Report (SS)", "1e-Fhwyc0yON1IBnzyHmBITujmSzZdci1rzOzL4urXa4")
 
         print("\n\033[1;36mSSBO A8M MY\033[0m \033[2m(AVA)\033[0m \033[1;36mTM AMR\033[0m")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_SSBO_AMR, "SSBO_A8M_TM_AMR", "TM - All Member Report (SS)", "1PZ0OMMEV_p-wyPv_Sk2D1nNABlDGlUGMI-U-kfjt0as")
+        safe_call(Fetch.ssbo_TMallmemberReport, "Acewin8", "Malaysia", "SSBO_A8M_TM_AMR", "TM - All Member Report (SS)", "1PZ0OMMEV_p-wyPv_Sk2D1nNABlDGlUGMI-U-kfjt0as")
 
         print("\n\033[1;36mSSBO A8S SG\033[0m \033[2m(AVA)\033[0m \033[1;36mTM AMR\033[0m")
-        safe_call(Fetch.ssbo_allmemberReport, "Acewin8", "Singapore", "SSBO_A8S_TM_AMR", "TM - All Member Report (SS)", "1b2yE7mdtxXxa-lLhgGX_ciVHIyWTzy4MUgMfHnHDqRk")
+        safe_call(Fetch.ssbo_TMallmemberReport, "Acewin8", "Singapore", "SSBO_A8S_TM_AMR", "TM - All Member Report (SS)", "1b2yE7mdtxXxa-lLhgGX_ciVHIyWTzy4MUgMfHnHDqRk")
 
         print("\n\033[1;36mSSBO A8S SG\033[0m \033[2m(CINDY)\033[0m \033[1;36mTM AMR\033[0m")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_SSBO_AMR, "SSBO_A8S_TM_AMR", "TM - All Member Report (SS)", "1UMz3hMfPhvfrZaudJvkYI8gjh1_GOXI6a2ZlibeFAL0")
+        safe_call(Fetch.ssbo_TMallmemberReport, "Acewin8", "Singapore", "SSBO_A8S_TM_AMR", "TM - All Member Report (SS)", "1UMz3hMfPhvfrZaudJvkYI8gjh1_GOXI6a2ZlibeFAL0")
 
         print("\n\033[1;36mSSBO A8T THAI\033[0m \033[2m(VIEW, TIP, KUNG)\033[0m \033[1;36mTM AMR\033[0m")
-        safe_call(Fetch.ssbo_allmemberReport, "Acewin8", "Thailand", "SSBO_A8T_TM_AMR", "TM - All Member Report", "1sJkHxS9PUUrNAjxPwcsb5FVvQgAS6o1LiqG2gOeWJIg")
+        safe_call(Fetch.ssbo_TMallmemberReport, "Acewin8", "Thailand", "SSBO_A8T_TM_AMR", "TM - All Member Report", "1sJkHxS9PUUrNAjxPwcsb5FVvQgAS6o1LiqG2gOeWJIg")
 
         print("\n\033[1;36mSSBO 9T THAI\033[0m \033[2m(KOI)\033[0m \033[1;36mTM AMR\033[0m")
-        safe_call(Fetch.ssbo_allmemberReport, "Ivip9", "Thailand", "SSBO_9T_TM_AMR", "TM - All Member Report", "1DUBOOOYMVmwMo9v1R9CYuX24stlpjRkDDpeJ9sVXyBE")
+        safe_call(Fetch.ssbo_TMallmemberReport, "Ivip9", "Thailand", "SSBO_9T_TM_AMR", "TM - All Member Report", "1DUBOOOYMVmwMo9v1R9CYuX24stlpjRkDDpeJ9sVXyBE")
         
+        ##################################
+        #########  TODAY #################
+        ##################################
+
+        print("\n\033[1;36mSSBO A8T THAI\033[0m \033[2m(VIEW, TIP, KUNG)\033[0m \033[1;36mTODAY AMR\033[0m")
+        safe_call(Fetch.ssbo_TODAYallmemberReport, "Acewin8", "Thailand", "SSBO_A8T_TODAY_AMR", "TODAY AMR", "1sJkHxS9PUUrNAjxPwcsb5FVvQgAS6o1LiqG2gOeWJIg")
+
         # Close Browser
         Automation.cleanup()
     

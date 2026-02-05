@@ -187,8 +187,8 @@ class mongodb_2_gs:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google/token.json"
-    CREDS_PATH = "./api/google/credentials.json"
+    TOKEN_PATH = "/home/thomas/api/google5/token.json"
+    CREDS_PATH = "/home/thomas/api/google5/credentials.json"
 
     # Google API Authentication
     @classmethod
@@ -1463,7 +1463,7 @@ while True:
             
             # IBS J8M MY
             print("\n\033[1;36mIBS J8M MI 10:00 - 23:59\033[0m")
-            safe_call(Fetch.member_info, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_MI_10_00", "1IAer3P0IUWNH69itVLlJ8gcZumaHFIQVGchOTkHiMFs", "J8M IBS", description="IBS J8M MY MEMBER INFO")
+            safe_call(Fetch.member_info, "jw8bo.com", "jw8", "MYR", "+08:00", "J8M_MI_10_00_test", "1IAer3P0IUWNH69itVLlJ8gcZumaHFIQVGchOTkHiMFs", "J8M IBS", description="IBS J8M MY MEMBER INFO")
             
             # IBS J8S SG
             print("\n\033[1;36mIBS J8S MI 10:00 - 23:59\033[0m")
@@ -1474,7 +1474,7 @@ while True:
             safe_call(Fetch.member_info, "aw8bo.com", "aw8", "MYR", "+08:00", "A8M_MI_10_00", "1IAer3P0IUWNH69itVLlJ8gcZumaHFIQVGchOTkHiMFs", "A8M IBS", description="IBS A8M MY MEMBER INFO")
 
             # SSBO A8M MY
-            print("\n\033[1;36mSSBO A8M MI 10:00 - 23:59\033[0m")
+            print("\n\033[1;36mSSBO A8M MIß 10:00 - 23:59\033[0m")
             safe_call(Fetch.ssbo_member_info, "aw8", ["MYR"], "SSBO_A8M_MI_10_00", "1IAer3P0IUWNH69itVLlJ8gcZumaHFIQVGchOTkHiMFs", "A8M SS", description="SSBO A8M MY MEMBER INFO")
 
             # IBS A8S SG

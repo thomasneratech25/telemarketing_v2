@@ -1,4 +1,4 @@
-import os
+ximport os
 import re
 import sys
 import pytz
@@ -192,8 +192,8 @@ class mongodb_2_gs:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google4/token.json"
-    CREDS_PATH = "./api/google4/credentials.json"
+    TOKEN_PATH = "/home/thomas/api/google2/token.json"
+    CREDS_PATH = "/home/thomas/api/google2/credentials.json"
 
     # Google API Authentication
     @classmethod
@@ -1862,7 +1862,7 @@ while True:
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         # VIEW TIP KUNG
-        safe_call(Fetch.ssbo_deposit_list_USERNAME, "aw8", ["THB"], "SSBO_A8T_DL", "1sJkHxS9PUUrNAjxPwcsb5FVvQgAS6o1LiqG2gOeWJIg", "DEPOSIT LIST", "A", "C", description="SSBO A8T deposit list")
+        safe_call(Fetch.ssbo_deposit_list_USERNAME, "aw8", ["THB"], "SSBO_A8T_DL", "1sJkHxS9PUUrNAjxPwcsb5FVvQgAS6o1LiqG2gOeWJIg", "Deposit List", "A", "C", description="SSBO A8T deposit list")
         
         # VIEW TIP KUNG
         safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_USERNAME, "SSBO_A8T_DL", "1WqFxJFLYBQLE9ZU3dH1SXlh6c2toUmL_i3tG3059BK4", "DEPOSIT LIST", "A", "C", description="SSBO A8T deposit list")
@@ -1872,19 +1872,6 @@ while True:
         # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         safe_call(Fetch.ssbo_deposit_list_USERNAME, "uea", ["THB"], "SSBO_UT_DL", "1jaUZzl3TG2bgok2y704G29cGGxc7NDBfhSA00ndsO6U", "DEPOSIT LIST", "A", "C", description="SSBO UT THAI DL USERNAME")
-
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # ============================================================== SSBO 9T DEPOSIT LIST USERNAME ================================================================
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        
-        # SUPATTA
-        safe_call(Fetch.ssbo_deposit_list_USERNAME, "ip9", ["THB"], "SSBO_9T_DL", "1aOrdFTvzQmctMuXhjiZ5BIwycugD2eBkxGiai2U73rg", "DEPOSIT LIST", "A", "C", description="SSBO 9T deposit list")
-        
-        # ARRIN
-        safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_USERNAME, "SSBO_9T_DL", "1Xr5ZZwp-ESPvoMeFEQ2Zq1SaIum5vFbskKnmyh71AlM", "DEPOSIT LIST", "A", "C", description="SSBO 9T deposit list")
-
-        # KOI
-        safe_call(mongodb_2_gs.upload_to_google_sheet_ssbo_DL_USERNAME, "SSBO_9T_DL", "1DUBOOOYMVmwMo9v1R9CYuX24stlpjRkDDpeJ9sVXyBE", "DEPOSIT LIST", "A", "C", description="SSBO 9T deposit list")
 
         # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         # # ============================================================== SSBO A8V DEPOSIT LIST USERNAME ================================================================

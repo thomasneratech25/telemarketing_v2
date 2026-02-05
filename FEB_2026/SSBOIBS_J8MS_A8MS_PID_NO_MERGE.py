@@ -185,8 +185,8 @@ class mongodb_2_gs:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google3/token.json"
-    CREDS_PATH = "./api/google3/credentials.json"
+    TOKEN_PATH = "/home/thomas/api/google5/token.json"
+    CREDS_PATH = "/home/thomas/api/google5/credentials.json"
 
     # Google API Authentication
     @classmethod

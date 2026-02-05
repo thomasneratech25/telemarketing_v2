@@ -18,7 +18,6 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from runtime import logger, safe_call, MONGODB_URI
 from google_auth_oauthlib.flow import InstalledAppFlow
-
 from datetime import date, datetime, timedelta, timezone
 
 PROXIES = {
@@ -188,8 +187,8 @@ class mongodb_2_gs:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    TOKEN_PATH = "./api/google3/token.json"
-    CREDS_PATH = "./api/google3/credentials.json"
+    TOKEN_PATH = "/home/thomas/api/google/token.json"
+    CREDS_PATH = "/home/thomas/api/google/credentials.json"
 
     # Google API Authentication
     @classmethod
@@ -753,14 +752,14 @@ class Fetch(BO_Account, mongodb_2_gs):
         session = create_session()
 
         # Print title
-        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {collection} {Fore.YELLOW} MEMBER INFO Data ... {Style.RESET_ALL}\n"
+        msg = f"\n{Style.BRIGHT}{Fore.YELLOW}Getting {Fore.GREEN} {collection} {Fore.YELLOW} ND Data ... {Style.RESET_ALL}\n"
         for ch in msg:
             sys.stdout.write(ch)
             sys.stdout.flush()
             time.sleep(0.01)
         
         # Get today date
-        today = datetime.now().strftime("%Y-%m-%d")
+        today = datetime.now().date()
 
         # First day of LAST month 
         first_day_this_month = today.replace(day=1)
@@ -1012,6 +1011,9 @@ while True:
         
         # ARRIN
         safe_call(Fetch.ssbo_ND, "ip9", "THB", "SSBO_9T_ND", "1Xr5ZZwp-ESPvoMeFEQ2Zq1SaIum5vFbskKnmyh71AlM", "ND", description="SSBO 9T ND")
+
+        # Delay 5 minutes
+        time.sleep(300)
         
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")
