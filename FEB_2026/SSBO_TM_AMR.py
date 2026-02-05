@@ -79,7 +79,7 @@ class Automation:
     def chrome_CDP(cls):
 
         # User Profile
-        USER_DATA_DIR = f"/Users/nera_thomas/Library/Application Support/Google/Chrome/Profile 17"
+        USER_DATA_DIR = f"/Users/nera_thomas/Library/Application Support/Google/Chrome/Profile 18"
         
         # Start Chrome normally
         cls.chrome_proc = subprocess.Popen([

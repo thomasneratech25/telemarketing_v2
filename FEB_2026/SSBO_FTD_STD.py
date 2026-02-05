@@ -920,7 +920,7 @@ while True:
         # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         # ARRIN
-        safe_call(Fetch.ssbo_ftd_stdReport, "ip9", "THB", "SSBO_9T_FTD_STD", "1Xr5ZZwp-ESPvoMeFEQ2Zq1SaIum5vFbskKnmyh71AlM", "TOM 2ND 3RD", description="SSBO 9T FTD/STD")
+        safe_call(Fetch.ssbo_ftd_stdReport, "ip9", "THB", "SSBO_9T_FTD_STD", "1Xr5ZZwp-ESPvoMeFEQ2Zq1SaIum5vFbskKnmyh71AlM", "2ND 3RD", description="SSBO 9T FTD/STD")
         
         # Delay 5 minutes
         time.sleep(300)

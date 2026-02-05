@@ -254,9 +254,6 @@ class mongodb_2_gs:
             unique=True
         )
 
-        collection.create_index(
-            [("username", 1), ("first_name", 1), ("register_info_date", 1), ("mobileno", 1)],
-
         # Count insert and skip
         inserted = 0
         skipped = 0
@@ -666,45 +663,45 @@ while True:
         print(now.time())
         
         # Run code when is 7am
-        if last_run_date != now.date() and now.hour == 7 and now.minute == 0:
+        if last_run_date != now.date() and now.hour == 7 and 0 <= now.minute < 10:
 
             # ==========================================================================
             # =-=-=-=-==-=-=-=-=-=-=-=-=-= GT NON_FRESH =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=
             # ==========================================================================
 
             # NAREM
-            safe_call(Fetch.NON_FRESH, "gcwin99bo.com", "gc99", "GT", "THB", "+07:00", "GT_NON_FRESH", "1X3_U_OaqDp7IYEVITUh-PaLJtq3VbV6MzI58wRzXcLs", "NON_FRESH", description="GT NON_FRESH")
+            safe_call(Fetch.NON_FRESH, "gcwin99bo.com", "gc99", "GT", "THB", "+07:00", "GT_NON_FRESH", "1X3_U_OaqDp7IYEVITUh-PaLJtq3VbV6MzI58wRzXcLs", "NON FRESH", description="GT NON_FRESH")
 
             # # ==========================================================================
             # =-=-=-=-==-=-=-=-=-=-=-=-=-= N855T NON_FRESH =-=-=-=-==-=-=-=-=-=-=-=-=-=-
             # ==========================================================================
 
             # ELSA
-            safe_call(Fetch.NON_FRESH, "f5x3n8v.com", "n855", "N855T", "THB", "+07:00", "N855T_NON_FRESH", "1PhrRokHUYNLKvI8QWINUD5DtbhtJNkkToDZB0k4frjQ", "NON_FRESH", description="N855T NON_FRESH")
+            safe_call(Fetch.NON_FRESH, "f5x3n8v.com", "n855", "N855T", "THB", "+07:00", "N855T_NON_FRESH", "1PhrRokHUYNLKvI8QWINUD5DtbhtJNkkToDZB0k4frjQ", "NON FRESH", description="N855T NON_FRESH")
 
             # ==========================================================================
             # =-=-=-=-==-=-=-=-=-=-=-=-=-= N789T NON_FRESH =-=-=-=-==-=-=-=-=-=-=-=-=-=-
             # ==========================================================================
 
             # SOFIA
-            safe_call(Fetch.NON_FRESH, "q2n5w3z.com", "n789", "N789T", "THB", "+07:00", "N789T_NON_FRESH", "15jh_5Aulx-PFwA73UhUg32iLon_kiLWw3reik-0t0uU", "NON_FRESH", description="N789T NON_FRESH")
+            safe_call(Fetch.NON_FRESH, "q2n5w3z.com", "n789", "N789T", "THB", "+07:00", "N789T_NON_FRESH", "15jh_5Aulx-PFwA73UhUg32iLon_kiLWw3reik-0t0uU", "NON FRESH", description="N789T NON_FRESH")
 
             # ==========================================================================
             # =-=-=-=-==-=-=-=-=-=-=-=-=-= N1T NON_FRESH =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-
             # ==========================================================================
 
             # Riley
-            safe_call(Fetch.NON_FRESH, "m8b4x1z6.com", "n191", "N1T", "THB", "+07:00", "N1T_NON_FRESH", "1MN69M3PuBOHBDbLKk9Ycx5Z143PQeITDOE4xoLPHuMI", "NON_FRESH", description="N1T NON_FRESH")
+            safe_call(Fetch.NON_FRESH, "m8b4x1z6.com", "n191", "N1T", "THB", "+07:00", "N1T_NON_FRESH", "1MN69M3PuBOHBDbLKk9Ycx5Z143PQeITDOE4xoLPHuMI", "NON FRESH", description="N1T NON_FRESH")
             
             # Prevent rerun today
             last_run_date = now.date()
             
-        # Delay 5 minutes
-        time.sleep(300)
+        # Delay 30 seconds
+        time.sleep(30)
 
     except KeyboardInterrupt:
-            logger.info("Execution interrupted by user.")
-            break
+        logger.info("Execution interrupted by user.")
+        break
     except Exception:
         logger.exception("Unexpected error; retrying in 60 seconds.")
         time.sleep(60)
