@@ -752,7 +752,7 @@ while True:
         
         # MEI
         print("\n\033[1;36mS6T\033[0m \033[2m(MEI)\033[0m\033[1;36m DL PID\033[0m")
-        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "S6T_DL", "1jUdIWWG_PYZKLVDLKnDzgT-T7BVCld6REp42T9NXaBA", "Deposit List", "A", "C", description="S6T deposit list")
+        safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "S6T_DL", "1f8VvIcXyG4X6B4kUhZTtnxn7FbRdRsE55hwFOgm7xc0", "Deposit List", "A", "C", description="S6T deposit list")
         
         # ==========================================================================
         # =-=-=-=-==-=-=-=-= J8T DEPOSIT LIST =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-= 
@@ -810,6 +810,9 @@ while True:
         # EVA
         print("\n\033[1;36mA8R\033[0m \033[2m(EVA)\033[0m\033[1;36m DL PID\033[0m")
         safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "A8R_DL", "1CPEsseipXkhr-cfIpD8cEhJ1_OLTM8XB6ehYS6Rxz9U", "DEPOSIT LIST", "A", "C", description="A8R deposit list")
+
+        # Delay 5 seconds
+        time.sleep(300)
 
     except KeyboardInterrupt:
             logger.info("Execution interrupted by user.")

@@ -1479,6 +1479,9 @@ while True:
         print("\n\033[1;36mIBS A8S SG\033[0m \033[2m(CINDY)\033[0m\033[1;36m DL USERNAME\033[0m")
         safe_call(mongodb_2_gs.upload_to_google_sheet_DL_USERNAME, "A8S_DL_USERNAME", "1UMz3hMfPhvfrZaudJvkYI8gjh1_GOXI6a2ZlibeFAL0", "Deposit List", "E", "G")
 
+        # Delay 5 minutes
+        time.sleep(300)
+        
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")
         break

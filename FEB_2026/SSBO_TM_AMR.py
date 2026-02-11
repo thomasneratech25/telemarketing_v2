@@ -1137,7 +1137,10 @@ while True:
 
         # Close Browser
         Automation.cleanup()
-    
+    	
+        # Delay 5 minutes
+        time.sleep(300)
+
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")
         break

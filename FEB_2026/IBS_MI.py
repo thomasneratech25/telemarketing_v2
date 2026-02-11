@@ -1039,7 +1039,10 @@ while True:
 
         # GJM (DAVIS)
         safe_call(Fetch.member_info, "gojudibo.com", "gojudi", "GJM", "MYR", "+08:00", "GJM_MI", "1RxWx0vBCC7_oSN4jX5yGnltVzN6IDWSVLf_dYgN3OfI", "New Register", description="IBS GJM MEMBER INFO")
-               
+        
+        # Delay 5 minutes
+        time.sleep(300)
+        
     except KeyboardInterrupt:
             logger.info("Execution interrupted by user.")
             break

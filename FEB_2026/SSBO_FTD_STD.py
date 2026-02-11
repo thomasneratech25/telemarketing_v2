@@ -911,19 +911,55 @@ class Fetch(BO_Account, mongodb_2_gs):
 # member_info_2 format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name)
 # deposit_list format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name, google sheet start column, google sheet end column)
 
+# ================== AUTO STOP DATE CONFIG ==================
+
+gmt8 = pytz.timezone("Asia/Singapore")
+now = datetime.now(gmt8)
+
+# Calculate next month (safe for December)
+if now.month == 12:
+    stop_year = now.year + 1
+    stop_month = 1
+else:
+    stop_year = now.year
+    stop_month = now.month + 1
+
+# Stop at 1st day of next month, 00:00 GMT+8
+STOP_DATETIME = gmt8.localize(datetime(stop_year, stop_month, 1, 0, 0, 0))
+print(f"Bot will stop automatically at: {STOP_DATETIME}")
+
+# ================== AUTO STOP DATE CONFIG ==================
+
+last_run_date = None
 
 while True:
     try:
 
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        # # ============================================================== SSBO 9T FTD/STD  ==========================================================================
-        # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-        # ARRIN
-        safe_call(Fetch.ssbo_ftd_stdReport, "ip9", "THB", "SSBO_9T_FTD_STD", "1Xr5ZZwp-ESPvoMeFEQ2Zq1SaIum5vFbskKnmyh71AlM", "2ND 3RD", description="SSBO 9T FTD/STD")
+        # Auto-stop check
+        current_time = datetime.now(gmt8)
+        if current_time >= STOP_DATETIME:
+            logger.info(f"Reached stop date ({STOP_DATETIME}). Bot is stopping.")
+            break
         
-        # Delay 5 minutes
-        time.sleep(300)
+        # Check current time to use correct google sheet tab to upload data
+        now = datetime.now()
+        print(now.time())
+        
+        # Run code when is 7am
+        if last_run_date != now.date() and now.hour == 7 and 0 <= now.minute < 10:
+
+            # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+            # # ============================================================== SSBO 9T FTD/STD  ==========================================================================
+            # # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+            # ARRIN
+            safe_call(Fetch.ssbo_ftd_stdReport, "ip9", "THB", "SSBO_9T_FTD_STD", "1Xr5ZZwp-ESPvoMeFEQ2Zq1SaIum5vFbskKnmyh71AlM", "2ND 3RD", description="SSBO 9T FTD/STD")
+            
+            # Prevent rerun today
+            last_run_date = now.date()
+
+        # Delay 30 seconds
+        time.sleep(30)
         
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")

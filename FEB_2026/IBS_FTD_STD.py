@@ -1443,45 +1443,57 @@ print(f"Bot will stop automatically at: {STOP_DATETIME}")
 
 # ================== AUTO STOP DATE CONFIG ==================
 
+last_run_date = None
+
 while True:
     try:
-        
+
         # Auto-stop check
         current_time = datetime.now(gmt8)
         if current_time >= STOP_DATETIME:
             logger.info(f"Reached stop date ({STOP_DATETIME}). Bot is stopping.")
             break
         
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=
-        # =========================== GT FTD/STD ==================================
-        # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=
+        # Check current time to use correct google sheet tab to upload data
+        now = datetime.now()
+        print(now.time())
+        
+        # Run code when is 7am
+        if last_run_date != now.date() and now.hour == 7 and 0 <= now.minute < 10:
+        
+            # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=
+            # =========================== GT FTD/STD ==================================
+            # =-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=
 
-        # NAREM 
-        safe_call(Fetch.ftd_stdReport, "gcwin99bo.com", "gc99", "THB", "+07:00", "GT_FTD_STD", "1X3_U_OaqDp7IYEVITUh-PaLJtq3VbV6MzI58wRzXcLs", "2ND 3RD", description="IBS GT FTD/STD")
+            # NAREM 
+            safe_call(Fetch.ftd_stdReport, "gcwin99bo.com", "gc99", "THB", "+07:00", "GT_FTD_STD", "1X3_U_OaqDp7IYEVITUh-PaLJtq3VbV6MzI58wRzXcLs", "2ND 3RD", description="IBS GT FTD/STD")
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-=-=-=-=-=-= N855T FTD/STD =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-
-        # ==========================================================================
+            # ==========================================================================
+            # =-=-=-=-==-=-=-=-=-=-=-=-=-= N855T FTD/STD =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-
+            # ==========================================================================
 
-        # ELSA
-        safe_call(Fetch.ftd_stdReport, "f5x3n8v.com", "n855", "THB", "+07:00", "N855T_FTD_STD", "1PhrRokHUYNLKvI8QWINUD5DtbhtJNkkToDZB0k4frjQ", "2ND 3RD", description="N855T FTD/STD")
+            # ELSA
+            safe_call(Fetch.ftd_stdReport, "f5x3n8v.com", "n855", "THB", "+07:00", "N855T_FTD_STD", "1PhrRokHUYNLKvI8QWINUD5DtbhtJNkkToDZB0k4frjQ", "2ND 3RD", description="N855T FTD/STD")
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-=-=-=-=-=-= N789T FTD/STD =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-
-        # ==========================================================================
+            # ==========================================================================
+            # =-=-=-=-==-=-=-=-=-=-=-=-=-= N789T FTD/STD =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-
+            # ==========================================================================
 
-        # SOFIA
-        safe_call(Fetch.ftd_stdReport, "q2n5w3z.com", "n789", "THB", "+07:00", "N789T_FTD_STD", "15jh_5Aulx-PFwA73UhUg32iLon_kiLWw3reik-0t0uU", "2ND 3RD", description="N789T FTD/STD")
+            # SOFIA
+            safe_call(Fetch.ftd_stdReport, "q2n5w3z.com", "n789", "THB", "+07:00", "N789T_FTD_STD", "15jh_5Aulx-PFwA73UhUg32iLon_kiLWw3reik-0t0uU", "2ND 3RD", description="N789T FTD/STD")
 
-        # ==========================================================================
-        # =-=-=-=-==-=-=-=-=-=-=-=-=-= N1T FTD/STD =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-
-        # ==========================================================================
+            # ==========================================================================
+            # =-=-=-=-==-=-=-=-=-=-=-=-=-= N1T FTD/STD =-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-
+            # ==========================================================================
 
-        # Riley
-        safe_call(Fetch.ftd_stdReport, "m8b4x1z6.com", "n191", "THB", "+07:00", "N1T_FTD_STD", "1MN69M3PuBOHBDbLKk9Ycx5Z143PQeITDOE4xoLPHuMI", "2ND 3RD", description="N1T FTD/STD")
+            # Riley
+            safe_call(Fetch.ftd_stdReport, "m8b4x1z6.com", "n191", "THB", "+07:00", "N1T_FTD_STD", "1MN69M3PuBOHBDbLKk9Ycx5Z143PQeITDOE4xoLPHuMI", "2ND 3RD", description="N1T FTD/STD")
 
-        # Delay 5 minutes
-        time.sleep(300)
+            # Prevent rerun today
+            last_run_date = now.date()
+
+        # Delay 30 seconds
+        time.sleep(30)
         
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")

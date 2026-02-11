@@ -1457,7 +1457,10 @@ while True:
             # SSBO A8S SG
             print("\n\033[1;36mSSBO A8S MI 00:00 - 09:59\033[0m")
             safe_call(Fetch.ssbo_member_info, "aw8", ["SGD"], "SSBO_A8S_MI_00_10", "1GR3NwHoD6niRcXAbdssPIrxzJIdlSea9gya8W7MkTb4", "A8S SS", description="SSBO A8S SG MEMBER INFO")
-        
+
+            # Delay 1 minutes
+            time.sleep(60)
+
         # 10:00 - 23:59
         else:
             
@@ -1482,9 +1485,11 @@ while True:
             safe_call(Fetch.member_info, "aw8bo.com", "aw8", "SGD", "+08:00", "A8S_MI_10_00", "1IAer3P0IUWNH69itVLlJ8gcZumaHFIQVGchOTkHiMFs", "A8S IBS", description="IBS A8S SG MEMBER INFO")
 
             # SSBO A8S SG
-            print("\n\033[1;36mSSBO A8S MI 00:00 - 09:59\033[0m")
+            print("\n\033[1;36mSSBO A8S MI 10:00 - 23:59\033[0m")
             safe_call(Fetch.ssbo_member_info, "aw8", ["SGD"], "SSBO_A8S_MI_10_00", "1IAer3P0IUWNH69itVLlJ8gcZumaHFIQVGchOTkHiMFs", "A8S SS", description="SSBO A8S SG MEMBER INFO")
             
+            # Delay 1 minutes
+            time.sleep(60)
 
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")

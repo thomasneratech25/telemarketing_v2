@@ -821,7 +821,7 @@ while True:
         # =============================================================================================================================
 
         # # J1B (ALL MEMBER INFO) RABBY
-        # safe_call(Fetch.allmemberReport, "IBS J1B", "batsman88.com", "jaya11", "BDT", "+08:00", "1NaxtKUkQOsdwFmqDrv_yEnMNW9GST9GLn2_p5x0PsIw", "TODAY AMR")
+        safe_call(Fetch.allmemberReport, "IBS J1B", "batsman88.com", "jaya11", "BDT", "+08:00", "1NaxtKUkQOsdwFmqDrv_yEnMNW9GST9GLn2_p5x0PsIw", "TODAY AMR")
         
         # =============================================================================================================================
         # -_-_-_-_-_-_-_-_-_-_-_-_-_-_  IBS I8N TODAY ALL MEMBER REPORT -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_

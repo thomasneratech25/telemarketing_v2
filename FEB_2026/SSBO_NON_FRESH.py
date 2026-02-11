@@ -999,10 +999,35 @@ class Fetch(BO_Account, mongodb_2_gs):
 # member_info_2 format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name)
 # deposit_list format = (bo link, bo name, currency, gmt time, MongoDB Collection, GS ID, GS Tab Name, google sheet start column, google sheet end column)
 
+# ================== AUTO STOP DATE CONFIG ==================
+
+gmt7 = pytz.timezone("Asia/Bangkok")
+now = datetime.now(gmt7)
+
+# Calculate next month (safe for December)
+if now.month == 12:
+    stop_year = now.year + 1
+    stop_month = 1
+else:
+    stop_year = now.year
+    stop_month = now.month + 1
+
+# Stop at 1st day of next month, 00:00 GMT+7
+STOP_DATETIME = gmt7.localize(datetime(stop_year, stop_month, 1, 0, 0, 0))
+print(f"Bot will stop automatically at: {STOP_DATETIME}")
+
+# ================== AUTO STOP DATE CONFIG ==================
+
 last_run_date = None
 
 while True:
     try:
+
+        # Auto-stop check
+        current_time = datetime.now(gmt7)
+        if current_time >= STOP_DATETIME:
+            logger.info(f"Reached stop date ({STOP_DATETIME}). Bot is stopping.")
+            break
 
         # Check current time to use correct google sheet tab to upload data
         now = datetime.now()

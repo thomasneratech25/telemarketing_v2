@@ -819,200 +819,6 @@ class mongodb_2_gs:
         # print("Rows to upload:", rows)
         print("Uploaded MongoDB data to Google Sheet.\n\n")
 
-    # ====================================================================================
-    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-= IBS DEPOSIT LIST (USERNAME) =-=-=-=-=-=-=-=-=-=-=-=-=-
-    # ====================================================================================
-    
-    # MongoDB Database 
-    def mongodbAPI_DL_USERNAME(rows, collection):
-
-        # MongoDB API KEY
-        MONGODB_URI = os.getenv("MONGODB_API_KEY")
-
-        # Call MongoDB database and collection
-        client = MongoClient(MONGODB_URI)
-        db = client["J8MS_A8MS"]
-        collection = db[collection]
-
-        # Set and Ensure when upload data this 3 Field is Unique Data
-        collection.create_index(
-            [("username", 1), ("amount", 1), ("completed_at", 1)],
-            unique=True
-        )
-
-        # Count insert and skip
-        inserted = 0
-        skipped = 0
-        cleaned_docs = []
-
-        batch = []
-
-        # for each rows in a list of JSON objects return
-        for row in rows:
-            # Extract only the fields you want (Extract Data from json file)
-            username = row.get("username")
-            amount = row.get("amount")
-            completed_at = row.get("completed_at")
-
-            # Convert Date and Time to (YYYY-MM-DD HH:MM:SS)
-            dt = datetime.fromisoformat(completed_at)
-            completed_at_fmt = dt.strftime("%Y-%m-%d %H:%M:%S")
-
-            # Build the new cleaned document (Use for upload data to MongoDB)
-            doc = {
-                "username": username,
-                "amount": amount,
-                "completed_at": completed_at_fmt,
-            }
-
-            # Keep the version without _id for uploading later
-            cleaned_docs.append(doc.copy())
-            batch.append(doc)
-
-            if len(batch) == 500:
-                try:
-                    collection.insert_many(batch, ordered=False)
-                    inserted += len(batch)
-                except Exception as exc:
-                    if hasattr(exc, "details"):
-                        skipped += len(exc.details.get("writeErrors", []))
-                        inserted += len(batch) - len(exc.details.get("writeErrors", []))
-                    else:
-                        skipped += 0
-                batch = []
-
-        # Insert any remaining documents in batch
-        if batch:
-            try:
-                collection.insert_many(batch, ordered=False)
-                inserted += len(batch)
-            except Exception as exc:
-                if hasattr(exc, "details"):
-                    skipped += len(exc.details.get("writeErrors", []))
-                    inserted += len(batch) - len(exc.details.get("writeErrors", []))
-                else:
-                    skipped += 0
-
-        print(f"MongoDB Summary → Inserted: {inserted}, Skipped: {skipped}")
-        return cleaned_docs
-
-        # Update Data to Google Sheet from MongoDB (Deposit List) (Username)
-    
-    # Upload Google Sheet
-    @classmethod
-    def upload_to_google_sheet_DL_USERNAME(cls, collection, gs_id, gs_tab, start_column, end_column, rows=None, extra_mongo_collections=None, overwrite=False, upload_to_sheet=True):
-
-        # Authenticate with OAuth2
-        creds = cls.googleAPI()
-        service = build("sheets", "v4", credentials=creds)
-        sheet = service.spreadsheets()
-
-        # Google Sheet ID and Sheet Tab Name (range name)
-        SPREADSHEET_ID = gs_id
-
-        # Convert from MongoDB (dics) to Google Sheet API (list), because Google Sheets API only accept "list".
-        def sanitize_rows(raw_rows):
-            """Normalize rows into list-of-lists; keep completed_at unchanged."""
-            sanitized = []
-            for r in raw_rows:
-                if isinstance(r, dict):
-                    username = (
-                        r.get("username")
-                        or r.get("player_id")
-                        or r.get("memberLogin")
-                        or ""
-                    )
-                    username = str(username)
-                    if username and not username.startswith("'"):
-                        username = f"'{username}"  # force Google Sheets to treat as text
-                    # --- BEGIN PATCHED AMOUNT HANDLING ---
-                    amount_raw = str(r.get("amount", ""))
-
-                    # Force 2 decimal places WITHOUT rounding
-                    if "." in amount_raw:
-                        whole, frac = amount_raw.split(".", 1)
-                        frac = (frac + "00")[:2]   # pad then truncate
-                        amount_clean = f"{whole}.{frac}"
-                    else:
-                        amount_clean = f"{amount_raw}.00"
-                    # --- END PATCHED AMOUNT HANDLING ---
-
-                    sanitized.append([
-                        username,
-                        amount_clean,
-                        r.get("completed_at", ""),
-                    ])
-                elif isinstance(r, (list, tuple)):
-                    pid = str(r[0]) if len(r) > 0 else ""
-                    if pid and not pid.startswith("'"):
-                        pid = f"'{pid}"
-                    sanitized.append([
-                        pid,
-                        str(r[1]) if len(r) > 1 else "",
-                        r[2] if len(r) > 2 else "",  # do not coerce to str
-                    ])
-                else:
-                    sanitized.append([str(r), "", ""])
-            return sanitized
-
-        # If no data upload to MongoDB, it auto upload data to google sheet
-        if not upload_to_sheet:
-            print(f"upload_to_sheet=False → Skipping Google Sheet update for tab '{gs_tab}'.")
-            return
-
-        if not rows:
-
-            client = MongoClient(MONGODB_URI)
-            db = client["J8MS_A8MS"]
-            collection = db[collection]
-            documents = list(collection.find({}, {"_id": 0}).sort("completed_at", 1))
-            rows = documents
-            
-        combined_rows = cls._normalize_pid_rows(rows)
-        if extra_mongo_collections:
-            combined_rows.extend(cls._fetch_extra_pid_rows(extra_mongo_collections))
-
-        cls._sort_rows_by_datetime(combined_rows, "completed_at")
-        rows = sanitize_rows(combined_rows)
-
-        if not rows:
-            print("No rows found to upload to Google Sheet.")
-            return
-
-        if overwrite or extra_mongo_collections or (start_column, end_column) in {("A", "C"), ("E", "G")}:
-            first_empty_row = 3
-        else:
-            first_empty_row = cls._find_first_empty_row(
-                sheet,
-                SPREADSHEET_ID,
-                gs_tab,
-                start_column,
-                end_column,
-                start_row=3
-            )
-        end_row = first_empty_row + len(rows) - 1
-        target_range = cls._build_a1_range(gs_tab, start_column, first_empty_row, end_column, end_row)
-
-        body = {"values": rows, "majorDimension": "ROWS"}
-
-        cls._ensure_sheet_row_capacity(service, SPREADSHEET_ID, gs_tab, end_row)
-
-        print(f"Uploading {len(rows)} rows to Google Sheet range {target_range}")
-
-        try:
-            sheet.values().update(
-                spreadsheetId=SPREADSHEET_ID,
-                range=target_range,
-                valueInputOption="USER_ENTERED",  # let Sheets parse dates/numbers
-                body=body
-            ).execute()
-        except Exception as exc:
-            print(f"Failed to upload to Google Sheets: {exc}")
-            raise
-
-        # print("Rows to upload:", rows)
-        print("Uploaded MongoDB data to Google Sheet.\n\n")
-
 # Fetch Data
 class Fetch(BO_Account, mongodb_2_gs):
     
@@ -1618,8 +1424,8 @@ else:
     stop_year = now.year
     stop_month = now.month + 1
 
-# Stop at next month of 10th, 00:00 GMT+7
-STOP_DATETIME = gmt8.localize(datetime(stop_year, stop_month, 10, 0, 0, 0))
+# Stop at next month of 1st, 00:00 GMT+8
+STOP_DATETIME = gmt8.localize(datetime(stop_year, stop_month, 1, 0, 0, 0))
 print(f"Bot will stop automatically at: {STOP_DATETIME}")
 
 # ================== AUTO STOP DATE CONFIG ==================
@@ -1703,7 +1509,9 @@ while True:
         print("\n\033[1;31mYVONNE\033[0m \033[1;36mIBS A8S SG DL PID + SSBO A8S SG DL USERNAME\033[0m \033[2m(COMBINE)\033[0m")
         safe_call(mongodb_2_gs.upload_to_google_sheet_DL_PID, "A8S_DL", "17o9McEnqSmUZNb45dGsWlMThpn0WbwDl5ZQsdYxM-Ig", "DEPOSIT LIST", "M", "O", extra_mongo_collections=["SSBO_A8S_DL"])
     
-
+        # Delay 5 minutes
+        time.sleep(300)
+        
     except KeyboardInterrupt:
         logger.info("Execution interrupted by user.")
         break
